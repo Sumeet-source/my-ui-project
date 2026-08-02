@@ -2,46 +2,62 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { useAdmin } from '../context/AdminContext.jsx';
-import { products as localProducts } from '../data/products.js';
+// FALLBACK IMPORT
+import { products as localProducts } from '../data/products.js'; 
 
 export default function Home() {
+  // Try to fetch from DB, fallback to local file if it fails
+const { products: dbProducts, loading } = useAdmin();
+const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
   const [searchParams] = useSearchParams();
-  const { products: dbProducts } = useAdmin();
-  const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
   
-  // BONUS CLAUDE FIX: Initialize directly from the URL to avoid a brief "flash" of all products
-  const categoryURL = searchParams.get('category') || 'all';
-  const [activeCategory, setActiveCategory] = useState(categoryURL);
-  
+  // Initialize state
+  const [activeCategory, setActiveCategory] = useState(() => searchParams.get('category') || 'all');
   const [sortOption, setSortOption] = useState('default');
   const [brandFilter, setBrandFilter] = useState('all');
   const [priceRange, setPriceRange] = useState('all');
 
   const searchTerm = searchParams.get('search') || '';
 
-  // --- CLAUDE FIX: Scroll to New Arrivals once the filtered content has actually rendered ---
+  // --- THE FIX ---
+  // Whenever the URL changes (Men/Women clicks), update the activeCategory
+  useEffect(() => {
+    const cat = searchParams.get('category') || 'all';
+    setActiveCategory(cat);
+  }, [searchParams]); 
+  // --- END OF FIX ---
+
+  // --- SCROLL FIX ---
+  // The menu buttons do a full page reload to '/?category=X#new-arrivals'.
+  // On a hard reload, the browser tries to jump to #new-arrivals immediately,
+  // before this component has rendered the filtered section - so the native
+  // jump silently fails and you're stuck at the top. Re-trigger it ourselves
+  // once the filtered content has actually rendered.
   useEffect(() => {
     if (window.location.hash === '#new-arrivals') {
       requestAnimationFrame(() => {
         document.getElementById('new-arrivals')?.scrollIntoView({ behavior: 'smooth' });
       });
     }
-  }, [activeCategory]); // Re-runs when the category filter finishes updating
-  // --- END OF FIX ---
+  }, [activeCategory]);
+  // --- END OF SCROLL FIX ---
 
-  // Filtering logic
+  // 1. Filter by Category
   const categoryFiltered = activeCategory === 'all' 
     ? products 
     : products.filter((product) => product.category === activeCategory);
 
+  // 2. Filter by Search Term
   const searchFiltered = categoryFiltered.filter((product) =>
     product.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // 3. Filter by Brand
   const brandFiltered = brandFilter === 'all'
     ? searchFiltered
     : searchFiltered.filter((product) => product.brand === brandFilter);
 
+  // 4. Filter by Price Range
   const priceFiltered = brandFiltered.filter((product) => {
     if (priceRange === 'under50') return product.price < 50;
     if (priceRange === '50to100') return product.price >= 50 && product.price <= 100;
@@ -49,6 +65,7 @@ export default function Home() {
     return true;
   });
 
+  // 5. Sort
   const sortedProducts = [...priceFiltered].sort((a, b) => {
     if (sortOption === 'low-to-high') return a.price - b.price;
     if (sortOption === 'high-to-low') return b.price - a.price;
@@ -59,7 +76,6 @@ export default function Home() {
 
   return (
     <div className="font-sans overflow-x-hidden">
-      {/* HERO BANNER */}
       <section className="relative h-[600px] flex items-center justify-center bg-black" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1920&q=80')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative z-10 text-center text-white px-4">
@@ -69,7 +85,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CATEGORIES */}
       <section className="max-w-7xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-black pl-4">Shop by Category</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -85,7 +100,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PRODUCT GRID SECTION */}
       <section className="max-w-7xl mx-auto px-6 py-16" id="new-arrivals">
         <div className="flex flex-wrap justify-between items-center mb-8 border-l-4 border-black pl-4 gap-4">
           <h2 className="text-3xl font-bold text-gray-900">
