@@ -16,22 +16,16 @@ export default function ProductDetails() {
 
   const scrollContainerRef = useRef(null);
   
-  // ---------------- CRITICAL FIX START ----------------
   // Combine DB products (if available) with local products (as fallback)
   const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
   
   // Find the specific product from the combined list
   const product = products.find((p) => p.id === parseInt(id));
-  // ---------------- CRITICAL FIX END ----------------
 
-  // Logic to find related products
   const relatedProducts = product 
-    ? products
-        .filter((p) => p.category === product.category && p.id !== product.id)
-        .slice(0, 8)
+    ? products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 8)
     : [];
 
-  // Local state for the UI reviews
   const [reviews, setReviews] = useState(product?.reviews || []);
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
 
