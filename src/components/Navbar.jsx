@@ -36,7 +36,7 @@ export default function Navbar() {
     }
   };
 
-  // --- Underline logic: perfectly flush with the text (bottom-0) ---
+  // Desktop underline span logic
   const getUnderlineSpanClasses = (isActive) =>
     `relative inline-block 
     after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white 
@@ -54,7 +54,7 @@ export default function Navbar() {
   return (
     <nav className="bg-[#1d1d1d] text-white relative z-50">
       
-      {/* TOP UTILITY BAR */}
+      {/* --- TOP UTILITY BAR --- */}
       <div className="border-b border-white/10">
         <div className="max-w-[1600px] mx-auto px-6 py-1.5 hidden md:flex justify-between items-center tracking-wide font-medium">
           <div className="flex-1"></div>
@@ -69,11 +69,27 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* MAIN NAVIGATION BAR */}
-      <div className="flex justify-between items-center px-6 py-5 max-w-[1600px] mx-auto">
+      {/* --- MAIN NAVIGATION BAR --- */}
+      <div className="flex justify-between items-center px-4 py-3 md:px-6 md:py-5 max-w-[1600px] mx-auto relative">
         
-        {/* Left: Logo */}
-        <Link to="/" className="block shrink-0 ml-8 lg:ml-16 mr-4 lg:mr-6">
+        {/* === LEFT: MOBILE HAMBURGER & PROFILE === */}
+        <div className="flex items-center gap-3 md:hidden">
+          {/* Hamburger Button (Left side) */}
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-1">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          {/* Profile Icon */}
+          <Link to={user ? "/dashboard" : "/login"} className="text-white">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+          </Link>
+        </div>
+
+        {/* === CENTER: LOGO (Centered on mobile, left on desktop) === */}
+        <Link to="/" className="block shrink-0 md:ml-8 lg:ml-16 md:mr-4 lg:mr-6">
           <svg width="44" height="26" viewBox="0 0 44 26" className="w-[44px] h-[26px] shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clipPath="url(#clip0_115_2)">
               <path d="M15.918 15.0189C15.918 15.0189 13.006 8.56122 11.002 0C11.002 0 10.004 7.38122 7.848 15.0189H15.918Z" fill="white"/>
@@ -88,7 +104,36 @@ export default function Navbar() {
           </svg>
         </Link>
 
-        {/* MIDDLE: Centered Links */}
+        {/* === RIGHT: MOBILE ICONS (Search, Wishlist, Cart) === */}
+        <div className="flex items-center gap-4 md:hidden">
+          {/* Search Icon (Focuses the desktop search input, or just closes/opens menu) */}
+          <button 
+            onClick={() => {
+              const input = document.querySelector('input[placeholder="Search"]');
+              if (input) input.focus();
+            }} 
+            className="text-white"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+          {/* Wishlist Icon */}
+          <Link to="/wishlist" className="relative text-white">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </Link>
+          {/* Cart Icon */}
+          <Link to="/cart" className="relative text-white">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            {cart.length > 0 && <span className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
+          </Link>
+        </div>
+
+        {/* === DESKTOP LINKS & MEGA MENUS (HIDDEN ON MOBILE) === */}
         <div className="hidden md:flex justify-center flex-1 gap-20 text-[16px] font-bold items-center h-10">
           
           <Link to="/" className="relative h-full flex items-center cursor-pointer">
@@ -103,7 +148,6 @@ export default function Navbar() {
               <span className={getUnderlineSpanClasses(isActiveMen)}>Men</span>
             </Link>
             <div className="absolute left-1/2 top-full transform -translate-x-1/2 w-screen max-w-7xl bg-white text-black shadow-xl border-t border-gray-200 hidden group-hover:block z-50">
-              {/* INVISIBLE BRIDGE FIX - Prevents the hover gap from causing a "boom" vanish */}
               <div className="absolute -top-4 left-0 right-0 h-4 bg-transparent"></div>
               <div className="w-full bg-white/90 backdrop-blur-sm pl-12 pr-6 py-10 flex justify-center gap-12">
                 <div className="w-64 shrink-0 min-w-[16rem] min-h-[288px] rounded-lg overflow-hidden flex flex-col items-center">
@@ -114,39 +158,11 @@ export default function Navbar() {
                   </div>
                 </div>
                 <div className="flex-1 max-w-5xl grid grid-cols-5 gap-6 text-left">
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Featured</h3>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Best Sellers</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">New Arrivals</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">eGift Cards</Link>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Shop by Category</h3>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Tops & Hoodies</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Joggers & Pants</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Shorts</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Compression</Link>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Shop by Sport</h3>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Running</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Training</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Basketball</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Golf</Link>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Collections</h3>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Pro Training</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Cold Weather</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Tech Fleece</Link>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Accessories</h3>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Bags & Backpacks</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Socks & Underwear</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Hats & Headbands</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Utility Cases</Link>
-                  </div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Featured</h3><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Best Sellers</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">New Arrivals</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">eGift Cards</Link></div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Shop by Category</h3><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Tops & Hoodies</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Joggers & Pants</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Shorts</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Compression</Link></div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Shop by Sport</h3><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Running</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Training</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Basketball</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Golf</Link></div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Collections</h3><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Pro Training</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Cold Weather</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Tech Fleece</Link></div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Accessories</h3><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Bags & Backpacks</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Socks & Underwear</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Hats & Headbands</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Utility Cases</Link></div>
                 </div>
               </div>
             </div>
@@ -158,7 +174,6 @@ export default function Navbar() {
               <span className={getUnderlineSpanClasses(isActiveWomen)}>Women</span>
             </Link>
             <div className="absolute left-1/2 top-full transform -translate-x-1/2 w-screen max-w-7xl bg-white text-black shadow-xl border-t border-gray-200 hidden group-hover:block z-50">
-              {/* INVISIBLE BRIDGE FIX */}
               <div className="absolute -top-4 left-0 right-0 h-4 bg-transparent"></div>
               <div className="w-full bg-white/90 backdrop-blur-sm pl-12 pr-6 py-10 flex justify-center gap-12">
                 <div className="w-64 shrink-0 min-w-[16rem] min-h-[288px] rounded-lg overflow-hidden flex flex-col items-center">
@@ -169,39 +184,11 @@ export default function Navbar() {
                   </div>
                 </div>
                 <div className="flex-1 max-w-5xl grid grid-cols-5 gap-6 text-left">
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Featured</h3>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Best Sellers</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">New Arrivals</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">eGift Cards</Link>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Shop by Category</h3>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Tops & Bras</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Leggings</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Joggers & Shorts</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Jackets</Link>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Shop by Sport</h3>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Running</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Training</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Yoga</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Tennis</Link>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Collections</h3>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Elevated Training</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Meridian</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Tech Fleece</Link>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Accessories</h3>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Bags & Backpacks</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Socks & Underwear</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Hats & Headbands</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Utility Cases</Link>
-                  </div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Featured</h3><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Best Sellers</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">New Arrivals</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">eGift Cards</Link></div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Shop by Category</h3><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Tops & Bras</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Leggings</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Joggers & Shorts</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Jackets</Link></div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Shop by Sport</h3><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Running</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Training</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Yoga</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Tennis</Link></div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Collections</h3><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Elevated Training</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Meridian</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Tech Fleece</Link></div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Accessories</h3><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Bags & Backpacks</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Socks & Underwear</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Hats & Headbands</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Utility Cases</Link></div>
                 </div>
               </div>
             </div>
@@ -213,7 +200,6 @@ export default function Navbar() {
               <span className={getUnderlineSpanClasses(isActiveShoes)}>Shoes</span>
             </Link>
             <div className="absolute left-1/2 top-full transform -translate-x-1/2 w-screen max-w-7xl bg-white text-black shadow-xl border-t border-gray-200 hidden group-hover:block z-50">
-              {/* INVISIBLE BRIDGE FIX */}
               <div className="absolute -top-4 left-0 right-0 h-4 bg-transparent"></div>
               <div className="w-full bg-white/90 backdrop-blur-sm pl-12 pr-6 py-10 flex justify-center gap-12">
                 <div className="w-64 shrink-0 min-w-[16rem] min-h-[288px] rounded-lg overflow-hidden flex flex-col items-center">
@@ -239,7 +225,6 @@ export default function Navbar() {
               <span className={getUnderlineSpanClasses(isActiveOutlet)}>Outlet</span>
             </Link>
             <div className="absolute left-1/2 top-full transform -translate-x-1/2 w-screen max-w-7xl bg-white text-black shadow-xl border-t border-gray-200 hidden group-hover:block z-50">
-              {/* INVISIBLE BRIDGE FIX */}
               <div className="absolute -top-4 left-0 right-0 h-4 bg-transparent"></div>
               <div className="w-full pl-12 pr-6 py-10 flex justify-center gap-12 bg-white">
                 <div className="w-80 shrink-0 h-[300px] relative rounded-lg overflow-hidden">
@@ -251,34 +236,9 @@ export default function Navbar() {
                   </div>
                 </div>
                 <div className="flex-1 max-w-5xl grid grid-cols-3 gap-8 text-left">
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Men</h3>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Tops</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Pants & Leggings</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Shoes</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Innerwear</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Shorts</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Accessories</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Jackets & Vests</Link>
-                    <Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Hoodies & Sweatshirt</Link>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Women</h3>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Tops</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Pants & Leggings</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Shoes</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Innerwear</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Accessories</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Sports Bra</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Shorts</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Hoodies & Sweatshirt</Link>
-                    <Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Jackets & Vests</Link>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Shoes</h3>
-                    <Link to="/?category=footwear" className="block text-sm text-gray-700 hover:text-black py-1.5">Sandals & Slides</Link>
-                    <Link to="/?category=footwear" className="block text-sm text-gray-700 hover:text-black py-1.5">Shoes</Link>
-                  </div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Men</h3><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Tops</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Pants & Leggings</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Shoes</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Innerwear</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Shorts</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Accessories</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Jackets & Vests</Link><Link to="/?category=men" className="block text-sm text-gray-700 hover:text-black py-1.5">Hoodies & Sweatshirt</Link></div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Women</h3><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Tops</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Pants & Leggings</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Shoes</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Innerwear</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Accessories</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Sports Bra</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Shorts</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Hoodies & Sweatshirt</Link><Link to="/?category=women" className="block text-sm text-gray-700 hover:text-black py-1.5">Jackets & Vests</Link></div>
+                  <div><h3 className="font-bold text-[16px] tracking-wide text-[#1d1d1d] mb-4">Shoes</h3><Link to="/?category=footwear" className="block text-sm text-gray-700 hover:text-black py-1.5">Sandals & Slides</Link><Link to="/?category=footwear" className="block text-sm text-gray-700 hover:text-black py-1.5">Shoes</Link></div>
                 </div>
               </div>
             </div>
@@ -290,8 +250,8 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* RIGHT SIDE */}
-        <div className="flex items-center gap-6">
+        {/* === DESKTOP SEARCH / ICONS (HIDDEN ON MOBILE) === */}
+        <div className="hidden md:flex items-center gap-6">
           <div className="hidden sm:flex items-center gap-2 border-b border-white/30 hover:border-white transition-colors pb-0.5 w-32">
             <input 
               type="text" 
@@ -310,23 +270,71 @@ export default function Navbar() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             {cart.length > 0 && <span className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </Link>
-          <button className="md:hidden focus:outline-none" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">{isMenuOpen ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}</svg>
-          </button>
         </div>
       </div>
 
-      {/* MOBILE DROPDOWN */}
+      {/* --- MOBILE FULL-SCREEN DRAWER (MATCHES IMAGE 3) --- */}
       {isMenuOpen && (
-        <div className="md:hidden bg-black text-white border-t border-zinc-800 flex flex-col items-center gap-4 py-6 shadow-lg">
-          <Link to="/" className="text-white hover:text-gray-300 transition font-normal">New Arrivals</Link>
-          <Link to="/?category=men" className="text-white hover:text-gray-300 transition font-normal">Men</Link>
-          <Link to="/?category=women" className="text-white hover:text-gray-300 transition font-normal">Women</Link>
-          <Link to="/?category=footwear" className="text-white hover:text-gray-300 transition font-normal">Shoes</Link>
-          <Link to="/outlet" className="text-white hover:text-gray-300 transition font-normal">Outlet</Link>
-          <Link to="/echo" className="text-white hover:text-gray-300 transition font-normal">Echo</Link>
-          <Link to="/wishlist" className="text-white hover:text-gray-300 transition font-normal">Wishlist</Link>
-          <Link to="/cart" className="text-white hover:text-gray-300 transition font-normal">Cart</Link>
+        <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col">
+          {/* Drawer Header (Centered Logo + Close X) */}
+          <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100">
+            <div className="flex-1"></div>
+            <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0">
+              <svg width="44" height="26" viewBox="0 0 44 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clipPath="url(#clip0_115_2_black)">
+                  <path d="M15.918 15.0189C15.918 15.0189 13.006 8.56122 11.002 0C11.002 0 10.004 7.38122 7.848 15.0189H15.918Z" fill="black"/>
+                  <path d="M23.59 15.0189H7.848C7.848 15.0189 2.977 15.0189 0.142 15.0189C0.142 15.0189 2.929 22.0131 7.848 22.0131C12.767 22.0131 23.59 15.0189 23.59 15.0189Z" fill="black"/>
+                  <path d="M9.653 0C9.653 0 1.981 0 0 0C0 0 0.22 1.285 1.204 3.408C2.277 5.732 5.665 13.329 8.084 15.019H9.653V0Z" fill="black"/>
+                </g>
+                <defs>
+                  <clipPath id="clip0_115_2_black">
+                    <rect width="23.59" height="22.013" fill="white"/>
+                  </clipPath>
+                </defs>
+              </svg>
+            </Link>
+            <div className="flex-1 flex justify-end">
+              <button onClick={() => setIsMenuOpen(false)} className="text-black p-1">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Drawer Links */}
+          <div className="flex flex-col px-6 py-4 overflow-y-auto">
+            {/* List copied exactly from Image 3 */}
+            <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+              <span>New <span className="text-orange-500 text-sm">🔥</span></span>
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+            </Link>
+            <Link to="/?category=men" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+              <span>Men</span>
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+            </Link>
+            <Link to="/?category=women" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+              <span>Women</span>
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+            </Link>
+            <Link to="/?category=footwear" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+              <span>Shoes</span>
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+            </Link>
+            <Link to="/outlet" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+              <span>Outlet</span>
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+            </Link>
+            <Link to="/echo" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+              <span>Echo</span>
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+            </Link>
+            {/* India Flag Link */}
+            <div className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+              <span className="flex items-center gap-2">🇮🇳 IN</span>
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+            </div>
+          </div>
         </div>
       )}
     </nav>
