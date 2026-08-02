@@ -1,11 +1,13 @@
-export default function FilterSidebar({ filters, setFilters }) {
+export default function FilterSidebar({ filters = { gender: [], category: [] }, setFilters }) {
   const handleCheckbox = (key, value) => {
     setFilters((prev) => {
-      const currentList = prev[key] || [];
+      // Safety check if prev is somehow undefined
+      const safePrev = prev || { gender: [], category: [] };
+      const currentList = safePrev[key] || [];
       const newList = currentList.includes(value)
         ? currentList.filter((item) => item !== value)
         : [...currentList, value];
-      return { ...prev, [key]: newList };
+      return { ...safePrev, [key]: newList };
     });
   };
 
@@ -19,16 +21,24 @@ export default function FilterSidebar({ filters, setFilters }) {
       <div className="border-b border-gray-200 py-4">
         <h4 className="font-semibold text-sm text-gray-900 mb-2">Gender</h4>
         <div className="space-y-2 text-sm text-gray-600">
-          <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={filters.gender?.includes('men')} onChange={() => handleCheckbox('gender', 'men')} /> Men</label>
-          <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={filters.gender?.includes('women')} onChange={() => handleCheckbox('gender', 'women')} /> Women</label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={filters.gender?.includes('men')} onChange={() => handleCheckbox('gender', 'men')} /> Men
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={filters.gender?.includes('women')} onChange={() => handleCheckbox('gender', 'women')} /> Women
+          </label>
         </div>
       </div>
 
       <div className="border-b border-gray-200 py-4">
         <h4 className="font-semibold text-sm text-gray-900 mb-2">Product Category</h4>
         <div className="space-y-2 text-sm text-gray-600">
-          <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={filters.category?.includes('outerwear')} onChange={() => handleCheckbox('category', 'outerwear')} /> Outerwear</label>
-          <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={filters.category?.includes('footwear')} onChange={() => handleCheckbox('category', 'footwear')} /> Footwear</label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={filters.category?.includes('outerwear')} onChange={() => handleCheckbox('category', 'outerwear')} /> Outerwear
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={filters.category?.includes('footwear')} onChange={() => handleCheckbox('category', 'footwear')} /> Footwear
+          </label>
         </div>
       </div>
     </div>

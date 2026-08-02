@@ -7,16 +7,13 @@ export default function Outlet() {
   const [sortBy, setSortBy] = useState('featured');
   const [filters, setFilters] = useState({ gender: [], category: [] });
 
-  // Filter the products
   const filteredProducts = products.filter((product) => {
-    // Gender filter
+    if (!filters) return true;
     if (filters.gender?.length > 0 && !filters.gender.includes(product.category)) return false;
-    // Category filter (outerwear, footwear, etc.)
     if (filters.category?.length > 0 && !filters.category.includes(product.category)) return false;
     return true;
   });
 
-  // Sort the filtered products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'low-high') return a.price - b.price;
     if (sortBy === 'high-low') return b.price - a.price;
@@ -24,7 +21,7 @@ export default function Outlet() {
   });
 
   return (
-    <div className="bg-white min-h-screen ">
+    <div className="bg-white min-h-screen overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-6 py-8">
         <p className="text-sm text-gray-500 mb-6">Outlet</p>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
