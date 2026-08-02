@@ -62,7 +62,7 @@ export default function Cart() {
   const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="max-w-7xl mx-auto px-6 py-12 overflow-x-hidden">
       {orderPlaced && (
         <div className="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm">
           <p className="font-bold">✅ Order Placed Successfully!</p>

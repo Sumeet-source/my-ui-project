@@ -60,7 +60,7 @@ const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProdu
   const uniqueBrands = ['all', ...new Set(products.map(p => p.brand).filter(Boolean))];
 
   return (
-    <div className="font-sans">
+    <div className="font-sans overflow-x-hidden">
       <section className="relative h-[600px] flex items-center justify-center bg-black" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1920&q=80')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative z-10 text-center text-white px-4">

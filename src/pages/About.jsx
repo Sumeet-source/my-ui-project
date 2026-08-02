@@ -1,6 +1,7 @@
 export default function About() {
   return (
-    <div className="font-sans">
+    <div className="font-sans overflow-x-hidden">
+      
       {/* Mission Header */}
       <section className="relative py-20 bg-black text-white text-center">
         <div className="max-w-4xl mx-auto px-6">

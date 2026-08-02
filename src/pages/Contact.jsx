@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Contact() {
-  // State to track what the user types
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -9,7 +9,6 @@ export default function Contact() {
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Handle typing in the input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -18,22 +17,15 @@ export default function Contact() {
     }));
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
-    e.preventDefault(); // Prevents the page from refreshing
-    
-    // In a real app, you would send this data to a server here.
-    // For now, we just show the success message.
+    e.preventDefault();
     setIsSubmitted(true);
-    
-    // Optional: Clear the form after 2 seconds if you want, 
-    // but usually we just let the user see the success message.
+    setTimeout(() => setIsSubmitted(false), 4000);
   };
 
-  // If the form was submitted successfully, show the thank you message
   if (isSubmitted) {
     return (
-      <div className="max-w-2xl mx-auto px-6 py-20 text-center">
+      <div className="max-w-2xl mx-auto px-6 py-20 text-center overflow-x-hidden">
         <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg mb-6 inline-block">
           <span className="text-2xl">✅</span>
         </div>
@@ -51,9 +43,8 @@ export default function Contact() {
     );
   }
 
-  // The actual Contact Form
   return (
-    <div className="max-w-2xl mx-auto px-6 py-16">
+    <div className="max-w-2xl mx-auto px-6 py-16 overflow-x-hidden">
       <h1 className="text-4xl font-bold text-gray-900 mb-6 border-l-4 border-black pl-4">
         Contact Us
       </h1>
