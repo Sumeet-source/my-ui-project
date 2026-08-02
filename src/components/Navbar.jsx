@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom'; // Added useNavigate
+import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -9,7 +9,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const navigate = useNavigate(); // Added to handle navigation reliably
+  const navigate = useNavigate();
 
   const searchTerm = searchParams.get('search') || '';
   const activeCategory = searchParams.get('category');
@@ -37,14 +37,12 @@ export default function Navbar() {
     }
   };
 
-  // Desktop underline span logic
   const getUnderlineSpanClasses = (isActive) =>
     `relative inline-block 
     after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white 
     after:transition-all after:duration-300 hover:after:w-full 
     ${isActive ? 'after:w-full' : ''}`;
 
-  // Determine if a page is active
   const isActiveHome = false; 
   const isActiveMen = location.pathname === '/' && activeCategory === 'men';
   const isActiveWomen = location.pathname === '/' && activeCategory === 'women';
@@ -52,10 +50,14 @@ export default function Navbar() {
   const isActiveOutlet = location.pathname === '/outlet';
   const isActiveEcho = location.pathname === '/echo';
 
-  // Mobile navigation helper (Guarantees navigation + close drawer)
+  // --- UPDATED: The guaranteed navigation function ---
   const handleMobileNavigate = (path) => {
+    console.log("🔥 Mobile button pressed! Navigating to:", path); // Debug log for you
     navigate(path);
-    setIsMenuOpen(false);
+    // Give the router 150ms to catch the navigation BEFORE closing the drawer
+    setTimeout(() => {
+      setIsMenuOpen(false);
+    }, 150);
   };
 
   return (
@@ -79,7 +81,6 @@ export default function Navbar() {
       {/* --- MAIN NAVIGATION BAR --- */}
       <div className="flex justify-between items-center px-4 py-3 md:px-6 md:py-5 max-w-[1600px] mx-auto relative">
         
-        {/* === LEFT: MOBILE HAMBURGER & PROFILE === */}
         <div className="flex items-center gap-3 md:hidden">
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,7 +94,6 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* === CENTER: LOGO (Centered on mobile, left on desktop) === */}
         <Link to="/" className="block shrink-0 md:ml-8 lg:ml-16 md:mr-4 lg:mr-6">
           <svg width="44" height="26" viewBox="0 0 44 26" className="w-[44px] h-[26px] shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clipPath="url(#clip0_115_2)">
@@ -109,15 +109,8 @@ export default function Navbar() {
           </svg>
         </Link>
 
-        {/* === RIGHT: MOBILE ICONS (Search, Wishlist, Cart) === */}
         <div className="flex items-center gap-4 md:hidden">
-          <button 
-            onClick={() => {
-              const input = document.querySelector('input[placeholder="Search"]');
-              if (input) input.focus();
-            }} 
-            className="text-white"
-          >
+          <button onClick={() => { const input = document.querySelector('input[placeholder="Search"]'); if (input) input.focus(); }} className="text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -135,16 +128,12 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* === DESKTOP LINKS & MEGA MENUS (HIDDEN ON MOBILE) === */}
         <div className="hidden md:flex justify-center flex-1 gap-20 text-[16px] font-bold items-center h-10">
-          
           <Link to="/" className="relative h-full flex items-center cursor-pointer">
             <span className={getUnderlineSpanClasses(isActiveHome)}>
               New <span className="text-orange-500 text-sm">🔥</span>
             </span>
           </Link>
-
-          {/* --- MEN MEGA MENU --- */}
           <div className="group h-full flex items-center">
             <Link to="/?category=men" className="relative h-full flex items-center cursor-pointer">
               <span className={getUnderlineSpanClasses(isActiveMen)}>Men</span>
@@ -170,7 +159,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* --- WOMEN MEGA MENU --- */}
           <div className="group h-full flex items-center">
             <Link to="/?category=women" className="relative h-full flex items-center cursor-pointer">
               <span className={getUnderlineSpanClasses(isActiveWomen)}>Women</span>
@@ -196,7 +184,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* --- SHOES MEGA MENU --- */}
           <div className="group h-full flex items-center">
             <Link to="/?category=footwear" className="relative h-full flex items-center cursor-pointer">
               <span className={getUnderlineSpanClasses(isActiveShoes)}>Shoes</span>
@@ -221,7 +208,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* --- OUTLET MEGA MENU --- */}
           <div className="group h-full flex items-center">
             <Link to="/outlet" className="relative h-full flex items-center cursor-pointer">
               <span className={getUnderlineSpanClasses(isActiveOutlet)}>Outlet</span>
@@ -246,13 +232,11 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* REGULAR LINKS (Echo) */}
           <Link to="/echo" className="relative h-full flex items-center cursor-pointer">
             <span className={getUnderlineSpanClasses(isActiveEcho)}>Echo</span>
           </Link>
         </div>
 
-        {/* === DESKTOP SEARCH / ICONS (HIDDEN ON MOBILE) === */}
         <div className="hidden md:flex items-center gap-6">
           <div className="hidden sm:flex items-center gap-2 border-b border-white/30 hover:border-white transition-colors pb-0.5 w-32">
             <input 
@@ -275,7 +259,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- MOBILE FULL-SCREEN DRAWER (FIXED NAVIGATION) --- */}
+      {/* --- MOBILE FULL-SCREEN DRAWER (FIXED NAVIGATION WITH TIMEOUT) --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col">
           {/* Drawer Header */}
@@ -304,7 +288,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Drawer Links - UPDATED TO USE NAVIGATE CORRECTLY */}
+          {/* Drawer Links - UPDATED WITH DELAYED CLOSE */}
           <div className="flex flex-col px-6 py-4 overflow-y-auto">
             <button onClick={() => handleMobileNavigate('/')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>New <span className="text-orange-500 text-sm">🔥</span></span>
