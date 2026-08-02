@@ -3,28 +3,36 @@ import { useState, useRef } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAdmin } from '../context/AdminContext.jsx';
+import { products as localProducts } from '../data/products.js'; // <--- Added fallback
 import ProductCard from '../components/ProductCard';
 
 export default function ProductDetails() {
   const { id } = useParams();
   const { addToCart } = useCart();
   const { showToast } = useToast();
-  const { products, updateProduct } = useAdmin(); // Added updateProduct
+  const { products: dbProducts } = useAdmin();
   const [selectedSize, setSelectedSize] = useState('');
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const scrollContainerRef = useRef(null);
   
-  // Find the specific product
+  // ---------------- CRITICAL FIX START ----------------
+  // Combine DB products (if available) with local products (as fallback)
+  const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
+  
+  // Find the specific product from the combined list
   const product = products.find((p) => p.id === parseInt(id));
+  // ---------------- CRITICAL FIX END ----------------
 
-  // Related products logic
+  // Logic to find related products
   const relatedProducts = product 
     ? products
         .filter((p) => p.category === product.category && p.id !== product.id)
         .slice(0, 8)
     : [];
 
+  // Local state for the UI reviews
+  const [reviews, setReviews] = useState(product?.reviews || []);
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
 
   if (!product) {
@@ -52,18 +60,13 @@ export default function ProductDetails() {
     showToast(`${product.title} (Size: ${selectedSize}) added to cart!`, 'success');
   };
 
-  // UPDATED: Save review to global database
   const handleReviewSubmit = (e) => {
     e.preventDefault();
     if (!newReview.user || !newReview.comment) {
       showToast("Please fill in your name and comment.", "error");
       return;
     }
-    
-    const updatedReviews = [...(product.reviews || []), newReview];
-    // Update the global state
-    updateProduct(product.id, { reviews: updatedReviews });
-    
+    setReviews([...reviews, newReview]);
     setNewReview({ user: '', comment: '', rating: 5 });
     showToast("Review submitted successfully!", "success");
   };
@@ -76,12 +79,9 @@ export default function ProductDetails() {
     ));
   };
 
-  const avgRating = product.reviews && product.reviews.length > 0 
-    ? (product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length).toFixed(1)
-    : 0;
-
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
+      {/* -- Product Details -- */}
       <div className="flex flex-col md:flex-row gap-12 mb-12">
         <div className="flex-1 relative group">
           <div className="cursor-pointer relative overflow-hidden rounded-xl shadow-lg" onClick={() => setIsLightboxOpen(true)}>
@@ -98,7 +98,7 @@ export default function ProductDetails() {
           <div className="flex items-center gap-4">
             <span className="text-3xl font-bold text-gray-700">${product.price}</span>
             <div className="flex items-center gap-1">
-              <span className="text-yellow-400 text-lg">{renderStars(avgRating)}</span>
+              <span className="text-yellow-400 text-lg">{renderStars(product.rating)}</span>
               <span className="text-sm text-gray-500 ml-1">({product.reviews?.length || 0} reviews)</span>
             </div>
           </div>
@@ -146,7 +146,7 @@ export default function ProductDetails() {
       <section className="border-t border-gray-200 pt-10 max-w-4xl">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
         <div className="space-y-6 mb-8">
-          {(product.reviews || []).map((review, index) => (
+          {product.reviews?.map((review, index) => (
             <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-100">
               <div className="flex justify-between items-center mb-1">
                 <span className="font-bold text-gray-800">{review.user}</span>
