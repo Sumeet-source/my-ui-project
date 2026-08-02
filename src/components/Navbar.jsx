@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -9,7 +9,6 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const navigate = useNavigate();
 
   const searchTerm = searchParams.get('search') || '';
   const activeCategory = searchParams.get('category');
@@ -50,14 +49,10 @@ export default function Navbar() {
   const isActiveOutlet = location.pathname === '/outlet';
   const isActiveEcho = location.pathname === '/echo';
 
-  // --- UPDATED: The guaranteed navigation function ---
+  // --- GUARANTEED MOBILE NAVIGATION ---
   const handleMobileNavigate = (path) => {
-    console.log("🔥 Mobile button pressed! Navigating to:", path); // Debug log for you
-    navigate(path);
-    // Give the router 150ms to catch the navigation BEFORE closing the drawer
-    setTimeout(() => {
-      setIsMenuOpen(false);
-    }, 150);
+    // Force a full page reload to the new URL
+    window.location.href = path;
   };
 
   return (
@@ -259,10 +254,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- MOBILE FULL-SCREEN DRAWER (FIXED NAVIGATION WITH TIMEOUT) --- */}
+      {/* --- MOBILE DRAWER (USING WINDOW.LOCATION.HREF) --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col">
-          {/* Drawer Header */}
           <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100">
             <div className="flex-1"></div>
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0">
@@ -288,29 +282,29 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Drawer Links - UPDATED WITH DELAYED CLOSE */}
           <div className="flex flex-col px-6 py-4 overflow-y-auto">
-            <button onClick={() => handleMobileNavigate('/')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+            {/* All buttons now use window.location.href for guaranteed navigation */}
+            <button onClick={() => { window.location.href = '/'; }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>New <span className="text-orange-500 text-sm">🔥</span></span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
             </button>
-            <button onClick={() => handleMobileNavigate('/?category=men')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+            <button onClick={() => { window.location.href = '/?category=men'; }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>Men</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
             </button>
-            <button onClick={() => handleMobileNavigate('/?category=women')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+            <button onClick={() => { window.location.href = '/?category=women'; }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>Women</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
             </button>
-            <button onClick={() => handleMobileNavigate('/?category=footwear')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+            <button onClick={() => { window.location.href = '/?category=footwear'; }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>Shoes</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
             </button>
-            <button onClick={() => handleMobileNavigate('/outlet')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+            <button onClick={() => { window.location.href = '/outlet'; }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>Outlet</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
             </button>
-            <button onClick={() => handleMobileNavigate('/echo')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+            <button onClick={() => { window.location.href = '/echo'; }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>Echo</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
             </button>
