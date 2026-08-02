@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useSearchParams, useLocation } from 'react-router-dom';
+import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom'; // Added useNavigate
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -9,6 +9,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+  const navigate = useNavigate(); // Added to handle navigation reliably
 
   const searchTerm = searchParams.get('search') || '';
   const activeCategory = searchParams.get('category');
@@ -51,6 +52,12 @@ export default function Navbar() {
   const isActiveOutlet = location.pathname === '/outlet';
   const isActiveEcho = location.pathname === '/echo';
 
+  // Mobile navigation helper (Guarantees navigation + close drawer)
+  const handleMobileNavigate = (path) => {
+    navigate(path);
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className="bg-[#1d1d1d] text-white relative z-50">
       
@@ -74,13 +81,11 @@ export default function Navbar() {
         
         {/* === LEFT: MOBILE HAMBURGER & PROFILE === */}
         <div className="flex items-center gap-3 md:hidden">
-          {/* Hamburger Button (Left side) */}
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          {/* Profile Icon */}
           <Link to={user ? "/dashboard" : "/login"} className="text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -106,7 +111,6 @@ export default function Navbar() {
 
         {/* === RIGHT: MOBILE ICONS (Search, Wishlist, Cart) === */}
         <div className="flex items-center gap-4 md:hidden">
-          {/* Search Icon (Focuses the desktop search input, or just closes/opens menu) */}
           <button 
             onClick={() => {
               const input = document.querySelector('input[placeholder="Search"]');
@@ -118,13 +122,11 @@ export default function Navbar() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
-          {/* Wishlist Icon */}
           <Link to="/wishlist" className="relative text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </Link>
-          {/* Cart Icon */}
           <Link to="/cart" className="relative text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -273,10 +275,10 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- MOBILE FULL-SCREEN DRAWER (MATCHES IMAGE 3) --- */}
+      {/* --- MOBILE FULL-SCREEN DRAWER (FIXED NAVIGATION) --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col">
-          {/* Drawer Header (Centered Logo + Close X) */}
+          {/* Drawer Header */}
           <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100">
             <div className="flex-1"></div>
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0">
@@ -302,34 +304,32 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Drawer Links */}
+          {/* Drawer Links - UPDATED TO USE NAVIGATE CORRECTLY */}
           <div className="flex flex-col px-6 py-4 overflow-y-auto">
-            {/* List copied exactly from Image 3 */}
-            <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+            <button onClick={() => handleMobileNavigate('/')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>New <span className="text-orange-500 text-sm">🔥</span></span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-            </Link>
-            <Link to="/?category=men" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+            </button>
+            <button onClick={() => handleMobileNavigate('/?category=men')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>Men</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-            </Link>
-            <Link to="/?category=women" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+            </button>
+            <button onClick={() => handleMobileNavigate('/?category=women')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>Women</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-            </Link>
-            <Link to="/?category=footwear" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+            </button>
+            <button onClick={() => handleMobileNavigate('/?category=footwear')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>Shoes</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-            </Link>
-            <Link to="/outlet" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+            </button>
+            <button onClick={() => handleMobileNavigate('/outlet')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>Outlet</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-            </Link>
-            <Link to="/echo" onClick={() => setIsMenuOpen(false)} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+            </button>
+            <button onClick={() => handleMobileNavigate('/echo')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
               <span>Echo</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-            </Link>
-            {/* India Flag Link */}
+            </button>
             <div className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
               <span className="flex items-center gap-2">🇮🇳 IN</span>
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
