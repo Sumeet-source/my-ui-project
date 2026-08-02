@@ -1,10 +1,14 @@
-import { useState, useEffect } from 'react'; // Added useEffect
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { useAdmin } from '../context/AdminContext.jsx';
+// FALLBACK IMPORT
+import { products as localProducts } from '../data/products.js'; 
 
 export default function Home() {
-  const { products } = useAdmin(); 
+  // Try to fetch from DB, fallback to local file if it fails
+const { products: dbProducts, loading } = useAdmin();
+const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
   const [searchParams] = useSearchParams();
   
   // Initialize state
