@@ -11,7 +11,7 @@ import Signup from "./pages/Signup.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Admin from "./pages/Admin.jsx";
 import Outlet from "./pages/Outlet.jsx";
-import Echo from "./pages/Echo.jsx"; // Added this
+import Echo from "./pages/Echo.jsx";
 
 const router = createBrowserRouter([
   {
@@ -29,7 +29,7 @@ const router = createBrowserRouter([
       { path: "dashboard", element: <Dashboard /> },
       { path: "admin", element: <Admin /> },
       { path: "outlet", element: <Outlet /> },
-      { path: "echo", element: <Echo /> }, // Added this
+      { path: "echo", element: <Echo /> },
     ]
   }
 ]);
