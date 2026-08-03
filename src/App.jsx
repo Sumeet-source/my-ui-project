@@ -30,6 +30,8 @@ const router = createBrowserRouter([
       { path: "admin", element: <Admin /> },
       { path: "outlet", element: <Outlet /> },
       { path: "echo", element: <Echo /> },
+      // --- CATCH-ALL FALLBACK ---
+      { path: "*", element: <Home /> } 
     ]
   }
 ]);
