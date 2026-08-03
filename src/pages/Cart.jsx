@@ -3,7 +3,6 @@ import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { Link } from 'react-router-dom';
-import api from '../api/axiosClient.js'; // Import your API client
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart(); 
@@ -14,40 +13,47 @@ export default function Cart() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [upiId, setUpiId] = useState('');
 
-  const handlePlaceOrder = async () => { // Make this function async
+  // --- BULLETPROOF ORDER HANDLER ---
+  const handlePlaceOrder = () => {
     if (!upiId) {
       showToast("Please enter your UPI ID!", "error");
       return;
     }
 
+    // 1. Force the UI to immediately show the spinner
     setIsProcessing(true);
 
-    // Build the order object
-    const orderData = {
-      userEmail: user?.email || 'Guest',
-      items: cart,
-      total: getTotalPrice(),
-      paymentMethod: 'UPI',
-      upiId: upiId
-    };
+    // 2. Simulate a network/database delay
+    setTimeout(() => {
+      const order = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString(),
+        items: cart,
+        total: getTotalPrice(),
+        paymentMethod: 'UPI',
+        upiId: upiId
+      };
 
-    try {
-      // 1. Save the order permanently to MongoDB (removed localStorage logic)
-      await api.post('/orders', orderData);
+      // 3. Save to user's order history in localStorage
+      if (user) {
+        const existingOrders = JSON.parse(localStorage.getItem(`orders_${user.email}`) || '[]');
+        localStorage.setItem(`orders_${user.email}`, JSON.stringify([order, ...existingOrders]));
+      }
 
-      // 2. Clear cart and show success
+      // 4. Reset the UI and show success
       clearCart();
       setIsModalOpen(false);
       setOrderPlaced(true);
-      showToast("Payment successful! Order placed!", "success");
-      setTimeout(() => setOrderPlaced(false), 4000);
-    } catch (error) {
-      showToast("Failed to place order. Please try again.", "error");
-    } finally {
       setIsProcessing(false);
       setUpiId('');
-    }
+      
+      showToast("Payment successful! Order placed!", "success");
+      
+      // 5. Hide the success banner after 4 seconds
+      setTimeout(() => setOrderPlaced(false), 4000);
+    }, 2000); // 2-second simulated delay
   };
+  // --- END OF BULLETPROOF ORDER HANDLER ---
 
   if (cart.length === 0 && !orderPlaced) {
     return (
@@ -62,7 +68,7 @@ export default function Cart() {
   const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12 overflow-x-hidden">
+    <div className="max-w-7xl mx-auto px-6 py-12">
       {orderPlaced && (
         <div className="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm">
           <p className="font-bold">✅ Order Placed Successfully!</p>
@@ -105,7 +111,7 @@ export default function Cart() {
         </div>
       </div>
 
-      {/* UPI Modal */}
+      {/* UPI Payment Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-white max-w-md w-full rounded-xl shadow-2xl p-6 relative">
@@ -120,7 +126,15 @@ export default function Cart() {
                 <input type="text" value={upiId} onChange={(e) => setUpiId(e.target.value)} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" placeholder="e.g. merchant@upi" />
               </div>
               <div className="pt-4 space-y-2">
-                <button onClick={handlePlaceOrder} disabled={isProcessing} className={`w-full py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 ${isProcessing ? 'bg-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800'}`}>
+                <button
+                  onClick={handlePlaceOrder}
+                  disabled={isProcessing}
+                  className={`w-full py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 ${
+                    isProcessing 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-black text-white hover:bg-gray-800'
+                  }`}
+                >
                   {isProcessing ? (
                     <>
                       <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
