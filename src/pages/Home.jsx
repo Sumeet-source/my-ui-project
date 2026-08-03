@@ -20,31 +20,37 @@ export default function Home() {
 
   const searchTerm = searchParams.get('search') || '';
 
-  // --- SYNC URL STATE ---
-  // Whenever the URL changes (Men/Women clicks), update the activeCategory
-  useEffect(() => {
-    const cat = searchParams.get('category') || 'all';
-    setActiveCategory(cat);
-  }, [searchParams]); 
-
-  // --- SCROLL FIX (BULLETPROOF WINDOW.SCROLLTO) ---
+  
   useEffect(() => {
     if (window.location.hash === '#new-arrivals') {
-      const timer = setTimeout(() => {
-        const element = document.getElementById('new-arrivals');
+      const element = document.getElementById('new-arrivals');
+      
+      // Helper function to scroll to the element
+      const scrollToGrid = () => {
         if (element) {
-          // Calculate the exact Y position of the element on the screen
           const y = element.getBoundingClientRect().top + window.scrollY;
-          // Scroll the window to that exact pixel height
           window.scrollTo({ top: y, behavior: 'smooth' });
         }
-      }, 1500); // 1.5 seconds delay gives the mobile CPU time to finish painting the layout
-      
-      // Cleanup timeout if the component unmounts early
-      return () => clearTimeout(timer);
+      };
+
+      // 1. If the page is already fully loaded, scroll immediately
+      if (document.readyState === 'complete') {
+        // Tiny 300ms safety delay just for final layout paint
+        setTimeout(scrollToGrid, 300);
+      } else {
+        // 2. If the page is still loading, attach a listener to wait for it
+        const onLoadHandler = () => {
+          setTimeout(scrollToGrid, 300);
+        };
+        window.addEventListener('load', onLoadHandler);
+        
+        // Cleanup listener if the component unmounts
+        return () => window.removeEventListener('load', onLoadHandler);
+      }
     }
   }, [activeCategory]);
   // --- END OF SCROLL FIX ---
+  
 
   // 1. Filter by Category
   const categoryFiltered = activeCategory === 'all' 
