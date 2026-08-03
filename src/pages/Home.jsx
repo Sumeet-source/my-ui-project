@@ -35,8 +35,15 @@ const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProdu
   // once the filtered content has actually rendered.
   useEffect(() => {
     if (window.location.hash === '#new-arrivals') {
+      // requestAnimationFrame ensures the DOM is ready, 
+      // and the 300ms setTimeout gives the mobile browser time to physically paint the layout
       requestAnimationFrame(() => {
-        document.getElementById('new-arrivals')?.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+          const element = document.getElementById('new-arrivals');
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 300); 
       });
     }
   }, [activeCategory]);
