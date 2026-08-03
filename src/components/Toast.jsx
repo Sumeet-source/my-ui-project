@@ -27,7 +27,7 @@ export default function Toast() {
 
   return (
     <div 
-      className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-xl text-white font-semibold transition-all duration-300 transform ${
+      className={`fixed top-20 right-4 z-[100] px-6 py-4 rounded-lg shadow-xl text-white font-semibold transition-all duration-300 transform ${
         isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
       } ${typeClasses[toast?.type] || 'bg-black'}`}
     >
