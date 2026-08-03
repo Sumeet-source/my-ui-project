@@ -33,21 +33,22 @@ const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProdu
   // before this component has rendered the filtered section - so the native
   // jump silently fails and you're stuck at the top. Re-trigger it ourselves
   // once the filtered content has actually rendered.
+    // --- SCROLL FIX (MOBILE LAYOUT ENGINE DELAY) ---
   useEffect(() => {
     if (window.location.hash === '#new-arrivals') {
-      // requestAnimationFrame ensures the DOM is ready, 
-      // and the 300ms setTimeout gives the mobile browser time to physically paint the layout
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          const element = document.getElementById('new-arrivals');
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 300); 
-      });
+      // Increased to 1000ms to guarantee the mobile CPU finishes painting the grid layout
+      const timer = setTimeout(() => {
+        const element = document.getElementById('new-arrivals');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 1000); // 1-second delay
+
+      // Cleanup timeout if the component unmounts early
+      return () => clearTimeout(timer);
     }
   }, [activeCategory]);
-  // --- END OF SCROLL FIX ---
+  
 
   // 1. Filter by Category
   const categoryFiltered = activeCategory === 'all' 
