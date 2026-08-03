@@ -8,13 +8,20 @@ export function AdminProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   // --- FETCH ALL PRODUCTS FROM BACKEND ---
+    // --- FETCH ALL PRODUCTS FROM BACKEND ---
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await api.get('/products');
-        setProducts(response.data);
+        
+        // --- SAFETY CHECK: Ensure the backend returned an array, otherwise default to empty array ---
+        const data = Array.isArray(response.data) ? response.data : [];
+        
+        setProducts(data);
       } catch (error) {
         console.error('Failed to fetch products:', error);
+        // Prevent the app from crashing by setting an empty array on error
+        setProducts([]); 
       } finally {
         setLoading(false);
       }
