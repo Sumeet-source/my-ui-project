@@ -1,9 +1,9 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react'; // Added useEffect
 import { useCart } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAdmin } from '../context/AdminContext.jsx';
-import { products as localProducts } from '../data/products.js'; // <--- Added fallback
+import { products as localProducts } from '../data/products.js';
 import ProductCard from '../components/ProductCard';
 
 export default function ProductDetails() {
@@ -15,11 +15,14 @@ export default function ProductDetails() {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const scrollContainerRef = useRef(null);
-  
-  // Combine DB products (if available) with local products (as fallback)
+
+  // --- FORCE SCROLL TO TOP ON PAGE LOAD ---
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []); // Runs only once when the component mounts
+  // --- END OF FIX ---
+
   const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
-  
-  // Find the specific product from the combined list
   const product = products.find((p) => p.id === parseInt(id));
 
   const relatedProducts = product 
