@@ -1,38 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAdmin } from '../context/AdminContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { Navigate } from 'react-router-dom';
-import api from '../api/axiosClient.js'; // Import API client
 
 export default function Admin() {
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuth(); // Added loading!
   const { products, addProduct, deleteProduct, toggleStock } = useAdmin();
   const { showToast } = useToast();
   const [view, setView] = useState('products');
-  const [orders, setOrders] = useState([]); // State to hold orders from DB
   
   const [formData, setFormData] = useState({
     title: '', price: '', image: '', category: 'men', inStock: true
   });
 
-  // Fetch orders from the backend when the component loads
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await api.get('/orders');
-        setOrders(response.data);
-      } catch (error) {
-        console.error("Failed to fetch orders:", error);
-      }
-    };
-    fetchOrders();
-  }, []);
+  // Fallback to localStorage if context hasn't loaded yet or user is null
+  const effectiveUser = user || (() => {
+    const stored = localStorage.getItem('forge_user');
+    return stored ? JSON.parse(stored) : null;
+  })();
 
+  // 1. Wait for auth to check localStorage
   if (loading) {
     return <div className="text-center py-20 text-xl text-gray-600">Loading your dashboard...</div>;
   }
-  if (!user || user.email !== 'admin@test.com') {
+
+  // 2. Only check access AFTER loading is complete
+  if (!effectiveUser || effectiveUser.email !== 'admin@test.com') {
     return <Navigate to="/login" replace />;
   }
 
@@ -52,16 +46,17 @@ export default function Admin() {
     setFormData({ title: '', price: '', image: '', category: 'men', inStock: true });
   };
 
+  const allOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
       <h1 className="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-black pl-4">Admin Dashboard</h1>
       
       <div className="flex gap-4 border-b border-gray-200 mb-8 pb-2">
         <button onClick={() => setView('products')} className={`font-semibold transition pb-2 ${view === 'products' ? 'text-black border-b-2 border-black' : 'text-gray-500 hover:text-black'}`}>Manage Products</button>
-        <button onClick={() => setView('orders')} className={`font-semibold transition pb-2 ${view === 'orders' ? 'text-black border-b-2 border-black' : 'text-gray-500 hover:text-black'}`}>Order History ({orders.length})</button>
+        <button onClick={() => setView('orders')} className={`font-semibold transition pb-2 ${view === 'orders' ? 'text-black border-b-2 border-black' : 'text-gray-500 hover:text-black'}`}>Order History ({allOrders.length})</button>
       </div>
 
-      {/* Products View */}
       {view === 'products' && (
         <>
           <div className="bg-white p-6 rounded-lg shadow-md mb-12">
@@ -109,35 +104,22 @@ export default function Admin() {
         </>
       )}
 
-      {/* Orders View (Now from MongoDB) */}
       {view === 'orders' && (
         <div className="space-y-4">
-          {orders.length === 0 ? (
+          {allOrders.length === 0 ? (
             <div className="bg-white p-6 rounded-lg shadow-sm text-center text-gray-500">No orders have been placed yet.</div>
           ) : (
             <div className="space-y-6">
-              {orders.map((order) => (
-                <div key={order._id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+              {allOrders.map((order) => (
+                <div key={order.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b border-gray-200 pb-4">
-                    <div>
-                      <span className="font-bold text-gray-900">Order #{order._id.slice(-6)}</span>
-                      <span className="text-sm text-gray-500 ml-4">{new Date(order.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                      <span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full">{order.paymentMethod}</span>
-                      <span className="font-bold text-lg text-black">${order.total.toFixed(2)}</span>
-                    </div>
+                    <div><span className="font-bold text-gray-900">Order #{order.id}</span><span className="text-sm text-gray-500 ml-4">{order.date}</span></div>
+                    <div className="flex items-center gap-2 mt-2 sm:mt-0"><span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full">{order.paymentMethod}</span><span className="font-bold text-lg text-black">${order.total.toFixed(2)}</span></div>
                   </div>
-                  <div className="mb-4 text-sm">
-                    <span className="font-semibold text-gray-700">Customer:</span> {order.userEmail || 'Unknown User'}
-                    {order.upiId && <span className="ml-4 text-gray-500">UPI: {order.upiId}</span>}
-                  </div>
+                  <div className="mb-4 text-sm"><span className="font-semibold text-gray-700">Customer:</span> {order.userEmail || 'Unknown User'}{order.upiId && <span className="ml-4 text-gray-500">UPI: {order.upiId}</span>}</div>
                   <div className="space-y-2 bg-gray-50 p-3 rounded-lg">
                     {order.items.map((item, idx) => (
-                      <div key={idx} className="flex justify-between text-sm text-gray-600">
-                        <span>{item.title} {item.size ? `(Size: ${item.size})` : ''} <span className="font-bold">x{item.quantity}</span></span>
-                        <span>${(item.price * item.quantity).toFixed(2)}</span>
-                      </div>
+                      <div key={idx} className="flex justify-between text-sm text-gray-600"><span>{item.title} {item.size ? `(Size: ${item.size})` : ''} <span className="font-bold">x{item.quantity}</span></span><span>${(item.price * item.quantity).toFixed(2)}</span></div>
                     ))}
                   </div>
                 </div>
