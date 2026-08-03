@@ -10,14 +10,14 @@ export default function Login() {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = login(email, password);
-    if (success) {
+    const result = await login(email, password);
+    if (result.success) {
       showToast("Logged in successfully!", "success");
-      navigate('/dashboard'); // Redirect to dashboard on success
+      navigate('/dashboard');
     } else {
-      showToast("Invalid email or password. Please try again.", "error");
+      showToast(result.message || "Login failed. Please try again.", "error");
     }
   };
 

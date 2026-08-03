@@ -7,7 +7,13 @@ export default function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [view, setView] = useState('profile'); // 'profile' or 'orders'
+  const [view, setView] = useState('profile');
+
+  // Fallback: try to load user from localStorage if context is missing
+  const effectiveUser = user || (() => {
+    const stored = localStorage.getItem('forge_user');
+    return stored ? JSON.parse(stored) : null;
+  })();
 
   const handleLogout = () => {
     logout();
@@ -15,19 +21,20 @@ export default function Dashboard() {
     navigate('/');
   };
 
-  if (!user) {
-    return <div className="text-center py-20 text-xl text-gray-600">Please log in to view your dashboard.</div>;
+  if (!effectiveUser) {
+    return (
+      <div className="text-center py-20 text-xl text-gray-600">
+        Please log in to view your dashboard.
+      </div>
+    );
   }
 
-  // Retrieve orders from localStorage
-  const orders = JSON.parse(localStorage.getItem(`orders_${user.email}`) || '[]');
+  const orders = JSON.parse(localStorage.getItem(`orders_${effectiveUser.email}`) || '[]');
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Welcome back, {user.name}!</h1>
-      
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">Welcome back, {effectiveUser.name}!</h1>
       <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 space-y-4">
-        {/* Dashboard Navigation Tabs */}
         <div className="border-b border-gray-200 pb-4 flex gap-4 mb-4">
           <button onClick={() => setView('profile')} className={`font-semibold transition ${view === 'profile' ? 'text-black border-b-2 border-black pb-1' : 'text-gray-500 hover:text-black'}`}>
             My Profile
@@ -37,23 +44,21 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* PROFILE VIEW */}
         {view === 'profile' && (
           <div className="space-y-4">
             <div className="border-b border-gray-200 pb-4">
-              <p className="text-gray-600"><span className="font-semibold">Email:</span> {user.email}</p>
-              <p className="text-gray-600"><span className="font-semibold">Member since:</span> {new Date(user.id).toLocaleDateString()}</p>
+              <p className="text-gray-600"><span className="font-semibold">Email:</span> {effectiveUser.email}</p>
+              <p className="text-gray-600"><span className="font-semibold">Member since:</span> {new Date(effectiveUser.id).toLocaleDateString()}</p>
             </div>
             <div className="flex flex-wrap gap-4">
               <button onClick={handleLogout} className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">Log Out</button>
-              {user.email === 'admin@test.com' && (
+              {effectiveUser.email === 'admin@test.com' && (
                 <Link to="/admin" className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition">Go to Admin Panel</Link>
               )}
             </div>
           </div>
         )}
 
-        {/* ORDERS VIEW */}
         {view === 'orders' && (
           <div className="space-y-4">
             {orders.length === 0 ? (
