@@ -7,11 +7,12 @@ import { products as localProducts } from '../data/products.js';
 
 export default function Home() {
   // Try to fetch from DB, fallback to local file if it fails
-const { products: dbProducts, loading } = useAdmin();
-const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
+  const { products: dbProducts, loading } = useAdmin();
+  const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
+  
   const [searchParams] = useSearchParams();
   
-  // Initialize state
+  // Initialize state directly from URL to prevent "flash" of all products
   const [activeCategory, setActiveCategory] = useState(() => searchParams.get('category') || 'all');
   const [sortOption, setSortOption] = useState('default');
   const [brandFilter, setBrandFilter] = useState('all');
@@ -19,36 +20,31 @@ const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProdu
 
   const searchTerm = searchParams.get('search') || '';
 
-  // --- THE FIX ---
+  // --- SYNC URL STATE ---
   // Whenever the URL changes (Men/Women clicks), update the activeCategory
   useEffect(() => {
     const cat = searchParams.get('category') || 'all';
     setActiveCategory(cat);
   }, [searchParams]); 
-  // --- END OF FIX ---
 
-  // --- SCROLL FIX ---
-  // The menu buttons do a full page reload to '/?category=X#new-arrivals'.
-  // On a hard reload, the browser tries to jump to #new-arrivals immediately,
-  // before this component has rendered the filtered section - so the native
-  // jump silently fails and you're stuck at the top. Re-trigger it ourselves
-  // once the filtered content has actually rendered.
-    // --- SCROLL FIX (MOBILE LAYOUT ENGINE DELAY) ---
+  // --- SCROLL FIX (BULLETPROOF WINDOW.SCROLLTO) ---
   useEffect(() => {
     if (window.location.hash === '#new-arrivals') {
-      // Increased to 1000ms to guarantee the mobile CPU finishes painting the grid layout
       const timer = setTimeout(() => {
         const element = document.getElementById('new-arrivals');
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Calculate the exact Y position of the element on the screen
+          const y = element.getBoundingClientRect().top + window.scrollY;
+          // Scroll the window to that exact pixel height
+          window.scrollTo({ top: y, behavior: 'smooth' });
         }
-      }, 1000); // 1-second delay
-
+      }, 1500); // 1.5 seconds delay gives the mobile CPU time to finish painting the layout
+      
       // Cleanup timeout if the component unmounts early
       return () => clearTimeout(timer);
     }
   }, [activeCategory]);
-  
+  // --- END OF SCROLL FIX ---
 
   // 1. Filter by Category
   const categoryFiltered = activeCategory === 'all' 
@@ -84,6 +80,7 @@ const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProdu
 
   return (
     <div className="font-sans overflow-x-hidden">
+      {/* HERO BANNER */}
       <section className="relative h-[600px] flex items-center justify-center bg-black" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1920&q=80')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative z-10 text-center text-white px-4">
@@ -93,6 +90,7 @@ const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProdu
         </div>
       </section>
 
+      {/* CATEGORIES */}
       <section className="max-w-7xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-black pl-4">Shop by Category</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -108,6 +106,7 @@ const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProdu
         </div>
       </section>
 
+      {/* PRODUCT GRID SECTION */}
       <section className="max-w-7xl mx-auto px-6 py-16" id="new-arrivals">
         <div className="flex flex-wrap justify-between items-center mb-8 border-l-4 border-black pl-4 gap-4">
           <h2 className="text-3xl font-bold text-gray-900">
