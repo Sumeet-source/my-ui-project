@@ -3,10 +3,11 @@ import { useAdmin } from '../context/AdminContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { Navigate } from 'react-router-dom';
+import { products as localProducts } from '../data/products.js'; // Added fallback
 
 export default function Admin() {
-  const { user, loading } = useAuth(); // Added loading!
-  const { products, addProduct, deleteProduct, toggleStock } = useAdmin();
+  const { user, loading } = useAuth();
+  const { products: dbProducts, addProduct, deleteProduct, toggleStock } = useAdmin(); // Renamed DB products
   const { showToast } = useToast();
   const [view, setView] = useState('products');
   
@@ -14,18 +15,19 @@ export default function Admin() {
     title: '', price: '', image: '', category: 'men', inStock: true
   });
 
+  // Fallback to local products if database fails
+  const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
+
   // Fallback to localStorage if context hasn't loaded yet or user is null
   const effectiveUser = user || (() => {
     const stored = localStorage.getItem('forge_user');
     return stored ? JSON.parse(stored) : null;
   })();
 
-  // 1. Wait for auth to check localStorage
   if (loading) {
     return <div className="text-center py-20 text-xl text-gray-600">Loading your dashboard...</div>;
   }
 
-  // 2. Only check access AFTER loading is complete
   if (!effectiveUser || effectiveUser.email !== 'admin@test.com') {
     return <Navigate to="/login" replace />;
   }
@@ -53,8 +55,8 @@ export default function Admin() {
       <h1 className="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-black pl-4">Admin Dashboard</h1>
       
       <div className="flex gap-4 border-b border-gray-200 mb-8 pb-2">
-        <button onClick={() => setView('products')} className={`font-semibold transition pb-2 ${view === 'products' ? 'text-black border-b-2 border-black' : 'text-gray-500 hover:text-black'}`}>Manage Products</button>
-        <button onClick={() => setView('orders')} className={`font-semibold transition pb-2 ${view === 'orders' ? 'text-black border-b-2 border-black' : 'text-gray-500 hover:text-black'}`}>Order History ({allOrders.length})</button>
+        <button onClick={() => setView('products')} className={`font-semibold transition pb-2 ${view === 'products' ? 'text-black border-b-2 border-black' : 'text-gray-500 hover:text-black}'}`}>Manage Products</button>
+        <button onClick={() => setView('orders')} className={`font-semibold transition pb-2 ${view === 'orders' ? 'text-black border-b-2 border-black' : 'text-gray-500 hover:text-black}'}`}>Order History ({allOrders.length})</button>
       </div>
 
       {view === 'products' && (
@@ -90,11 +92,11 @@ export default function Admin() {
                         <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold">⭐ {avgRating !== 'N/A' ? avgRating : 'No reviews'}</span>
                         {avgRating !== 'N/A' && <span className="text-gray-400">({product.reviews.length} reviews)</span>}
                       </div>
-                      <span className={`text-xs font-bold ml-2 ${product.inStock ? 'text-green-600' : 'text-red-600'}`}>{product.inStock ? 'In Stock' : 'Out of Stock'}</span>
+                      <span className={`text-xs font-bold ml-2 ${product.inStock ? 'text-green-600' : 'text-red-600}'}`}>{product.inStock ? 'In Stock' : 'Out of Stock'}</span>
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => toggleStock(product._id || product.id)} className={`px-3 py-1 text-xs font-bold rounded transition ${product.inStock ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>{product.inStock ? 'Mark OOS' : 'Mark In Stock'}</button>
+                    <button onClick={() => toggleStock(product._id || product.id)} className={`px-3 py-1 text-xs font-bold rounded transition ${product.inStock ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-green-100 text-green-700 hover:bg-green-200}'}`}>{product.inStock ? 'Mark OOS' : 'Mark In Stock'}</button>
                     <button onClick={() => deleteProduct(product._id || product.id)} className="text-red-500 hover:text-red-700 text-sm font-bold">Delete</button>
                   </div>
                 </div>
