@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Admin from "./pages/Admin.jsx";
 import Outlet from "./pages/Outlet.jsx";
 import Echo from "./pages/Echo.jsx";
+import Men from "./pages/Men.jsx";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
       { path: "echo", element: <Echo /> },
       // --- CATCH-ALL FALLBACK ---
       { path: "*", element: <Home /> } 
+      { path: "men", element: <Men /> },
     ]
   }
 ]);

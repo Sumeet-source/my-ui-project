@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // NEW: State to track which sub-menu is open (null = main menu)
   const [activeSubmenu, setActiveSubmenu] = useState(null);
   
   const { cart } = useCart();
@@ -45,19 +44,17 @@ export default function Navbar() {
     after:transition-all after:duration-300 hover:after:w-full 
     ${isActive ? 'after:w-full' : ''}`;
 
+  // --- UPDATED ACTIVE STATE CHECKS FOR NEW PAGES ---
   const isActiveHome = false; 
-  const isActiveMen = location.pathname === '/' && activeCategory === 'men';
-  const isActiveWomen = location.pathname === '/' && activeCategory === 'women';
-  const isActiveShoes = location.pathname === '/' && activeCategory === 'footwear';
+  const isActiveMen = location.pathname === '/men';
+  const isActiveWomen = location.pathname === '/women';
+  const isActiveShoes = location.pathname === '/shoes';
   const isActiveOutlet = location.pathname === '/outlet';
   const isActiveEcho = location.pathname === '/echo';
 
   const handleMobileNavigate = (path) => {
     window.location.href = path;
   };
-
-  // Helper to navigate and close drawer
-  const closeDrawer = () => setIsMenuOpen(false);
 
   return (
     <nav className="bg-[#1d1d1d] text-white relative z-50">
@@ -130,16 +127,22 @@ export default function Navbar() {
           <Link to="/" className="relative h-full flex items-center cursor-pointer">
             <span className={getUnderlineSpanClasses(isActiveHome)}>New <span className="text-orange-500 text-sm">🔥</span></span>
           </Link>
+
+          {/* MEN MEGA MENU - UPDATED TO '/men' */}
           <div className="group h-full flex items-center">
-            <Link to="/?category=men" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveMen)}>Men</span></Link>
-            {/* Desktop mega-menu content kept exactly as before... */}
+            <Link to="/men" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveMen)}>Men</span></Link>
           </div>
+
+          {/* WOMEN MEGA MENU - UPDATED TO '/women' */}
           <div className="group h-full flex items-center">
-            <Link to="/?category=women" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveWomen)}>Women</span></Link>
+            <Link to="/women" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveWomen)}>Women</span></Link>
           </div>
+
+          {/* SHOES MEGA MENU - UPDATED TO '/shoes' */}
           <div className="group h-full flex items-center">
-            <Link to="/?category=footwear" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveShoes)}>Shoes</span></Link>
+            <Link to="/shoes" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveShoes)}>Shoes</span></Link>
           </div>
+
           <div className="group h-full flex items-center">
             <Link to="/outlet" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveOutlet)}>Outlet</span></Link>
           </div>
@@ -158,7 +161,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- NEW HIERARCHICAL MOBILE DRAWER --- */}
+      {/* --- HIERARCHICAL MOBILE DRAWER --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col overflow-hidden">
           {/* Header */}
@@ -198,6 +201,7 @@ export default function Navbar() {
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
                 
+                {/* UPDATED MENU LINKS TO '/men', '/women', '/shoes' */}
                 <button onClick={() => setActiveSubmenu('men')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                   <span>Men</span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
@@ -238,16 +242,16 @@ export default function Navbar() {
                   Back
                 </button>
                 <h3 className="text-2xl font-bold mb-4">Men</h3>
-                <button onClick={() => { window.location.href = '/?category=men'; setIsMenuOpen(false); }} className="block py-3 text-[16px] font-bold border-b border-gray-100 text-left w-full hover:text-blue-600">Shop All Men</button>
+                <button onClick={() => { window.location.href = '/men'; setIsMenuOpen(false); }} className="block py-3 text-[16px] font-bold border-b border-gray-100 text-left w-full hover:text-blue-600">Shop All Men</button>
                 <div className="py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Featured</div>
-                <button onClick={() => { window.location.href = '/?category=men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Best Sellers</button>
-                <button onClick={() => { window.location.href = '/?category=men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">New Arrivals</button>
+                <button onClick={() => { window.location.href = '/men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Best Sellers</button>
+                <button onClick={() => { window.location.href = '/men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">New Arrivals</button>
                 <div className="py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Shop by Category</div>
-                <button onClick={() => { window.location.href = '/?category=men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Tops & Hoodies</button>
-                <button onClick={() => { window.location.href = '/?category=men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Joggers & Pants</button>
-                <button onClick={() => { window.location.href = '/?category=men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Shorts</button>
-                <button onClick={() => { window.location.href = '/?category=men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Compression</button>
-                <button onClick={() => { window.location.href = '/?category=men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Footwear</button>
+                <button onClick={() => { window.location.href = '/men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Tops & Hoodies</button>
+                <button onClick={() => { window.location.href = '/men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Joggers & Pants</button>
+                <button onClick={() => { window.location.href = '/men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Shorts</button>
+                <button onClick={() => { window.location.href = '/men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Compression</button>
+                <button onClick={() => { window.location.href = '/men'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Footwear</button>
               </div>
             )}
 
@@ -259,16 +263,16 @@ export default function Navbar() {
                   Back
                 </button>
                 <h3 className="text-2xl font-bold mb-4">Women</h3>
-                <button onClick={() => { window.location.href = '/?category=women'; setIsMenuOpen(false); }} className="block py-3 text-[16px] font-bold border-b border-gray-100 text-left w-full hover:text-blue-600">Shop All Women</button>
+                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-3 text-[16px] font-bold border-b border-gray-100 text-left w-full hover:text-blue-600">Shop All Women</button>
                 <div className="py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Featured</div>
-                <button onClick={() => { window.location.href = '/?category=women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Best Sellers</button>
-                <button onClick={() => { window.location.href = '/?category=women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">New Arrivals</button>
+                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Best Sellers</button>
+                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">New Arrivals</button>
                 <div className="py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Shop by Category</div>
-                <button onClick={() => { window.location.href = '/?category=women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Tops & Bras</button>
-                <button onClick={() => { window.location.href = '/?category=women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Leggings</button>
-                <button onClick={() => { window.location.href = '/?category=women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Joggers & Shorts</button>
-                <button onClick={() => { window.location.href = '/?category=women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Jackets</button>
-                <button onClick={() => { window.location.href = '/?category=women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Footwear</button>
+                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Tops & Bras</button>
+                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Leggings</button>
+                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Joggers & Shorts</button>
+                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Jackets</button>
+                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Footwear</button>
               </div>
             )}
 
@@ -280,12 +284,12 @@ export default function Navbar() {
                   Back
                 </button>
                 <h3 className="text-2xl font-bold mb-4">Shoes</h3>
-                <button onClick={() => { window.location.href = '/?category=footwear'; setIsMenuOpen(false); }} className="block py-3 text-[16px] font-bold border-b border-gray-100 text-left w-full hover:text-blue-600">Shop All Shoes</button>
+                <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="block py-3 text-[16px] font-bold border-b border-gray-100 text-left w-full hover:text-blue-600">Shop All Shoes</button>
                 <div className="py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Shop by Category</div>
-                <button onClick={() => { window.location.href = '/?category=footwear'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Running Shoes</button>
-                <button onClick={() => { window.location.href = '/?category=footwear'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Training Shoes</button>
-                <button onClick={() => { window.location.href = '/?category=footwear'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Basketball Shoes</button>
-                <button onClick={() => { window.location.href = '/?category=footwear'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Slides</button>
+                <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Running Shoes</button>
+                <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Training Shoes</button>
+                <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Basketball Shoes</button>
+                <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Slides</button>
               </div>
             )}
 
