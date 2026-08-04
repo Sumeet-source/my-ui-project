@@ -15,6 +15,7 @@ import Echo from "./pages/Echo.jsx";
 import Men from "./pages/Men.jsx";       // Added
 import Women from "./pages/Women.jsx";   // Added
 import Shoes from "./pages/Shoes.jsx";   // Added
+import MenCategoryPage from "./pages/MenCategoryPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,8 @@ const router = createBrowserRouter([
       { path: "men", element: <Men /> },
       { path: "women", element: <Women /> },
       { path: "shoes", element: <Shoes /> },
+      // inside children: [
+      { path: "men-category", element: <MenCategoryPage /> },
     ]
   }
 ]);
