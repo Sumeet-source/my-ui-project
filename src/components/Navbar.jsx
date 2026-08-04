@@ -51,7 +51,6 @@ export default function Navbar() {
   const isActiveWomen = location.pathname === '/women';
   const isActiveShoes = location.pathname === '/shoes';
   const isActiveOutlet = location.pathname === '/outlet';
-  const isActiveEcho = location.pathname === '/echo';
 
   return (
     <nav className="bg-[#1d1d1d] text-white relative z-50">
@@ -119,7 +118,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* --- DESKTOP LINKS --- */}
+        {/* --- DESKTOP LINKS (ECHO REMOVED) --- */}
         <div className="hidden md:flex justify-center flex-1 gap-20 text-[16px] font-bold items-center h-10">
           <Link to="/" className="relative h-full flex items-center cursor-pointer">
             <span className={getUnderlineSpanClasses(isActiveHome)}>New <span className="text-orange-500 text-sm">🔥</span></span>
@@ -136,7 +135,6 @@ export default function Navbar() {
           <div className="group h-full flex items-center">
             <Link to="/outlet" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveOutlet)}>Outlet</span></Link>
           </div>
-          <Link to="/echo" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveEcho)}>Echo</span></Link>
         </div>
 
         <div className="hidden md:flex items-center gap-6">
@@ -169,7 +167,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- MOBILE DRAWER --- */}
+      {/* --- MOBILE DRAWER (ECHO REMOVED) --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col overflow-hidden">
           <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 shrink-0">
@@ -220,14 +218,8 @@ export default function Navbar() {
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
                 
-                {/* --- UPDATED OUTLET HAMBURGER LINK --- */}
                 <button onClick={() => { window.location.href = '/outlet'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                   <span>Outlet</span>
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-                </button>
-                
-                <button onClick={() => { window.location.href = '/echo'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
-                  <span>Echo</span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
                 
