@@ -209,18 +209,18 @@ export default function Navbar() {
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
                 
-                {/* --- UPDATED: Clicking Men immediately navigates to /men --- */}
                 <button onClick={() => { window.location.href = '/men'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                   <span>Men</span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
                 
-                <button onClick={() => setActiveSubmenu('women')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+                {/* UPDATED: Women and Shoes now go directly to their pages */}
+                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                   <span>Women</span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
                 
-                <button onClick={() => setActiveSubmenu('shoes')} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+                <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                   <span>Shoes</span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
@@ -239,44 +239,6 @@ export default function Navbar() {
                   <span className="flex items-center gap-2">🇮🇳 IN</span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </div>
-              </div>
-            )}
-
-            {/* --- SUB-MENU: WOMEN (Kept for reference) --- */}
-            {activeSubmenu === 'women' && (
-              <div className="flex flex-col">
-                <button onClick={() => setActiveSubmenu(null)} className="flex items-center gap-2 text-gray-500 text-sm font-medium mb-4">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                  Back
-                </button>
-                <h3 className="text-2xl font-bold mb-4">Women</h3>
-                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-3 text-[16px] font-bold border-b border-gray-100 text-left w-full hover:text-blue-600">Shop All Women</button>
-                <div className="py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Featured</div>
-                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Best Sellers</button>
-                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">New Arrivals</button>
-                <div className="py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Shop by Category</div>
-                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Tops & Bras</button>
-                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Leggings</button>
-                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Joggers & Shorts</button>
-                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Jackets</button>
-                <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Footwear</button>
-              </div>
-            )}
-
-            {/* --- SUB-MENU: SHOES (Kept for reference) --- */}
-            {activeSubmenu === 'shoes' && (
-              <div className="flex flex-col">
-                <button onClick={() => setActiveSubmenu(null)} className="flex items-center gap-2 text-gray-500 text-sm font-medium mb-4">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                  Back
-                </button>
-                <h3 className="text-2xl font-bold mb-4">Shoes</h3>
-                <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="block py-3 text-[16px] font-bold border-b border-gray-100 text-left w-full hover:text-blue-600">Shop All Shoes</button>
-                <div className="py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Shop by Category</div>
-                <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Running Shoes</button>
-                <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Training Shoes</button>
-                <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Basketball Shoes</button>
-                <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="block py-2 text-[15px] border-b border-gray-100 text-left w-full hover:text-blue-600">Slides</button>
               </div>
             )}
           </div>
