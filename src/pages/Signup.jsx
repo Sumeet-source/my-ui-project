@@ -148,7 +148,7 @@ export default function Signup() {
 
           {/* Terms */}
           <p className="text-xs text-gray-500 text-center">
-            By creating an account, you agree to Under Armour's{' '}
+            By creating an account, you agree to Forge's{' '}
             <a href="#" className="text-gray-900 underline hover:no-underline">Terms &amp; Conditions</a> and{' '}
             <a href="#" className="text-gray-900 underline hover:no-underline">Privacy Policy</a>.
           </p>
