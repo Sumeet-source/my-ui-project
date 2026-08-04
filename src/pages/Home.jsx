@@ -2,17 +2,13 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { useAdmin } from '../context/AdminContext.jsx';
-// FALLBACK IMPORT
 import { products as localProducts } from '../data/products.js'; 
 
 export default function Home() {
-  // Try to fetch from DB, fallback to local file if it fails
-  const { products: dbProducts, loading } = useAdmin();
+  const { products: dbProducts } = useAdmin();
   const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
   
   const [searchParams] = useSearchParams();
-  
-  // Initialize state directly from URL to prevent "flash" of all products
   const [activeCategory, setActiveCategory] = useState(() => searchParams.get('category') || 'all');
   const [sortOption, setSortOption] = useState('default');
   const [brandFilter, setBrandFilter] = useState('all');
@@ -20,54 +16,38 @@ export default function Home() {
 
   const searchTerm = searchParams.get('search') || '';
 
-  
+  useEffect(() => {
+    const cat = searchParams.get('category') || 'all';
+    setActiveCategory(cat);
+  }, [searchParams]); 
+
+  // --- SCROLL FIX ---
   useEffect(() => {
     if (window.location.hash === '#new-arrivals') {
-      const element = document.getElementById('new-arrivals');
-      
-      // Helper function to scroll to the element
-      const scrollToGrid = () => {
+      const timer = setTimeout(() => {
+        const element = document.getElementById('new-arrivals');
         if (element) {
           const y = element.getBoundingClientRect().top + window.scrollY;
           window.scrollTo({ top: y, behavior: 'smooth' });
         }
-      };
-
-      // 1. If the page is already fully loaded, scroll immediately
-      if (document.readyState === 'complete') {
-        // Tiny 300ms safety delay just for final layout paint
-        setTimeout(scrollToGrid, 300);
-      } else {
-        // 2. If the page is still loading, attach a listener to wait for it
-        const onLoadHandler = () => {
-          setTimeout(scrollToGrid, 300);
-        };
-        window.addEventListener('load', onLoadHandler);
-        
-        // Cleanup listener if the component unmounts
-        return () => window.removeEventListener('load', onLoadHandler);
-      }
+      }, 1500);
+      return () => clearTimeout(timer);
     }
   }, [activeCategory]);
-  // --- END OF SCROLL FIX ---
-  
 
-  // 1. Filter by Category
+  // Filtering logic
   const categoryFiltered = activeCategory === 'all' 
     ? products 
     : products.filter((product) => product.category === activeCategory);
 
-  // 2. Filter by Search Term
   const searchFiltered = categoryFiltered.filter((product) =>
     product.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // 3. Filter by Brand
   const brandFiltered = brandFilter === 'all'
     ? searchFiltered
     : searchFiltered.filter((product) => product.brand === brandFilter);
 
-  // 4. Filter by Price Range
   const priceFiltered = brandFiltered.filter((product) => {
     if (priceRange === 'under50') return product.price < 50;
     if (priceRange === '50to100') return product.price >= 50 && product.price <= 100;
@@ -75,7 +55,6 @@ export default function Home() {
     return true;
   });
 
-  // 5. Sort
   const sortedProducts = [...priceFiltered].sort((a, b) => {
     if (sortOption === 'low-to-high') return a.price - b.price;
     if (sortOption === 'high-to-low') return b.price - a.price;
@@ -147,7 +126,8 @@ export default function Home() {
             <p className="text-gray-400 mt-2">Try adjusting your filters.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          // --- UPDATED GRID FOR 2 COLUMNS ON MOBILE ---
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
             {sortedProducts.map((item) => (
               <ProductCard 
                 key={item.id} 

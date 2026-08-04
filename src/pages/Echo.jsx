@@ -8,7 +8,6 @@ export default function Echo() {
   const [filters, setFilters] = useState({ gender: [], category: [] });
 
   const filteredProducts = products.filter((product) => {
-    // Guard clause in case filters act weird
     if (!filters) return true;
     if (filters.gender?.length > 0 && !filters.gender.includes(product.category)) return false;
     if (filters.category?.length > 0 && !filters.category.includes(product.category)) return false;
@@ -41,7 +40,8 @@ export default function Echo() {
         </div>
         <div className="flex flex-col lg:flex-row gap-8">
           <FilterSidebar filters={filters} setFilters={setFilters} />
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-12 gap-x-6">
+          {/* --- UPDATED GRID FOR 2 COLUMNS ON MOBILE --- */}
+          <div className="flex-1 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12">
             {sortedProducts.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
