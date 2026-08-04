@@ -16,6 +16,7 @@ import Men from "./pages/Men.jsx";
 import Women from "./pages/Women.jsx";
 import Shoes from "./pages/Shoes.jsx";
 import NewArrivals from "./pages/NewArrivals.jsx";
+import Search from "./pages/Search.jsx";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
       { path: "women", element: <Women /> },
       { path: "shoes", element: <Shoes /> },
       { path: "new-arrivals", element: <NewArrivals /> },
+      { path: "search", element: <Search /> },
     ]
   }
 ]);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -6,7 +6,9 @@ import { useAuth } from '../context/AuthContext.jsx';
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
-  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false); // New overlay state
+  const [searchInput, setSearchInput] = useState('');
+  const inputRef = useRef(null);
   
   const { cart } = useCart();
   const { user, logout } = useAuth();
@@ -17,7 +19,14 @@ export default function Navbar() {
   const searchTerm = searchParams.get('search') || '';
   const activeCategory = searchParams.get('category');
 
-  const handleSearchChange = (e) => {
+  const handleSearchSubmit = (e) => {
+    if (e.key === 'Enter' && searchInput.trim()) {
+      navigate(`/search?q=${searchInput}`);
+      setIsSearchOpen(false);
+    }
+  };
+
+  const handleDesktopSearch = (e) => {
     const value = e.target.value;
     setSearchParams((prevParams) => {
       const params = new URLSearchParams(prevParams);
@@ -30,16 +39,6 @@ export default function Navbar() {
     });
   };
 
-  const handleSearchKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      const targetSection = document.getElementById('new-arrivals');
-      if (targetSection) {
-        targetSection.scrollIntoView({ behavior: 'smooth' });
-        e.target.blur();
-      }
-    }
-  };
-
   const getUnderlineSpanClasses = (isActive) =>
     `relative inline-block 
     after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white 
@@ -47,7 +46,7 @@ export default function Navbar() {
     ${isActive ? 'after:w-full' : ''}`;
 
   const isActiveHome = false; 
-  const isActiveNew = location.pathname === '/new-arrivals'; // Added
+  const isActiveNew = location.pathname === '/new-arrivals';
   const isActiveMen = location.pathname === '/men';
   const isActiveWomen = location.pathname === '/women';
   const isActiveShoes = location.pathname === '/shoes';
@@ -101,7 +100,8 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-4 md:hidden">
-          <button onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)} className="text-white">
+          {/* UPDATED: Opens Full Screen Search Overlay */}
+          <button onClick={() => setIsSearchOpen(true)} className="text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -121,12 +121,9 @@ export default function Navbar() {
 
         {/* --- DESKTOP LINKS --- */}
         <div className="hidden md:flex justify-center flex-1 gap-20 text-[16px] font-bold items-center h-10">
-          
-          {/* UPDATED: Links to the new /new-arrivals page */}
           <Link to="/new-arrivals" className="relative h-full flex items-center cursor-pointer">
             <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm">🔥</span></span>
           </Link>
-
           <div className="group h-full flex items-center">
             <Link to="/men" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveMen)}>Men</span></Link>
           </div>
@@ -143,7 +140,7 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-6">
           <div className="hidden sm:flex items-center gap-2 border-b border-white/30 hover:border-white transition-colors pb-0.5 w-32">
-            <input type="text" value={searchTerm} onChange={handleSearchChange} onKeyDown={handleSearchKeyDown} placeholder="Search" className="bg-transparent text-white text-[15px] placeholder-white/70 focus:outline-none w-full" />
+            <input type="text" value={searchTerm} onChange={handleDesktopSearch} placeholder="Search" className="bg-transparent text-white text-[15px] placeholder-white/70 focus:outline-none w-full" />
             <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
           <Link to="/wishlist" className="relative"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg></Link>
@@ -153,23 +150,40 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- MOBILE SLIDE-DOWN SEARCH BAR --- */}
-      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileSearchOpen ? 'max-h-20 opacity-100 px-4 pb-4' : 'max-h-0 opacity-0 px-4'}`}>
-        <div className="relative">
-          <input 
-            type="text" 
-            value={searchTerm} 
-            onChange={handleSearchChange} 
-            onKeyDown={handleSearchKeyDown}
-            placeholder="Search..." 
-            className="w-full bg-[#1a1a1a] text-white border border-gray-700 rounded-full py-2 pl-4 pr-10 text-sm focus:outline-none focus:border-white transition-all"
-            autoFocus={isMobileSearchOpen}
-          />
-          <svg className="w-4 h-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+      {/* --- MOBILE FULL-SCREEN SEARCH OVERLAY (Exact match to Image 2) --- */}
+      {isSearchOpen && (
+        <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
+          <div className="flex items-center justify-between px-4 py-4 border-b border-gray-800">
+            <button onClick={() => setIsSearchOpen(false)} className="text-white p-1">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div className="flex-1 mx-4">
+              <input 
+                ref={inputRef}
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={handleSearchSubmit}
+                placeholder="Search..." 
+                className="w-full bg-transparent text-white text-base border-b border-gray-600 focus:border-white focus:outline-none pb-1 transition-colors placeholder-gray-400"
+                autoFocus
+              />
+            </div>
+            <button onClick={() => setIsSearchOpen(false)} className="text-white text-sm font-medium">Cancel</button>
+          </div>
+
+          {/* Results placeholder or "No results found" message */}
+          <div className="flex-1 flex items-center justify-center text-white/60 text-lg">
+            {searchInput.trim() === '' ? (
+              <p className="text-gray-500">Type to start searching</p>
+            ) : (
+              <p className="text-gray-500">No results found!</p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* --- MOBILE DRAWER --- */}
       {isMenuOpen && (
@@ -202,33 +216,26 @@ export default function Navbar() {
           <div className="flex-1 overflow-y-auto px-6 py-4">
             {!activeSubmenu && (
               <div className="flex flex-col">
-                
-                {/* UPDATED: Hamburger New link goes to /new-arrivals */}
                 <button onClick={() => { window.location.href = '/new-arrivals'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                   <span>New <span className="text-orange-500 text-sm">🔥</span></span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
-                
                 <button onClick={() => { window.location.href = '/men'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                   <span>Men</span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
-                
                 <button onClick={() => { window.location.href = '/women'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                   <span>Women</span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
-                
                 <button onClick={() => { window.location.href = '/shoes'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                   <span>Shoes</span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
-                
                 <button onClick={() => { window.location.href = '/outlet'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                   <span>Outlet</span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
-                
                 <div className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
                   <span className="flex items-center gap-2">🇮🇳 IN</span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
