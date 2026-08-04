@@ -1,152 +1,173 @@
+// src/pages/Login.jsx
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext.jsx';
-import { useToast } from '../context/ToastContext.jsx';
-import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react'; // Icons for Show/Hide
+import { Link, useNavigate } from 'react-router-dom';
+// import { useToast } from '../hooks/useToast';
 
 export default function Login() {
-  const [loginMethod, setLoginMethod] = useState('password'); // 'password' or 'otp'
+  const [loginMode, setLoginMode] = useState('password'); // 'password' | 'otp'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mobile, setMobile] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  
-  const { login } = useAuth();
-  const { showToast } = useToast();
   const navigate = useNavigate();
+  // const { showToast } = useToast();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // If OTP is selected, we treat the mobile number as the email (simulation for now)
-    const loginEmail = loginMethod === 'otp' ? mobile : email;
-    const loginPassword = loginMethod === 'otp' ? 'otp_dummy_password' : password;
-
-    const result = await login(loginEmail, loginPassword);
-    if (result.success) {
-      showToast("Logged in successfully!", "success");
-      navigate('/dashboard');
+    if (loginMode === 'password') {
+      if (!email || !password) {
+        alert('Please enter email and password');
+        return;
+      }
+      console.log('Login with Password:', { email, password });
+      // showToast('Logged in!', 'success');
+      navigate('/');
     } else {
-      showToast(result.message || "Login failed. Please try again.", "error");
+      if (!mobile) {
+        alert('Please enter mobile number');
+        return;
+      }
+      console.log('Login with OTP:', { mobile });
+      // showToast('OTP sent!', 'info');
     }
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-6 py-10 bg-gray-50">
-      <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-md relative">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm sm:shadow-md p-6 sm:p-8 lg:p-10">
         
-        {/* Close Button (X) - Visually matches the screenshot */}
-        <button onClick={() => navigate('/')} className="absolute top-4 right-4 text-gray-400 hover:text-black">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        {/* Header */}
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900">
+          Log In
+        </h2>
+        <p className="mt-1 text-center text-sm text-gray-600">
+          Sign up for faster checkout &amp; easy returns
+        </p>
 
-        <h1 className="text-3xl font-bold text-gray-900 mt-2 mb-6">Log In</h1>
-        
-        {/* Radio Toggle */}
-        <div className="flex gap-6 mb-6">
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-900">
-            <input 
-              type="radio" 
-              name="method" 
-              value="password" 
-              checked={loginMethod === 'password'}
-              onChange={() => setLoginMethod('password')}
-              className="w-5 h-5 border-gray-300 text-black focus:ring-black"
-            />
+        {/* Mode Tabs - responsive flex */}
+        <div className="mt-6 grid grid-cols-2 gap-2 p-1 bg-gray-100 rounded-xl">
+          <button
+            onClick={() => setLoginMode('password')}
+            className={`py-2.5 text-sm font-medium rounded-lg transition ${
+              loginMode === 'password'
+                ? 'bg-white text-indigo-700 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
             Log In with Password
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-900">
-            <input 
-              type="radio" 
-              name="method" 
-              value="otp" 
-              checked={loginMethod === 'otp'}
-              onChange={() => setLoginMethod('otp')}
-              className="w-5 h-5 border-gray-300 text-black focus:ring-black"
-            />
+          </button>
+          <button
+            onClick={() => setLoginMode('otp')}
+            className={`py-2.5 text-sm font-medium rounded-lg transition ${
+              loginMode === 'otp'
+                ? 'bg-white text-indigo-700 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
             Log In with OTP
-          </label>
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          
+        <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
           {/* Password Mode Fields */}
-          {loginMethod === 'password' && (
+          {loginMode === 'password' && (
             <>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Email Address *</label>
-                <input 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  required 
-                  className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:border-black transition" 
-                  placeholder="Your email address" 
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Your email address"
+                  className="mt-1 w-full h-12 px-4 text-base border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                  required
                 />
               </div>
+
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Password *</label>
-                <div className="relative">
-                  <input 
-                    type={showPassword ? 'text' : 'password'} 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    required 
-                    className="w-full border border-gray-300 rounded-lg p-3 pr-12 focus:outline-none focus:border-black transition" 
-                    placeholder="Enter your password" 
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div className="relative mt-1">
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="w-full h-12 px-4 text-base border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition pr-16"
+                    required
                   />
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black"
+                    className="absolute inset-y-0 right-0 px-4 h-12 flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
-                <div className="flex justify-end mt-2">
-                  <button type="button" className="text-sm text-gray-600 hover:underline">Forgot Password?</button>
-                </div>
+              </div>
+
+              <div className="text-right">
+                <a href="#" className="text-sm text-indigo-600 hover:underline">
+                  Forgot Password?
+                </a>
               </div>
             </>
           )}
 
           {/* OTP Mode Fields */}
-          {loginMethod === 'otp' && (
+          {loginMode === 'otp' && (
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Mobile Number *</label>
-              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden focus-within:border-black">
-                <span className="bg-gray-100 px-3 py-3 text-gray-600 font-medium border-r border-gray-300">+91</span>
-                <input 
-                  type="tel" 
-                  value={mobile} 
-                  onChange={(e) => setMobile(e.target.value)} 
-                  required 
-                  className="flex-1 p-3 focus:outline-none" 
-                  placeholder="Mobile Number" 
+              <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">
+                Mobile Number
+              </label>
+              <div className="mt-1 flex">
+                <span className="inline-flex items-center px-4 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50 text-gray-600 text-base h-12">
+                  +91
+                </span>
+                <input
+                  id="mobile"
+                  type="tel"
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value)}
+                  placeholder="Mobile Number"
+                  className="w-full h-12 px-4 text-base border border-gray-300 rounded-r-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                  required
                 />
               </div>
             </div>
           )}
 
-          {/* Terms */}
-          <div className="text-xs text-gray-500 text-center mt-2">
-            By logging in, you agree to the <span className="underline cursor-pointer hover:text-black">Terms & Conditions</span> and <span className="underline cursor-pointer hover:text-black">Privacy Policy</span>.
-          </div>
-
-          {/* Submit Button */}
-          <button 
-            type="submit" 
-            className="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition mt-2 uppercase tracking-wider"
+          {/* Login Button */}
+          <button
+            type="submit"
+            className="w-full h-12 flex items-center justify-center text-base font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition duration-200 shadow-sm"
           >
-            {loginMethod === 'password' ? 'Sign In' : 'Login With OTP'}
+            {loginMode === 'password' ? 'Sign In' : 'Login With OTP'}
           </button>
 
-          {/* Register Link */}
-          <div className="text-center text-sm text-gray-600 mt-4">
-            New to FORGE? <Link to="/signup" className="text-black font-semibold underline hover:no-underline">Register</Link>
+          {/* Terms & Register */}
+          <p className="text-xs text-gray-500 text-center">
+            By logging in, you agree to the{' '}
+            <a href="#" className="text-indigo-600 hover:underline">Terms &amp; Conditions</a> and{' '}
+            <a href="#" className="text-indigo-600 hover:underline">Privacy Policy</a>.
+          </p>
+
+          <div className="text-center text-sm">
+            <span className="text-gray-600">New to Under Armour? </span>
+            <Link to="/signup" className="font-medium text-indigo-600 hover:underline">
+              Register
+            </Link>
           </div>
+
+          {/* Out of stock note (as shown in your images) */}
+          <p className="text-center text-xs text-red-500 border-t border-gray-200 pt-4 mt-2">
+            The requested product is out of stock at this time.
+          </p>
         </form>
       </div>
     </div>
