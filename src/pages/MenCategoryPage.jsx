@@ -1,7 +1,8 @@
 import React from 'react';
 import { Menu, User, Search, ShoppingBag, HelpCircle, ChevronDown } from 'lucide-react';
-import { ProductCard } from '../components/ProductCard';
+import ProductCard from '../components/ProductCard';
 import { PromoCard } from '../components/PromoCard';
+
 
 const PRODUCTS = [
   {
