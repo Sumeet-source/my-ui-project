@@ -1,29 +1,30 @@
 import React from 'react';
 import { Heart, Bell } from 'lucide-react';
 
-// CHANGED to 'export default' so it matches the imports in your pages
-export default function ProductCard({ product }) {
-  const {
-    featured,
-    image,
-    colors,
-    moreColorsCount = 0,
-    title,
-    price,
-    titleIsLink = false,
-  } = product;
+export default function ProductCard({ product, id, title, price, image, colors, moreColorsCount = 0, featured, titleIsLink = false }) {
+  // ---- Backward compatibility: if 'product' prop exists, use it; otherwise use individual props ----
+  const data = product || { id, title, price, image, colors, moreColorsCount, featured, titleIsLink };
+  const { 
+    featured: isFeatured,
+    image: img,
+    colors: colorList = [],
+    moreColorsCount: extraColors = 0,
+    title: itemTitle,
+    price: itemPrice,
+    titleIsLink: isLink = false
+  } = data;
 
   return (
     <div className="relative bg-white flex flex-col">
       {/* Image container */}
       <div className="relative aspect-square bg-gray-100 overflow-hidden">
         <img
-          src={image}
-          alt={title}
+          src={img}
+          alt={itemTitle}
           className="w-full h-full object-contain"
         />
         {/* Featured badge */}
-        {featured && (
+        {isFeatured && (
           <div className="absolute top-0 left-2 text-[10px] font-bold uppercase tracking-wide text-black leading-tight z-10">
             FEATURED
           </div>
@@ -40,36 +41,36 @@ export default function ProductCard({ product }) {
 
       {/* Color swatches */}
       <div className="pt-3 flex items-center gap-1.5">
-        {colors.slice(0, 4).map((color, idx) => (
+        {colorList.slice(0, 4).map((color, idx) => (
           <div
             key={idx}
             className="w-4 h-4 rounded-full border border-gray-200"
             style={{ backgroundColor: color }}
           />
         ))}
-        {moreColorsCount > 0 && (
+        {extraColors > 0 && (
           <span className="text-xs text-gray-500 ml-1">
-            +{moreColorsCount} More
+            +{extraColors} More
           </span>
         )}
       </div>
 
       {/* Title */}
       <div className="mt-1.5">
-        {titleIsLink ? (
+        {isLink ? (
           <a href="#" className="text-sm text-black underline leading-snug line-clamp-2 hover:no-underline">
-            {title}
+            {itemTitle}
           </a>
         ) : (
           <p className="text-sm text-black leading-snug line-clamp-2">
-            {title}
+            {itemTitle}
           </p>
         )}
       </div>
 
       {/* Price */}
       <div className="text-sm font-bold text-black mt-1">
-        ₹{price.toLocaleString('en-IN')}
+        ₹{itemPrice.toLocaleString('en-IN')}
       </div>
     </div>
   );
