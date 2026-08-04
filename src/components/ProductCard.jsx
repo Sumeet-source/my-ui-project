@@ -1,7 +1,8 @@
 import React from 'react';
 import { Heart, Bell } from 'lucide-react';
 
-export function ProductCard({ product }) {
+// CHANGED to 'export default' so it matches the imports in your pages
+export default function ProductCard({ product }) {
   const {
     featured,
     image,
