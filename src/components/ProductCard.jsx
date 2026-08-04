@@ -1,76 +1,47 @@
-import React from 'react';
-import { Heart, Bell } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useWishlist } from '../context/WishlistContext.jsx';
+import { useCart } from '../context/CartContext.jsx';
 
-export default function ProductCard({ product, id, title, price, image, colors, moreColorsCount = 0, featured, titleIsLink = false }) {
-  // ---- Backward compatibility: if 'product' prop exists, use it; otherwise use individual props ----
-  const data = product || { id, title, price, image, colors, moreColorsCount, featured, titleIsLink };
-  const { 
-    featured: isFeatured,
-    image: img,
-    colors: colorList = [],
-    moreColorsCount: extraColors = 0,
-    title: itemTitle,
-    price: itemPrice,
-    titleIsLink: isLink = false
-  } = data;
+export default function ProductCard({ id, title, price, image, rating, reviewsCount, inStock = true }) {
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { addToCart } = useCart();
+
+  const renderStars = (rating) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <span key={i} className={i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"}>
+        ★
+      </span>
+    ));
+  };
 
   return (
-    <div className="relative bg-white flex flex-col">
-      {/* Image container */}
-      <div className="relative aspect-square bg-gray-100 overflow-hidden">
-        <img
-          src={img}
-          alt={itemTitle}
-          className="w-full h-full object-contain"
-        />
-        {/* Featured badge */}
-        {isFeatured && (
-          <div className="absolute top-0 left-2 text-[10px] font-bold uppercase tracking-wide text-black leading-tight z-10">
-            FEATURED
-          </div>
-        )}
-        {/* Wishlist heart button */}
-        <button className="absolute top-2 right-2 w-8 h-8 rounded-full border border-gray-300 bg-white/80 flex items-center justify-center hover:bg-white transition">
-          <Heart className="w-4 h-4 stroke-black" />
-        </button>
-        {/* Notify bell button */}
-        <button className="absolute -bottom-4 right-4 w-9 h-9 rounded-full bg-black flex items-center justify-center shadow-md z-10">
-          <Bell className="w-4 h-4 stroke-white fill-none" />
-        </button>
-      </div>
+    <div className="bg-white p-4 group relative border border-transparent hover:border-gray-200 transition-all duration-300">
+      
+      {/* Heart Icon */}
+      <button 
+        onClick={() => toggleWishlist({ id, title, price, image })}
+        className="absolute top-4 right-4 z-10 transition-transform hover:scale-110"
+      >
+        <svg className={`w-6 h-6 transition-colors ${isInWishlist(id) ? 'fill-black' : 'fill-none stroke-black'}`} viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </button>
 
-      {/* Color swatches */}
-      <div className="pt-3 flex items-center gap-1.5">
-        {colorList.slice(0, 4).map((color, idx) => (
-          <div
-            key={idx}
-            className="w-4 h-4 rounded-full border border-gray-200"
-            style={{ backgroundColor: color }}
-          />
-        ))}
-        {extraColors > 0 && (
-          <span className="text-xs text-gray-500 ml-1">
-            +{extraColors} More
-          </span>
-        )}
-      </div>
+      {/* Product Image */}
+      <Link to={`/product/${id}`}>
+        <div className="relative w-full aspect-square overflow-hidden bg-gray-50 mb-4 rounded-md">
+          <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        </div>
+      </Link>
 
-      {/* Title */}
-      <div className="mt-1.5">
-        {isLink ? (
-          <a href="#" className="text-sm text-black underline leading-snug line-clamp-2 hover:no-underline">
-            {itemTitle}
-          </a>
-        ) : (
-          <p className="text-sm text-black leading-snug line-clamp-2">
-            {itemTitle}
-          </p>
-        )}
-      </div>
-
+      {/* Title & Price */}
+      <Link to={`/product/${id}`} className="block mb-2">
+        <h3 className="text-sm font-bold text-gray-900 hover:underline leading-tight">{title}</h3>
+      </Link>
+      
       {/* Price */}
-      <div className="text-sm font-bold text-black mt-1">
-        ₹{itemPrice.toLocaleString('en-IN')}
+      <div className="flex items-center gap-2 text-sm font-bold">
+        <span>₹{price}</span>
       </div>
     </div>
   );
