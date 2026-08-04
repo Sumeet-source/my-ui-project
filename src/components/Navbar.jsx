@@ -47,6 +47,7 @@ export default function Navbar() {
     ${isActive ? 'after:w-full' : ''}`;
 
   const isActiveHome = false; 
+  const isActiveNew = location.pathname === '/new-arrivals'; // Added
   const isActiveMen = location.pathname === '/men';
   const isActiveWomen = location.pathname === '/women';
   const isActiveShoes = location.pathname === '/shoes';
@@ -118,11 +119,14 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* --- DESKTOP LINKS (ECHO REMOVED) --- */}
+        {/* --- DESKTOP LINKS --- */}
         <div className="hidden md:flex justify-center flex-1 gap-20 text-[16px] font-bold items-center h-10">
-          <Link to="/" className="relative h-full flex items-center cursor-pointer">
-            <span className={getUnderlineSpanClasses(isActiveHome)}>New <span className="text-orange-500 text-sm">🔥</span></span>
+          
+          {/* UPDATED: Links to the new /new-arrivals page */}
+          <Link to="/new-arrivals" className="relative h-full flex items-center cursor-pointer">
+            <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm">🔥</span></span>
           </Link>
+
           <div className="group h-full flex items-center">
             <Link to="/men" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveMen)}>Men</span></Link>
           </div>
@@ -167,7 +171,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- MOBILE DRAWER (ECHO REMOVED) --- */}
+      {/* --- MOBILE DRAWER --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col overflow-hidden">
           <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 shrink-0">
@@ -198,7 +202,9 @@ export default function Navbar() {
           <div className="flex-1 overflow-y-auto px-6 py-4">
             {!activeSubmenu && (
               <div className="flex flex-col">
-                <button onClick={() => { window.location.href = '/#new-arrivals'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+                
+                {/* UPDATED: Hamburger New link goes to /new-arrivals */}
+                <button onClick={() => { window.location.href = '/new-arrivals'; setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                   <span>New <span className="text-orange-500 text-sm">🔥</span></span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                 </button>
