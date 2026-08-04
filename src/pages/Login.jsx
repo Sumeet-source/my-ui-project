@@ -154,7 +154,7 @@ export default function Login() {
 
           {/* Register link */}
           <div className="text-center text-sm">
-            <span className="text-gray-600">New to Under Armour? </span>
+            <span className="text-gray-600">New to Forge? </span>
             <Link to="/signup" className="font-semibold text-black hover:underline">
               Register
             </Link>
@@ -162,7 +162,7 @@ export default function Login() {
 
           {/* Out of stock note (like in the image) */}
           <p className="text-center text-xs text-red-600 border-t border-gray-200 pt-4 mt-2">
-            The requested product is out of stock at this time.
+           
           </p>
         </form>
       </div>
