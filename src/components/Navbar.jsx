@@ -6,6 +6,8 @@ import { useAuth } from '../context/AuthContext.jsx';
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
+  // NEW: State to handle the mobile search bar toggle
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   
   const { cart } = useCart();
   const { user, logout } = useAuth();
@@ -75,6 +77,8 @@ export default function Navbar() {
 
       {/* --- MAIN NAVIGATION BAR --- */}
       <div className="flex justify-between items-center px-4 py-3 md:px-6 md:py-5 max-w-[1600px] mx-auto relative">
+        
+        {/* --- LEFT: MOBILE HAMBURGER & PROFILE --- */}
         <div className="flex items-center gap-3 md:hidden">
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,6 +92,7 @@ export default function Navbar() {
           </Link>
         </div>
 
+        {/* --- CENTER: LOGO --- */}
         <Link to="/" className="block shrink-0 md:ml-8 lg:ml-16 md:mr-4 lg:mr-6">
           <svg width="44" height="26" viewBox="0 0 44 26" className="w-[44px] h-[26px] shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clipPath="url(#clip0_115_2)">
@@ -103,8 +108,10 @@ export default function Navbar() {
           </svg>
         </Link>
 
+        {/* --- RIGHT: MOBILE ICONS (Search, Wishlist, Cart) --- */}
         <div className="flex items-center gap-4 md:hidden">
-          <button onClick={() => { const input = document.querySelector('input[placeholder="Search"]'); if (input) input.focus(); }} className="text-white">
+          {/* UPDATED: Mobile Search Toggle Button */}
+          <button onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)} className="text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -122,7 +129,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* === DESKTOP LINKS AND MEGA MENUS === */}
+        {/* --- DESKTOP NAVIGATION (Hidden on Mobile) --- */}
         <div className="hidden md:flex justify-center flex-1 gap-20 text-[16px] font-bold items-center h-10">
           <Link to="/" className="relative h-full flex items-center cursor-pointer">
             <span className={getUnderlineSpanClasses(isActiveHome)}>New <span className="text-orange-500 text-sm">🔥</span></span>
@@ -225,6 +232,7 @@ export default function Navbar() {
           <Link to="/echo" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveEcho)}>Echo</span></Link>
         </div>
 
+        {/* --- DESKTOP SEARCH & ICONS --- */}
         <div className="hidden md:flex items-center gap-6">
           <div className="hidden sm:flex items-center gap-2 border-b border-white/30 hover:border-white transition-colors pb-0.5 w-32">
             <input type="text" value={searchTerm} onChange={handleSearchChange} onKeyDown={handleSearchKeyDown} placeholder="Search" className="bg-transparent text-white text-[15px] placeholder-white/70 focus:outline-none w-full" />
@@ -237,10 +245,27 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- HIERARCHICAL MOBILE DRAWER --- */}
+      {/* --- NEW: MOBILE SLIDE-DOWN SEARCH INPUT --- */}
+      <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileSearchOpen ? 'max-h-20 opacity-100 px-4 pb-4' : 'max-h-0 opacity-0 px-4'}`}>
+        <div className="relative">
+          <input 
+            type="text" 
+            value={searchTerm} 
+            onChange={handleSearchChange} 
+            onKeyDown={handleSearchKeyDown}
+            placeholder="Search..." 
+            className="w-full bg-[#1a1a1a] text-white border border-gray-700 rounded-full py-2 pl-4 pr-10 text-sm focus:outline-none focus:border-white transition-all"
+            autoFocus={isMobileSearchOpen}
+          />
+          <svg className="w-4 h-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      </div>
+
+      {/* --- MOBILE DRAWER (Same as before) --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col overflow-hidden">
-          {/* Header */}
           <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 shrink-0">
             <div className="flex-1"></div>
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0">
@@ -266,7 +291,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Scrollable Links Area */}
           <div className="flex-1 overflow-y-auto px-6 py-4">
             {!activeSubmenu && (
               <div className="flex flex-col">
