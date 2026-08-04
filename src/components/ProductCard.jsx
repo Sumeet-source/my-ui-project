@@ -2,24 +2,33 @@ import { Link } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext.jsx';
 import { useCart } from '../context/CartContext.jsx';
 
-export default function ProductCard({ id, title, price, originalPrice, image, colors = [], discount }) {
+export default function ProductCard({ id, title, price, originalPrice, image, colors = [], discount, featured }) { // Added `featured` prop
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
 
   return (
-    <div className="bg-white p-4 group relative">
+    <div className="bg-white p-4 group relative border border-transparent hover:border-gray-200 transition-all duration-300">
+      
+      {/* FEATURED BADGE (Matches Under Armour exactly) */}
+      {featured && (
+        <div className="absolute top-3 left-3 z-10 bg-black text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm">
+          Featured
+        </div>
+      )}
+
       {/* Heart Icon */}
       <button 
         onClick={() => toggleWishlist({ id, title, price, image })}
-        className="absolute top-4 right-4 z-10"
+        className="absolute top-3 right-3 z-10 transition-transform hover:scale-110"
       >
         <svg className={`w-6 h-6 transition-colors ${isInWishlist(id) ? 'fill-black' : 'fill-none stroke-black'}`} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
         </svg>
       </button>
 
+      {/* Product Image */}
       <Link to={`/product/${id}`}>
-        <div className="relative w-full aspect-square overflow-hidden bg-gray-50 mb-4">
+        <div className="relative w-full aspect-square overflow-hidden bg-gray-50 mb-4 rounded-md">
           <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         </div>
       </Link>
