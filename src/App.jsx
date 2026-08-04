@@ -12,7 +12,9 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Admin from "./pages/Admin.jsx";
 import Outlet from "./pages/Outlet.jsx";
 import Echo from "./pages/Echo.jsx";
-import Men from "./pages/Men.jsx";
+import Men from "./pages/Men.jsx";       // Added
+import Women from "./pages/Women.jsx";   // Added
+import Shoes from "./pages/Shoes.jsx";   // Added
 
 const router = createBrowserRouter([
   {
@@ -31,9 +33,10 @@ const router = createBrowserRouter([
       { path: "admin", element: <Admin /> },
       { path: "outlet", element: <Outlet /> },
       { path: "echo", element: <Echo /> },
-      // --- CATCH-ALL FALLBACK ---
-      { path: "*", element: <Home /> } 
+      // --- NEW PAGES ---
       { path: "men", element: <Men /> },
+      { path: "women", element: <Women /> },
+      { path: "shoes", element: <Shoes /> },
     ]
   }
 ]);
