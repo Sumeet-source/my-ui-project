@@ -1,148 +1,128 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import ProductCard from '../components/ProductCard';
-import { useAdmin } from '../context/AdminContext.jsx';
-import { products as localProducts } from '../data/products.js'; 
+import { Link } from 'react-router-dom';
+import axiosClient from '../api/axiosClient';
 
 export default function Home() {
-  const { products: dbProducts } = useAdmin();
-  const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
-  
-  const [searchParams] = useSearchParams();
-  const [activeCategory, setActiveCategory] = useState(() => searchParams.get('category') || 'all');
-  const [sortOption, setSortOption] = useState('default');
-  const [brandFilter, setBrandFilter] = useState('all');
-  const [priceRange, setPriceRange] = useState('all');
-
-  const searchTerm = searchParams.get('search') || '';
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const cat = searchParams.get('category') || 'all';
-    setActiveCategory(cat);
-  }, [searchParams]); 
+    fetchAllProducts();
+  }, []);
 
-  // --- SCROLL FIX ---
-  useEffect(() => {
-    if (window.location.hash === '#new-arrivals') {
-      const timer = setTimeout(() => {
-        const element = document.getElementById('new-arrivals');
-        if (element) {
-          const y = element.getBoundingClientRect().top + window.scrollY;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-      }, 1500);
-      return () => clearTimeout(timer);
+  const fetchAllProducts = async () => {
+    try {
+      const res = await axiosClient.get('/api/products');
+      setProducts(res.data); 
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [activeCategory]);
+  };
 
-  // Filtering logic
-  const categoryFiltered = activeCategory === 'all' 
-    ? products 
-    : products.filter((product) => product.category === activeCategory);
+  // Categories Data
+  const categories = [
+    { name: 'Men', link: '/men', img: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?q=80&w=800&auto=format&fit=crop' },
+    { name: 'Women', link: '/women', img: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=800&auto=format&fit=crop' },
+    { name: 'Shoes', link: '/shoes', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop' },
+    { name: 'Outlet', link: '/outlet', img: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=800&auto=format&fit=crop' }
+  ];
 
-  const searchFiltered = categoryFiltered.filter((product) =>
-    product.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const brandFiltered = brandFilter === 'all'
-    ? searchFiltered
-    : searchFiltered.filter((product) => product.brand === brandFilter);
-
-  const priceFiltered = brandFiltered.filter((product) => {
-    if (priceRange === 'under50') return product.price < 50;
-    if (priceRange === '50to100') return product.price >= 50 && product.price <= 100;
-    if (priceRange === 'over100') return product.price > 100;
-    return true;
-  });
-
-  const sortedProducts = [...priceFiltered].sort((a, b) => {
-    if (sortOption === 'low-to-high') return a.price - b.price;
-    if (sortOption === 'high-to-low') return b.price - a.price;
-    return 0;
-  });
-
-  const uniqueBrands = ['all', ...new Set(products.map(p => p.brand).filter(Boolean))];
+  // Instagram Data
+  const instaImages = [
+    'https://images.unsplash.com/photo-1517931524326-bdd55b5415f7?q=80&w=1000&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1574680096144-f9ca08522613?q=80&w=1000&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=1000&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1000&auto=format&fit=crop'
+  ];
 
   return (
-    <div className="font-sans overflow-x-hidden">
-      {/* HERO BANNER */}
-      <section className="relative h-[600px] flex items-center justify-center bg-black" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1920&q=80')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
-        <div className="absolute inset-0 bg-black/50"></div>
-        <div className="relative z-10 text-center text-white px-4">
-          <h1 className="text-5xl md:text-7xl font-extrabold uppercase tracking-wider mb-4">Push Beyond</h1>
-          <p className="text-lg md:text-2xl font-light mb-8">High-performance gear engineered for the grind.</p>
-          <a href="#new-arrivals" className="bg-white text-black px-10 py-4 rounded-full font-bold uppercase tracking-wide hover:bg-gray-200 transition shadow-lg inline-block">Shop Now</a>
+    <div className="bg-white min-h-screen">
+      {/* HERO BANNER 1 */}
+      <div className="relative w-full h-[500px] md:h-[700px] lg:h-[800px] overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop" alt="Gym Hero" className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://picsum.photos/2070/800?random=1'; }}/>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+        <div className="absolute inset-0 flex flex-col items-start justify-end px-6 md:px-20 pb-10 md:pb-20">
+          <h1 className="text-4xl md:text-7xl font-extrabold text-white tracking-tight drop-shadow-lg mb-2">PUSH <br className="hidden md:block" /> BEYOND</h1>
+          <p className="text-base md:text-xl text-gray-200 max-w-2xl mb-6 drop-shadow-md">Premium athletic wear engineered for your peak performance.</p>
+          <Link to="/men" className="bg-white text-black font-bold py-3 px-8 md:py-4 md:px-10 rounded hover:bg-gray-100 hover:scale-105 transition-all duration-300">SHOP NOW</Link>
         </div>
-      </section>
+      </div>
 
-      {/* CATEGORIES */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-black pl-4">Shop by Category</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {['men', 'women', 'outerwear', 'footwear'].map((cat, idx) => (
-            <div key={idx} onClick={() => setActiveCategory(cat)} className={`relative group h-64 rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-300 ${activeCategory === cat ? 'border-black' : 'border-transparent'}`}>
-               <img src={['https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?auto=format&fit=crop&w=600&q=80','https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=600&q=80','https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=600&q=80','https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80'][idx]} alt={cat} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition duration-300"></div>
-               <div className="absolute inset-0 flex items-center justify-center">
-                 <h3 className="text-white text-xl font-bold uppercase tracking-wider">{cat}</h3>
-               </div>
-            </div>
+      {/* HERO BANNER 2 */}
+      <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden my-8 md:my-12">
+        <img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=2070&auto=format&fit=crop" alt="HeatGear Elite" className="w-full h-full object-cover brightness-75" onError={(e) => { e.target.src = 'https://picsum.photos/2070/800?random=2'; }}/>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-wider mb-2">HEATGEAR<span className="text-red-500">®</span> ELITE</h2>
+          <p className="text-sm md:text-lg text-white max-w-xl mb-6">Compression that stretches the way you need it. Fresh new colors.</p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link to="/men" className="bg-black text-white font-semibold py-3 px-8 rounded hover:bg-gray-800 hover:scale-105 transition-all duration-300 border border-white/20">Shop Men</Link>
+            <Link to="/women" className="bg-white text-black font-semibold py-3 px-8 rounded hover:bg-gray-100 hover:scale-105 transition-all duration-300">Shop Women</Link>
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN CONTENT */}
+      <div className="px-6 md:px-10 pb-12">
+        {/* CATEGORY GRID */}
+        <h1 className="text-3xl font-bold mb-6 pt-8">Put Our Newest Gear To Work</h1>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
+          {categories.map((cat) => (
+            <Link to={cat.link} key={cat.name} className="flex flex-col group cursor-pointer">
+              <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-200">
+                <img src={cat.img} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://picsum.photos/seed/fallback/800/800'; }} />
+              </div>
+              <p className="mt-2 text-sm font-medium text-gray-900 uppercase tracking-wider">Shop {cat.name}</p>
+            </Link>
           ))}
         </div>
-      </section>
 
-      {/* PRODUCT GRID SECTION */}
-      <section className="max-w-7xl mx-auto px-6 py-16" id="new-arrivals">
-        <div className="flex flex-wrap justify-between items-center mb-8 border-l-4 border-black pl-4 gap-4">
-          <h2 className="text-3xl font-bold text-gray-900">
-            {searchTerm ? `Searching for "${searchTerm}"` : (activeCategory === 'all' ? 'New Arrivals' : activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1))}
-          </h2>
-          <div className="flex flex-wrap items-center gap-4">
-            <select value={brandFilter} onChange={(e) => setBrandFilter(e.target.value)} className="bg-white border border-gray-300 rounded-md py-1.5 px-3 text-sm font-medium text-gray-700 focus:outline-none focus:border-black transition shadow-sm cursor-pointer">
-              <option value="all">All Brands</option>
-              {uniqueBrands.filter(b => b !== 'all').map(brand => (
-                <option key={brand} value={brand}>{brand}</option>
-              ))}
-            </select>
-            <select value={priceRange} onChange={(e) => setPriceRange(e.target.value)} className="bg-white border border-gray-300 rounded-md py-1.5 px-3 text-sm font-medium text-gray-700 focus:outline-none focus:border-black transition shadow-sm cursor-pointer">
-              <option value="all">All Prices</option>
-              <option value="under50">Under $50</option>
-              <option value="50to100">$50 - $100</option>
-              <option value="over100">Over $100</option>
-            </select>
-            <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} className="bg-white border border-gray-300 rounded-md py-1.5 px-3 text-sm font-medium text-gray-700 focus:outline-none focus:border-black transition shadow-sm cursor-pointer">
-              <option value="default">Sort by</option>
-              <option value="low-to-high">Price: Low to High</option>
-              <option value="high-to-low">Price: High to Low</option>
-            </select>
-            {activeCategory !== 'all' && <button onClick={() => setActiveCategory('all')} className="text-sm font-semibold text-gray-600 hover:text-black transition underline">View All</button>}
-            {searchTerm && <button onClick={() => setSearchParams({})} className="text-sm font-semibold text-gray-600 hover:text-black transition underline">Clear Search</button>}
-          </div>
-        </div>
-
-        {sortedProducts.length === 0 ? (
-          <div className="text-center py-16 bg-gray-50 rounded-lg">
-            <p className="text-xl text-gray-500">No products found matching your filters.</p>
-            <p className="text-gray-400 mt-2">Try adjusting your filters.</p>
-          </div>
+        {/* FEATURED PRODUCTS (Ab Clickable) */}
+        <h2 className="text-2xl font-bold mb-4">Featured Products</h2>
+        {loading ? (
+          <p className="text-center py-10 text-gray-500">Loading products...</p>
         ) : (
-          // --- UPDATED GRID FOR 2 COLUMNS ON MOBILE ---
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
-            {sortedProducts.map((item) => (
-              <ProductCard 
-                key={item.id} 
-                id={item.id} 
-                title={item.title} 
-                price={item.price} 
-                image={item.image} 
-                rating={item.rating} 
-                reviewsCount={item.reviews?.length || 0} 
-                inStock={item.inStock}
-              />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+            {products.slice(0, 8).map((product) => (
+              <Link to={`/product/${product._id}`} key={product._id} className="group cursor-pointer">
+                <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square border border-gray-100">
+                  <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" onError={(e) => { e.target.src = 'https://picsum.photos/seed/fallbackprod/600/600'; }} />
+                  <button className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                  </button>
+                </div>
+                <div className="mt-3">
+                  <p className="text-sm font-semibold text-gray-900">{product.title}</p>
+                  <p className="text-sm text-gray-500">${product.price}</p>
+                </div>
+              </Link>
             ))}
           </div>
         )}
-      </section>
+
+        {/* INSTAGRAM SECTION */}
+        <div className="border-t border-gray-200 pt-10 mt-4">
+          <div className="flex justify-between items-end mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Follow Our Journey</h2>
+            <span className="text-sm text-gray-500 hover:text-black cursor-pointer font-medium">#FORGE_FITNESS</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+            {instaImages.map((imgSrc, index) => (
+              <div key={index} className="relative aspect-square overflow-hidden group bg-gray-200 rounded-lg">
+                <img src={imgSrc} alt={`Insta ${index + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" onError={(e) => { e.target.src = 'https://picsum.photos/seed/instafallback/1000/1000'; }} />
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition duration-300"></div>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center items-center mt-6 pt-4 border-t border-gray-100">
+             <Link to="#" className="flex items-center gap-2 text-gray-800 hover:text-black transition group">
+                <svg className="w-6 h-6 group-hover:scale-110 transition" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" /></svg>
+                <span className="text-sm font-semibold">Follow us @forge_fitness</span>
+             </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

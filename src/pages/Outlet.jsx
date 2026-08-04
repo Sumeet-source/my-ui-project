@@ -1,111 +1,90 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import FilterSidebar from '../components/FilterSidebar.jsx';
-import MobileFilterPanel from '../components/MobileFilterPanel.jsx';
-import ProductCard from '../components/ProductCard.jsx';
-import { products } from '../data/products.js';
+import { useState, useEffect } from 'react';
+import axiosClient from '../api/axiosClient';
+import FilterDrawer from '../components/FilterDrawer';
 
 export default function Outlet() {
-  const [sortBy, setSortBy] = useState('featured');
-  const [filters, setFilters] = useState({ gender: [], category: [] });
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
-  // Standard filter logic for Outlet page
-  const filteredProducts = products.filter((product) => {
-    if (filters.gender?.length > 0 && !filters.gender.includes(product.category)) return false;
-    if (filters.category?.length > 0 && !filters.category.includes(product.category)) return false;
-    return true;
-  });
+  useEffect(() => {
+    fetchOutletProducts();
+  }, []);
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (sortBy === 'low-high') return a.price - b.price;
-    if (sortBy === 'high-low') return b.price - a.price;
-    return 0;
-  });
+  const fetchOutletProducts = async () => {
+    try {
+      const res = await axiosClient.get('/api/products');
+      const outletProducts = res.data.filter(p => p.category === 'Outlet');
+      setProducts(outletProducts);
+      setFilteredProducts(outletProducts);
+    } catch (error) {
+      console.error('Error fetching outlet products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleApplyFilters = () => setIsFilterOpen(false);
+  const applyFilters = (filters) => {
+    let result = [...products];
+    if (filters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
+    else if (filters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
+    else if (filters.sort === 'newest') result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    if (filters.gender) {
+      result = result.filter(p => p.title.toLowerCase().includes(filters.gender.toLowerCase()));
+    }
+
+    if (filters.price === '0-50') result = result.filter(p => p.price < 50);
+    else if (filters.price === '50-100') result = result.filter(p => p.price >= 50 && p.price <= 100);
+    else if (filters.price === '100+') result = result.filter(p => p.price > 100);
+
+    setFilteredProducts(result);
+  };
+
+  const clearFilters = () => setFilteredProducts(products);
 
   return (
-    <div className="bg-white min-h-screen overflow-x-hidden relative">
-      
-      {/* --- MOBILE TOP NAVIGATION BAR (Image 2) --- */}
-      <div className="md:hidden flex justify-between items-center border-b border-gray-200 py-3 px-4 bg-white shrink-0">
-        <button 
-          onClick={() => setIsCategoryOpen(!isCategoryOpen)} 
-          className="flex-1 flex items-center justify-center gap-1 text-sm font-medium text-black border-r border-gray-200"
-        >
-          Outlet 
-          {isCategoryOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
-        <button 
-          onClick={() => setIsFilterOpen(true)} 
-          className="flex-1 flex items-center justify-center text-sm font-medium text-black"
-        >
-          Filters/ Sort
+    <div className="p-6 md:p-10 bg-white min-h-screen">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">FORGE Outlet</h1>
+        <button onClick={() => setIsFilterOpen(true)} className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded text-sm font-medium hover:bg-gray-200">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+          Filters / Sort
         </button>
       </div>
 
-      {/* --- MOBILE "OUTLET" CATEGORY DROPDOWN (Image 1) --- */}
-      {isCategoryOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 px-6 py-4 flex flex-col gap-4 shadow-sm">
-          <Link to="/men" onClick={() => setIsCategoryOpen(false)} className="text-sm font-medium text-black hover:text-blue-600">Men</Link>
-          <Link to="/women" onClick={() => setIsCategoryOpen(false)} className="text-sm font-medium text-black hover:text-blue-600">Women</Link>
-          <Link to="/shoes" onClick={() => setIsCategoryOpen(false)} className="text-sm font-medium text-black hover:text-blue-600">Shoes</Link>
+      {loading ? (
+        <p className="text-center py-10 text-gray-500">Loading products...</p>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {filteredProducts.length === 0 ? (
+            <p className="col-span-full text-center py-10 text-gray-500">No products match your filters.</p>
+          ) : (
+            filteredProducts.map((product) => (
+              <div key={product._id} className="group cursor-pointer">
+                <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
+                  <img 
+                    src={product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
+                    alt={product.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }}
+                  />
+                  <button className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                  </button>
+                </div>
+                <div className="mt-3">
+                  <p className="text-sm font-semibold text-gray-900">{product.title}</p>
+                  <p className="text-sm text-gray-500">${product.price}</p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 
-      {/* --- DESKTOP BREADCRUMB & TITLE --- */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-          <span>Outlet</span>
-        </div>
-        <h1 className="text-4xl font-bold text-gray-900 tracking-tight mb-8">FORGE Outlet</h1>
-
-        {/* --- DESKTOP LAYOUT (Hidden on Mobile) --- */}
-        <div className="hidden md:flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <div className="flex items-center gap-4 text-sm">
-            <span className="text-gray-500">{sortedProducts.length} items</span>
-            <div className="border border-gray-200 rounded-sm px-4 py-2 flex items-center gap-2">
-              <label className="text-xs text-gray-600">Sort</label>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="text-xs font-medium bg-transparent focus:outline-none cursor-pointer">
-                <option value="featured">Featured</option>
-                <option value="low-high">Price: Low to High</option>
-                <option value="high-low">Price: High to Low</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* --- MAIN LAYOUT (Sidebar + Grid) --- */}
-        <div className="flex flex-col lg:flex-row gap-12">
-          
-          {/* Desktop Sidebar */}
-          <div className="hidden lg:block w-56 shrink-0">
-            <FilterSidebar filters={filters} setFilters={setFilters} />
-          </div>
-          
-          {/* Product Grid - 2 Columns on Mobile, 3 on Desktop */}
-          <div className="flex-1 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 lg:gap-x-8 lg:gap-y-12">
-            {sortedProducts.map((product, index) => (
-              <ProductCard 
-                key={product.id} 
-                {...product} 
-                featured={index < 2} 
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* --- MOBILE FILTER FULL-SCREEN OVERLAY (Image 3) --- */}
-      <MobileFilterPanel 
-        isOpen={isFilterOpen} 
-        onClose={() => setIsFilterOpen(false)}
-        onApply={handleApplyFilters}
-      />
-
+      <FilterDrawer isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} onApply={applyFilters} onClear={clearFilters} />
     </div>
   );
 }

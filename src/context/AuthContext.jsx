@@ -9,8 +9,8 @@ export function AuthProvider({ children }) {
 
   // Check if user is already logged in on page load
   useEffect(() => {
-    const token = localStorage.getItem('forge_token');
-    const storedUser = localStorage.getItem('forge_user');
+    const token = localStorage.getItem('token'); // FIX: 'forge_token' -> 'token'
+    const storedUser = localStorage.getItem('user'); // FIX: 'forge_user' -> 'user'
     
     if (token && storedUser) {
       setUser(JSON.parse(storedUser));
@@ -21,12 +21,12 @@ export function AuthProvider({ children }) {
   // --- LOGIN ---
   const login = async (email, password) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
+      const response = await api.post('/api/auth/login', { email, password }); // FIX: '/auth' -> '/api/auth'
       const { token, user } = response.data;
       
       // Save to browser storage
-      localStorage.setItem('forge_token', token);
-      localStorage.setItem('forge_user', JSON.stringify(user));
+      localStorage.setItem('token', token); // FIX: 'forge_token' -> 'token'
+      localStorage.setItem('user', JSON.stringify(user)); // FIX: 'forge_user' -> 'user'
       
       setUser(user);
       return { success: true, user };
@@ -41,10 +41,8 @@ export function AuthProvider({ children }) {
   // --- SIGNUP ---
   const signup = async (name, email, password) => {
     try {
-      const response = await api.post('/auth/signup', { name, email, password });
+      const response = await api.post('/api/auth/signup', { name, email, password }); // FIX: '/auth' -> '/api/auth'
       
-      // NOTE: For a perfect experience, we want the backend to return a token here too.
-      // If it doesn't, the user will just have to log in manually after signing up.
       return { success: true, message: response.data.message };
     } catch (error) {
       return { 
@@ -56,8 +54,8 @@ export function AuthProvider({ children }) {
 
   // --- LOGOUT ---
   const logout = () => {
-    localStorage.removeItem('forge_token');
-    localStorage.removeItem('forge_user');
+    localStorage.removeItem('token'); // FIX: 'forge_token' -> 'token'
+    localStorage.removeItem('user'); // FIX: 'forge_user' -> 'user'
     setUser(null);
   };
 

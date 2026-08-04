@@ -9,9 +9,22 @@ export default function Dashboard() {
   const { showToast } = useToast();
   const [view, setView] = useState('profile');
 
-  // Fallback: try to load user from localStorage if context is missing
+  const getDateFromObjectId = (id) => {
+    if (!id) return 'N/A';
+    try {
+      const timestamp = parseInt(id.substring(0, 8), 16) * 1000;
+      return new Date(timestamp).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return 'N/A';
+    }
+  };
+
   const effectiveUser = user || (() => {
-    const stored = localStorage.getItem('forge_user');
+    const stored = localStorage.getItem('user'); 
     return stored ? JSON.parse(stored) : null;
   })();
 
@@ -23,72 +36,133 @@ export default function Dashboard() {
 
   if (!effectiveUser) {
     return (
-      <div className="text-center py-20 text-xl text-gray-600">
-        Please log in to view your dashboard.
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-10 bg-white rounded-xl shadow-lg">
+          <p className="text-xl text-gray-600">Please log in to view your dashboard.</p>
+          <Link to="/login" className="mt-4 inline-block bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition">Go to Login</Link>
+        </div>
       </div>
     );
   }
 
   const orders = JSON.parse(localStorage.getItem(`orders_${effectiveUser.email}`) || '[]');
+  
+  // Get Initials for Avatar
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Welcome back, {effectiveUser.name}!</h1>
-      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 space-y-4">
-        <div className="border-b border-gray-200 pb-4 flex gap-4 mb-4">
-          <button onClick={() => setView('profile')} className={`font-semibold transition ${view === 'profile' ? 'text-black border-b-2 border-black pb-1' : 'text-gray-500 hover:text-black'}`}>
-            My Profile
-          </button>
-          <button onClick={() => setView('orders')} className={`font-semibold transition ${view === 'orders' ? 'text-black border-b-2 border-black pb-1' : 'text-gray-500 hover:text-black'}`}>
-            Order History ({orders.length})
+    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        
+        {/* Header Section with Avatar - Mobile Optimized */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-16 bg-black text-white rounded-full flex items-center justify-center text-xl font-bold shrink-0">
+              {getInitials(effectiveUser.name)}
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 break-words">Welcome back, {effectiveUser.name}!</h1>
+              <p className="text-xs sm:text-sm text-gray-500">Member since {getDateFromObjectId(effectiveUser.id)}</p>
+            </div>
+          </div>
+          
+          {/* Logout Button - Mobile friendly */}
+          <button 
+            onClick={handleLogout} 
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-3 sm:px-4 sm:py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition text-sm font-medium"
+          >
+            {/* Mobile Icon */}
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            {/* Desktop Text */}
+            <span className="hidden sm:inline">Log Out</span>
           </button>
         </div>
 
-        {view === 'profile' && (
-          <div className="space-y-4">
-            <div className="border-b border-gray-200 pb-4">
-              <p className="text-gray-600"><span className="font-semibold">Email:</span> {effectiveUser.email}</p>
-              <p className="text-gray-600"><span className="font-semibold">Member since:</span> {new Date(effectiveUser.id).toLocaleDateString()}</p>
+        {/* Main Dashboard Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          {/* Stats & Quick Actions (Left Side) */}
+          <div className="md:col-span-1 space-y-6">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Stats</h3>
+              <div className="space-y-3 text-sm text-gray-600">
+                <div className="flex justify-between">
+                  <span>Total Orders</span>
+                  <span className="font-bold text-black">{orders.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Member Since</span>
+                  <span className="font-medium text-gray-800">{getDateFromObjectId(effectiveUser.id)}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-4">
-              <button onClick={handleLogout} className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">Log Out</button>
-              {effectiveUser.email === 'admin@test.com' && (
-                <Link to="/admin" className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition">Go to Admin Panel</Link>
-              )}
+
+            {/* Quick Links */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Quick Actions</h3>
+              <div className="space-y-2">
+                <button onClick={() => setView('orders')} className="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 transition">View Order History</button>
+                <Link to="/wishlist" className="block w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 transition">My Wishlist</Link>
+                {effectiveUser.isAdmin && (
+                  <Link to="/admin" className="block w-full text-left px-3 py-2 text-sm font-medium text-white bg-black rounded hover:bg-gray-800 transition mt-2 text-center">
+                    Go to Admin Panel
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
-        )}
 
-        {view === 'orders' && (
-          <div className="space-y-4">
-            {orders.length === 0 ? (
-              <p className="text-gray-500 italic">You haven't placed any orders yet.</p>
-            ) : (
-              <div className="space-y-6">
-                {orders.map((order) => (
-                  <div key={order.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                    <div className="flex justify-between items-center mb-2 border-b border-gray-200 pb-2">
-                      <span className="font-bold text-gray-900">Order #{order.id}</span>
-                      <span className="text-sm text-gray-500">{order.date}</span>
-                    </div>
-                    <div className="space-y-2 mb-2">
-                      {order.items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between text-sm text-gray-600">
-                          <span>{item.title} {item.size ? `(Size: ${item.size})` : ''} <span className="font-bold">x{item.quantity}</span></span>
-                          <span>${(item.price * item.quantity).toFixed(2)}</span>
+          {/* Right Side - Profile/Orders Content */}
+          <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100 min-h-[300px]">
+            {view === 'profile' && (
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">My Profile Details</h3>
+                <div className="space-y-3 text-gray-600 py-2">
+                  <p><span className="font-medium text-gray-900">Email Address:</span> {effectiveUser.email}</p>
+                  <p><span className="font-medium text-gray-900">Account Type:</span> {effectiveUser.isAdmin ? 'Administrator' : 'Customer'}</p>
+                </div>
+              </div>
+            )}
+
+            {view === 'orders' && (
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Order History</h3>
+                {orders.length === 0 ? (
+                  <p className="text-gray-500 italic py-8 text-center">You haven't placed any orders yet. <Link to="/shop" className="text-black underline">Start shopping</Link></p>
+                ) : (
+                  <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                    {orders.map((order) => (
+                      <div key={order.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition">
+                        <div className="flex justify-between items-center mb-2 border-b border-gray-200 pb-2">
+                          <span className="font-bold text-gray-900 text-sm">Order #{order.id}</span>
+                          <span className="text-xs text-gray-500">{order.date}</span>
                         </div>
-                      ))}
-                    </div>
-                    <div className="flex justify-between font-bold text-gray-900 border-t border-gray-300 pt-2">
-                      <span>Total</span>
-                      <span>${order.total.toFixed(2)}</span>
-                    </div>
+                        <div className="space-y-1 mb-2">
+                          {order.items.slice(0, 2).map((item, idx) => (
+                            <div key={idx} className="flex justify-between text-xs text-gray-600">
+                              <span>{item.title} {item.size ? `(Size: ${item.size})` : ''} <span className="font-bold">x{item.quantity}</span></span>
+                              <span>${(item.price * item.quantity).toFixed(2)}</span>
+                            </div>
+                          ))}
+                          {order.items.length > 2 && <p className="text-xs text-gray-400">+ {order.items.length - 2} more items</p>}
+                        </div>
+                        <div className="flex justify-between font-bold text-sm text-gray-900 border-t border-gray-300 pt-2">
+                          <span>Total</span>
+                          <span>${order.total.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

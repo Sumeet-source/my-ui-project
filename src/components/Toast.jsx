@@ -27,9 +27,13 @@ export default function Toast() {
 
   return (
     <div 
-      className={`fixed top-20 right-4 z-[100] px-6 py-4 rounded-lg shadow-xl text-white font-semibold transition-all duration-300 transform ${
-        isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
-      } ${typeClasses[toast?.type] || 'bg-black'}`}
+      className={`
+        fixed z-[9999] w-[90%] max-w-md mx-auto px-6 py-4 rounded-lg shadow-xl text-white font-semibold transition-all duration-300
+        top-20 left-0 right-0
+        md:top-4 md:left-1/2 md:-translate-x-1/2 md:w-auto md:max-w-none md:mx-0
+        ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-[-20px] opacity-0 pointer-events-none'}
+        ${typeClasses[toast?.type] || 'bg-black'}
+      `}
     >
       {toast?.message || 'Action completed'}
     </div>

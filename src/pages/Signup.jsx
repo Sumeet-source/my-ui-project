@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // Auth import
+import { useToast } from '../context/ToastContext'; // Toast import
 
 export default function Signup() {
   const [name, setName] = useState('');
@@ -8,21 +10,41 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agree, setAgree] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  
+  const { signup } = useAuth(); // Auth se signup function le liya
+  const { showToast } = useToast(); // Toast function le liya
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!name || !email || !mobile || !password) {
-      alert('Please fill all fields');
+      showToast('Please fill all fields', 'error');
       return;
     }
     if (!agree) {
-      alert('You must agree to the terms');
+      showToast('You must agree to the terms', 'error');
       return;
     }
-    // TODO: API call
-    console.log({ name, email, mobile, password });
-    navigate('/login');
+
+    setLoading(true);
+
+    try {
+      // Backend API call using AuthContext
+      const result = await signup(name, email, password);
+      
+      if (result.success) {
+        showToast('Account created successfully!', 'success'); // ✅ Custom Toast
+        navigate('/login');
+      } else {
+        showToast(result.message, 'error'); // ✅ Custom Toast
+      }
+    } catch (error) {
+      showToast('Something went wrong. Please try again.', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -138,12 +160,13 @@ export default function Signup() {
             </label>
           </div>
 
-          {/* Submit Button - Black like Under Armour */}
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full h-12 flex items-center justify-center text-base font-semibold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition duration-200"
+            disabled={loading}
+            className={`w-full h-12 flex items-center justify-center text-base font-semibold text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition duration-200 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Create An Account
+            {loading ? 'Creating Account...' : 'Create An Account'}
           </button>
 
           {/* Terms */}

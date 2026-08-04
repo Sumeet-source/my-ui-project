@@ -1,40 +1,62 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState, useRef, useEffect } from 'react'; // Added useEffect
+import { useState, useRef, useEffect } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
-import { useAdmin } from '../context/AdminContext.jsx';
-import { products as localProducts } from '../data/products.js';
+import axiosClient from '../api/axiosClient'; 
 import ProductCard from '../components/ProductCard';
 
 export default function ProductDetails() {
-  const { id } = useParams();
+  const { id } = useParams(); 
   const { addToCart } = useCart();
   const { showToast } = useToast();
-  const { products: dbProducts } = useAdmin();
+  const [product, setProduct] = useState(null);
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState('');
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-
   const scrollContainerRef = useRef(null);
 
-  // --- FORCE SCROLL TO TOP ON PAGE LOAD ---
+  // ✅ FIX: Ye hooks ab component ke bilkul TOP par hain. Isse error kabhi nahi aayega.
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []); // Runs only once when the component mounts
-  // --- END OF FIX ---
+    fetchProductData();
+  }, [id]);
 
-  const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
-  const product = products.find((p) => p.id === parseInt(id));
+  const fetchProductData = async () => {
+    try {
+      setLoading(true);
+      const allRes = await axiosClient.get('/api/products');
+      setAllProducts(allRes.data);
 
-  const relatedProducts = product 
-    ? products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 8)
-    : [];
+      const singleRes = await axiosClient.get(`/api/products/${id}`);
+      setProduct(singleRes.data);
+      // Product fetch hone ke baad reviews update kar diye
+      setReviews(singleRes.data.reviews || [
+        { user: 'Customer 1', comment: 'Great quality, fits perfectly!', rating: 5 },
+        { user: 'Customer 2', comment: 'Good fabric, but runs a bit small.', rating: 4 }
+      ]);
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      showToast('Failed to load product details', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const [reviews, setReviews] = useState(product?.reviews || []);
-  const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
+  if (loading) {
+    return <div className="text-center py-20 text-2xl text-gray-600">Loading product...</div>;
+  }
 
   if (!product) {
     return <div className="text-center py-20 text-2xl text-gray-600">Product not found!</div>;
   }
+
+  const relatedProducts = allProducts
+    .filter((p) => p.category === product.category && p._id !== product._id)
+    .slice(0, 8);
 
   const scrollCarousel = (direction) => {
     const container = scrollContainerRef.current;
@@ -53,7 +75,7 @@ export default function ProductDetails() {
       showToast("Please select a size!", "error");
       return;
     }
-    addToCart({ ...product, size: selectedSize });
+    addToCart({ ...product, id: product._id, size: selectedSize, image: product.imageUrl });
     showToast(`${product.title} (Size: ${selectedSize}) added to cart!`, 'success');
   };
 
@@ -82,7 +104,12 @@ export default function ProductDetails() {
       <div className="flex flex-col md:flex-row gap-12 mb-12">
         <div className="flex-1 relative group">
           <div className="cursor-pointer relative overflow-hidden rounded-xl shadow-lg" onClick={() => setIsLightboxOpen(true)}>
-            <img src={product.image} alt={product.title} className="w-full h-[500px] object-cover transition-transform duration-500 group-hover:scale-105" />
+            <img 
+              src={product?.imageUrl || 'https://picsum.photos/seed/fallback/600/600'} 
+              alt={product.title} 
+              className="w-full h-[500px] object-cover transition-transform duration-500 group-hover:scale-105" 
+              onError={(e) => { e.target.src = 'https://picsum.photos/seed/fallback/600/600'; }} 
+            />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition duration-300 flex items-center justify-center">
               <span className="bg-white/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition duration-300">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
@@ -95,8 +122,8 @@ export default function ProductDetails() {
           <div className="flex items-center gap-4">
             <span className="text-3xl font-bold text-gray-700">${product.price}</span>
             <div className="flex items-center gap-1">
-              <span className="text-yellow-400 text-lg">{renderStars(product.rating)}</span>
-              <span className="text-sm text-gray-500 ml-1">({product.reviews?.length || 0} reviews)</span>
+              <span className="text-yellow-400 text-lg">{renderStars(4.5)}</span>
+              <span className="text-sm text-gray-500 ml-1">({reviews.length} reviews)</span>
             </div>
           </div>
           <div>
@@ -117,7 +144,7 @@ export default function ProductDetails() {
       {isLightboxOpen && (
         <div className="fixed inset-0 z-[999] bg-black/95 flex items-center justify-center p-4 cursor-zoom-out" onClick={() => setIsLightboxOpen(false)}>
           <button onClick={() => setIsLightboxOpen(false)} className="absolute top-6 right-6 text-white text-5xl font-light hover:text-gray-300 transition z-10">&times;</button>
-          <img src={product.image} alt={product.title} className="max-w-full max-h-[90vh] object-contain rounded-lg cursor-default shadow-2xl" onClick={(e) => e.stopPropagation()} />
+          <img src={product.imageUrl} alt={product.title} className="max-w-full max-h-[90vh] object-contain rounded-lg cursor-default shadow-2xl" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
 
@@ -128,8 +155,16 @@ export default function ProductDetails() {
           <div className="relative group/carousel">
             <div ref={scrollContainerRef} className="flex gap-6 overflow-x-auto overflow-y-hidden py-4 px-2 scroll-smooth no-scrollbar">
               {relatedProducts.map((item) => (
-                <div key={item.id} className="min-w-[260px] max-w-[260px] flex-shrink-0">
-                  <ProductCard id={item.id} title={item.title} price={item.price} image={item.image} rating={item.rating} reviewsCount={item.reviews?.length || 0} inStock={item.inStock} />
+                <div key={item._id} className="min-w-[260px] max-w-[260px] flex-shrink-0">
+                  <ProductCard 
+                    id={item._id} 
+                    title={item.title} 
+                    price={item.price} 
+                    image={item.imageUrl} 
+                    rating={4.5} 
+                    reviewsCount={reviews.length} 
+                    inStock={item.inStock} 
+                  />
                 </div>
               ))}
             </div>
@@ -143,7 +178,7 @@ export default function ProductDetails() {
       <section className="border-t border-gray-200 pt-10 max-w-4xl">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
         <div className="space-y-6 mb-8">
-          {product.reviews?.map((review, index) => (
+          {reviews.map((review, index) => (
             <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-100">
               <div className="flex justify-between items-center mb-1">
                 <span className="font-bold text-gray-800">{review.user}</span>

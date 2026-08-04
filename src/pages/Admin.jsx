@@ -1,135 +1,204 @@
-import { useState } from 'react';
-import { useAdmin } from '../context/AdminContext.jsx';
-import { useToast } from '../context/ToastContext.jsx';
-import { useAuth } from '../context/AuthContext.jsx';
-import { Navigate } from 'react-router-dom';
-import { products as localProducts } from '../data/products.js'; // Added fallback
+import { useState, useEffect } from 'react';
+import { useToast } from '../context/ToastContext';
+import axiosClient from '../api/axiosClient';
 
-export default function Admin() {
-  const { user, loading } = useAuth();
-  const { products: dbProducts, addProduct, deleteProduct, toggleStock } = useAdmin(); // Renamed DB products
+export default function AdminDashboard() {
   const { showToast } = useToast();
-  const [view, setView] = useState('products');
-  
+  const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState({
-    title: '', price: '', image: '', category: 'men', inStock: true
+    title: '', 
+    price: '', 
+    description: '', 
+    imageUrl: '', 
+    category: 'Men', 
+    inStock: true
   });
 
-  // Fallback to local products if database fails
-  const products = (dbProducts && dbProducts.length > 0) ? dbProducts : localProducts;
+  // Mount hone par products fetch karo
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
-  // Fallback to localStorage if context hasn't loaded yet or user is null
-  const effectiveUser = user || (() => {
-    const stored = localStorage.getItem('forge_user');
-    return stored ? JSON.parse(stored) : null;
-  })();
-
-  if (loading) {
-    return <div className="text-center py-20 text-xl text-gray-600">Loading your dashboard...</div>;
-  }
-
-  if (!effectiveUser || effectiveUser.email !== 'admin@test.com') {
-    return <Navigate to="/login" replace />;
-  }
-
-  const handleChange = (e) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-    setFormData({ ...formData, [e.target.name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.title || !formData.price || !formData.image) {
-      showToast("Please fill in all fields.", "error");
-      return;
+  const fetchProducts = async () => {
+    try {
+      const res = await axiosClient.get('/api/products');
+      setProducts(res.data);
+    } catch (error) {
+      showToast('Failed to load products', 'error');
     }
-    addProduct({ ...formData, price: parseFloat(formData.price) });
-    showToast(`${formData.title} added to store!`, 'success');
-    setFormData({ title: '', price: '', image: '', category: 'men', inStock: true });
   };
 
-  const allOrders = JSON.parse(localStorage.getItem('all_orders') || '[]');
+  // Inputs change hone par formData update karo
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
+    try {
+      await axiosClient.post('/api/products', formData);
+      showToast('Product added successfully!', 'success');
+      fetchProducts();
+      setFormData({ title: '', price: '', description: '', imageUrl: '', category: 'Men', inStock: true });
+    } catch (error) {
+      showToast('Failed to add product', 'error');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if(!confirm('Are you sure you want to delete this product?')) return;
+    try {
+      await axiosClient.delete(`/api/products/${id}`);
+      showToast('Product deleted', 'info');
+      fetchProducts();
+    } catch (error) {
+      showToast('Failed to delete', 'error');
+    }
+  };
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-black pl-4">Admin Dashboard</h1>
-      
-      <div className="flex gap-4 border-b border-gray-200 mb-8 pb-2">
-        <button onClick={() => setView('products')} className={`font-semibold transition pb-2 ${view === 'products' ? 'text-black border-b-2 border-black' : 'text-gray-500 hover:text-black}'}`}>Manage Products</button>
-        <button onClick={() => setView('orders')} className={`font-semibold transition pb-2 ${view === 'orders' ? 'text-black border-b-2 border-black' : 'text-gray-500 hover:text-black}'}`}>Order History ({allOrders.length})</button>
-      </div>
+    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
 
-      {view === 'products' && (
-        <>
-          <div className="bg-white p-6 rounded-lg shadow-md mb-12">
-            <h2 className="text-xl font-bold mb-4">Add New Product</h2>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Product Title</label><input type="text" name="title" value={formData.title} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" placeholder="e.g. Compression Shorts" /></div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label><input type="number" name="price" value={formData.price} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" placeholder="49.99" /></div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label><input type="text" name="image" value={formData.image} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" placeholder="https://..." /></div>
-              <div className="flex items-center gap-6">
-                <div className="flex-1"><label className="block text-sm font-medium text-gray-700 mb-1">Category</label><select name="category" value={formData.category} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black"><option value="men">Men</option><option value="women">Women</option><option value="outerwear">Outerwear</option><option value="footwear">Footwear</option></select></div>
-                <div className="flex items-center gap-2 pt-5"><input type="checkbox" name="inStock" checked={formData.inStock} onChange={handleChange} className="w-5 h-5 border-gray-300 rounded focus:ring-black" /><label className="text-sm font-medium text-gray-700">In Stock</label></div>
+        {/* Manage Products / Order History tabs */}
+        <div className="flex border-b border-gray-200 mb-6">
+          <button className="py-2 px-4 border-b-2 border-black font-semibold">Manage Products</button>
+          <button className="py-2 px-4 text-gray-500 hover:text-gray-700">Order History (0)</button>
+        </div>
+
+        {/* Add New Product Form */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
+          <form onSubmit={handleAddProduct} className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-900">Product Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                placeholder="e.g. Compression Shorts"
+                className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-900">Price ($)</label>
+                <input
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  placeholder="49.99"
+                  className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black"
+                  required
+                />
               </div>
-              <div className="md:col-span-2"><button type="submit" className="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition">Add Product</button></div>
-            </form>
-          </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-900">Image URL</label>
+                <input
+                  type="text"
+                  name="imageUrl"
+                  value={formData.imageUrl}
+                  onChange={handleChange}
+                  placeholder="https://..."
+                  className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black"
+                  required
+                />
+              </div>
+            </div>
 
-          <h2 className="text-xl font-bold mb-4">Manage Existing Products</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {products.map((product) => {
-              const avgRating = product.reviews && product.reviews.length > 0 
-                ? (product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length).toFixed(1)
-                : 'N/A';
-              return (
-                <div key={product._id || product.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <img src={product.image} alt={product.title} className="w-12 h-12 object-cover rounded" />
-                    <div>
-                      <h3 className="font-semibold">{product.title}</h3>
-                      <p className="text-sm text-gray-500">${product.price}</p>
-                      <div className="flex items-center gap-2 text-xs mt-1">
-                        <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold">⭐ {avgRating !== 'N/A' ? avgRating : 'No reviews'}</span>
-                        {avgRating !== 'N/A' && <span className="text-gray-400">({product.reviews.length} reviews)</span>}
-                      </div>
-                      <span className={`text-xs font-bold ml-2 ${product.inStock ? 'text-green-600' : 'text-red-600}'}`}>{product.inStock ? 'In Stock' : 'Out of Stock'}</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => toggleStock(product._id || product.id)} className={`px-3 py-1 text-xs font-bold rounded transition ${product.inStock ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-green-100 text-green-700 hover:bg-green-200}'}`}>{product.inStock ? 'Mark OOS' : 'Mark In Stock'}</button>
-                    <button onClick={() => deleteProduct(product._id || product.id)} className="text-red-500 hover:text-red-700 text-sm font-bold">Delete</button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      )}
+            <div>
+              <label className="block text-sm font-semibold text-gray-900">Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Product details..."
+                className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20"
+              />
+            </div>
 
-      {view === 'orders' && (
-        <div className="space-y-4">
-          {allOrders.length === 0 ? (
-            <div className="bg-white p-6 rounded-lg shadow-sm text-center text-gray-500">No orders have been placed yet.</div>
+            <div className="flex items-center gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-900">Category</label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"
+                >
+                  <option value="Men">Men</option>
+                  <option value="Women">Women</option>
+                  <option value="Shoes">Shoes</option>
+                  <option value="Outlet">Outlet</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2 mt-6">
+                <input
+                  type="checkbox"
+                  name="inStock"
+                  checked={formData.inStock}
+                  onChange={handleChange}
+                  className="h-5 w-5 accent-black"
+                />
+                <label className="text-sm font-medium">In Stock</label>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full h-10 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition"
+            >
+              Add Product
+            </button>
+          </form>
+        </div>
+
+        {/* Manage Existing Products */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Manage Existing Products</h2>
+          {products.length === 0 ? (
+            <p className="text-gray-500 text-center py-8">No products found. Add your first product above!</p>
           ) : (
-            <div className="space-y-6">
-              {allOrders.map((order) => (
-                <div key={order.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b border-gray-200 pb-4">
-                    <div><span className="font-bold text-gray-900">Order #{order.id}</span><span className="text-sm text-gray-500 ml-4">{order.date}</span></div>
-                    <div className="flex items-center gap-2 mt-2 sm:mt-0"><span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full">{order.paymentMethod}</span><span className="font-bold text-lg text-black">${order.total.toFixed(2)}</span></div>
-                  </div>
-                  <div className="mb-4 text-sm"><span className="font-semibold text-gray-700">Customer:</span> {order.userEmail || 'Unknown User'}{order.upiId && <span className="ml-4 text-gray-500">UPI: {order.upiId}</span>}</div>
-                  <div className="space-y-2 bg-gray-50 p-3 rounded-lg">
-                    {order.items.map((item, idx) => (
-                      <div key={idx} className="flex justify-between text-sm text-gray-600"><span>{item.title} {item.size ? `(Size: ${item.size})` : ''} <span className="font-bold">x{item.quantity}</span></span><span>${(item.price * item.quantity).toFixed(2)}</span></div>
-                    ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {products.map((product) => (
+                <div key={product._id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex gap-4">
+                  <img 
+                    src={product.imageUrl} 
+                    alt={product.title} 
+                    className="w-24 h-24 object-cover rounded bg-gray-100"
+                  />
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-medium text-gray-900">{product.title}</h3>
+                      <p className="text-sm text-gray-600">${product.price}</p>
+                      <p className="text-xs text-gray-500 mt-1">{product.description?.slice(0, 50)}...</p>
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className={`text-xs font-semibold px-2 py-1 rounded-full ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        {product.inStock ? 'In Stock' : 'OOS'}
+                      </span>
+                      <div className="flex gap-2">
+                        <button className="text-sm text-red-600 hover:underline" onClick={() => handleDelete(product._id)}>
+                          Delete
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
