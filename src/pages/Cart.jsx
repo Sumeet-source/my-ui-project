@@ -3,8 +3,7 @@ import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { Link } from 'react-router-dom';
-import axiosClient from '../api/axiosClient'; // <--- IMPORT ADDED
-import axios from 'axios';
+import axiosClient from '../api/axiosClient';
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart(); 
@@ -14,12 +13,9 @@ export default function Cart() {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [upiId, setUpiId] = useState('');
-  
-  // Shipping Address state (Modal se collect karne ke liye)
   const [address, setAddress] = useState({ name: '', address: '' });
 
-  // --- REAL BACKEND ORDER HANDLER ---
-    const handlePlaceOrder = async () => {
+  const handlePlaceOrder = async () => {
     if (!upiId) {
       showToast("Please enter your UPI ID!", "error");
       return;
@@ -52,8 +48,8 @@ export default function Cart() {
         shippingAddress: address
       };
 
-      // git add src/pages/Cart.jsx ULTIMATE HARDCODED API CALL (Ye `/api` fix kar dega)
-      await axios.post('https://forge-backend-production-1cef.up.railway.app/api/orders', orderData);
+      await axiosClient.post('https://forge-backend-production-1cef.up.railway.app/api/orders', orderData);
+      
       clearCart();
       setIsModalOpen(false);
       setOrderPlaced(true);
@@ -72,19 +68,49 @@ export default function Cart() {
       setIsProcessing(false);
     }
   };
-  // --- END OF BACKEND ORDER HANDLER ---
 
+  // --- EMPTY CART UI ---
   if (cart.length === 0 && !orderPlaced) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
-        <p className="text-gray-600 mb-8">Looks like you haven't added any gear yet.</p>
-        <Link to="/" className="bg-black text-white px-8 py-3 rounded font-bold hover:bg-gray-800 transition">Start Shopping</Link>
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        
+        {/* Register / Login Section (Sirf tabhi dikhega jab user logged out ho) */}
+        {!user && (
+          <div className="flex flex-col md:flex-row gap-6 mb-10 border-b border-gray-200 pb-8">
+            <div className="flex-1">
+              <p className="text-green-700 text-sm font-medium mb-4">Create an account to get exclusive benefits.</p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/signup" className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Register</Link>
+                <Link to="/login" className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Login</Link>
+              </div>
+            </div>
+            <div className="flex-1 md:border-l md:border-gray-200 md:pl-6 flex flex-col justify-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2"><span className="text-lg">🛒</span> Faster checkout</div>
+              <div className="flex items-center gap-2"><span className="text-lg">↩️</span> Easier returns and exchanges</div>
+              <div className="flex items-center gap-2"><span className="text-lg">📦</span> Quick order information and tracking</div>
+            </div>
+          </div>
+        )}
+
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Bag</h1>
+        
+        <div className="flex flex-col md:flex-row gap-12">
+          <div className="flex-1">
+            <p className="text-gray-900 font-medium text-lg">You have no items in your bag.</p>
+            <p className="text-gray-500 mt-1 text-sm">Don't know where to start? Here's the gear everyone's after.</p>
+            <Link to="/men" className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition">Shop Best Sellers</Link>
+            <Link to="/" className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</Link>
+          </div>
+          
+          {/* Right side placeholder (Bilkul Under Armour screenshot jaisa grey box) */}
+          <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[200px]"></div>
+        </div>
       </div>
     );
   }
 
-  const subtotal = getTotalPrice(); // CartContext se total nikal rahe hain
+  // --- CART WITH ITEMS UI ---
+  const subtotal = getTotalPrice();
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
@@ -95,8 +121,10 @@ export default function Cart() {
         </div>
       )}
 
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Your Bag ({cart.length})</h1>
+      
       <div className="flex flex-col lg:flex-row gap-8">
+        {/* Cart Items List */}
         <div className="flex-1 space-y-4">
           {cart.map((item, index) => (
             <div key={index} className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
@@ -116,6 +144,7 @@ export default function Cart() {
           ))}
         </div>
 
+        {/* Order Summary */}
         <div className="lg:w-1/3 bg-gray-50 p-6 rounded-lg h-fit">
           <h2 className="text-xl font-bold text-gray-900 border-b border-gray-200 pb-4 mb-4">Order Summary</h2>
           <div className="flex justify-between text-gray-600 mb-2">
@@ -130,7 +159,7 @@ export default function Cart() {
         </div>
       </div>
 
-      {/* UPI Payment Modal */}
+      {/* UPI Payment Modal (Same as before) */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-white max-w-md w-full rounded-xl shadow-2xl p-6 relative">
@@ -139,23 +168,11 @@ export default function Cart() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-                <input 
-                  type="text" 
-                  value={address.name}
-                  onChange={(e) => setAddress({...address, name: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" 
-                  placeholder="John Doe" 
-                />
+                <input type="text" value={address.name} onChange={(e) => setAddress({...address, name: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" placeholder="John Doe" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
-                <input 
-                  type="text" 
-                  value={address.address}
-                  onChange={(e) => setAddress({...address, address: e.target.value})}
-                  className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" 
-                  placeholder="123 Main St" 
-                />
+                <input type="text" value={address.address} onChange={(e) => setAddress({...address, address: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" placeholder="123 Main St" />
               </div>
               <div className="border-t border-gray-200 pt-4 mt-4">
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4 flex items-center gap-2"><span className="text-2xl">📱</span><span className="text-sm text-blue-800 font-medium">UPI / QR Code Payment</span></div>
@@ -166,11 +183,7 @@ export default function Cart() {
                 <button
                   onClick={handlePlaceOrder}
                   disabled={isProcessing}
-                  className={`w-full py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 ${
-                    isProcessing 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-black text-white hover:bg-gray-800'
-                  }`}
+                  className={`w-full py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 ${isProcessing ? 'bg-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800'}`}
                 >
                   {isProcessing ? (
                     <>
