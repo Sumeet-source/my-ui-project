@@ -100,11 +100,9 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* 🔥 UPDATED LOGO (Bada aur bold) */}
+        {/* 🔥 UPDATED LOGO */}
         <Link to="/" className="flex items-center md:ml-8 lg:ml-16 md:mr-4 lg:mr-6 shrink-0">
-          <span className="text-3xl md:text-4xl font-black tracking-[0.2em] text-white">
-            FORGE
-          </span>
+          <span className="text-3xl md:text-4xl font-black tracking-[0.2em] text-white">FORGE</span>
         </Link>
 
         {/* Mobile Right Icons */}
@@ -118,7 +116,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* --- CLEAN DESKTOP LINKS (Gap aur Font badha diya) --- */}
+        {/* --- CLEAN DESKTOP LINKS --- */}
         <div className="hidden md:flex justify-center flex-1 gap-10 lg:gap-20 text-[17px] lg:text-[19px] font-bold items-center h-12">
           <Link to="/new-arrivals" className="relative h-full flex items-center cursor-pointer">
             <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm">🔥</span></span>
@@ -163,8 +161,8 @@ export default function Navbar() {
               Cancel
             </button>
             
-            {/* Search Input Wrapper */}
-            <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2">
+            {/* Search Input Wrapper - 🟢 FIX: Added 'min-w-0' */}
+            <div className="flex-1 min-w-0 flex items-center bg-gray-100 rounded-full px-4 py-2">
               <svg className="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -175,7 +173,7 @@ export default function Navbar() {
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={handleSearchSubmit}
                 placeholder="Search for products, brands and more..." 
-                className="flex-1 bg-transparent text-base text-gray-900 focus:outline-none ml-3 placeholder-gray-400"
+                className="w-full bg-transparent text-base text-gray-900 focus:outline-none ml-3 placeholder-gray-400"
                 autoFocus
               />
               {/* Clear 'X' Button */}
