@@ -2,11 +2,11 @@ import { useParams, Link } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
-import axiosClient from '../api/axiosClient'; 
+import axiosClient from '../api/axiosClient';
 import ProductCard from '../components/ProductCard';
 
 export default function ProductDetails() {
-  const { id } = useParams(); 
+  const { id } = useParams();
   const { addToCart } = useCart();
   const { showToast } = useToast();
   const [product, setProduct] = useState(null);
@@ -14,9 +14,9 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState('');
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [mainImageIndex, setMainImageIndex] = useState(0); // 🟢 Add: Thumbnail index state
   const scrollContainerRef = useRef(null);
 
-  // ✅ FIX: Ye hooks ab component ke bilkul TOP par hain. Isse error kabhi nahi aayega.
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
 
@@ -33,7 +33,6 @@ export default function ProductDetails() {
 
       const singleRes = await axiosClient.get(`/api/products/${id}`);
       setProduct(singleRes.data);
-      // Product fetch hone ke baad reviews update kar diye
       setReviews(singleRes.data.reviews || [
         { user: 'Customer 1', comment: 'Great quality, fits perfectly!', rating: 5 },
         { user: 'Customer 2', comment: 'Good fabric, but runs a bit small.', rating: 4 }
@@ -75,7 +74,13 @@ export default function ProductDetails() {
       showToast("Please select a size!", "error");
       return;
     }
-    addToCart({ ...product, id: product._id, size: selectedSize, image: product.imageUrl });
+    // Backend model ab 'images' array use kar raha hai, isliye 'imageUrl' fallback handle kiya hai
+    addToCart({ 
+      ...product, 
+      id: product._id, 
+      size: selectedSize, 
+      image: product.images?.[0] || product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image' 
+    });
     showToast(`${product.title} (Size: ${selectedSize}) added to cart!`, 'success');
   };
 
@@ -102,13 +107,16 @@ export default function ProductDetails() {
     <div className="max-w-7xl mx-auto px-6 py-12">
       {/* -- Product Details -- */}
       <div className="flex flex-col md:flex-row gap-12 mb-12">
+        
+        {/* Left Side: Image Gallery */}
         <div className="flex-1 relative group">
-          <div className="cursor-pointer relative overflow-hidden rounded-xl shadow-lg" onClick={() => setIsLightboxOpen(true)}>
+          {/* Main Image */}
+          <div className="cursor-pointer relative overflow-hidden rounded-xl shadow-lg bg-gray-100 aspect-square" onClick={() => setIsLightboxOpen(true)}>
             <img 
-              src={product?.imageUrl || 'https://picsum.photos/seed/fallback/600/600'} 
+              src={product.images?.[mainImageIndex] || product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
               alt={product.title} 
-              className="w-full h-[500px] object-cover transition-transform duration-500 group-hover:scale-105" 
-              onError={(e) => { e.target.src = 'https://picsum.photos/seed/fallback/600/600'; }} 
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+              onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }} 
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition duration-300 flex items-center justify-center">
               <span className="bg-white/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition duration-300">
@@ -116,7 +124,24 @@ export default function ProductDetails() {
               </span>
             </div>
           </div>
+
+          {/* Thumbnails (If multiple images exist) */}
+          {(product.images && product.images.length > 1) && (
+            <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
+              {product.images.map((img, idx) => (
+                <button 
+                  key={idx}
+                  onClick={() => setMainImageIndex(idx)}
+                  className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition flex-shrink-0 ${mainImageIndex === idx ? 'border-black' : 'border-gray-200 hover:border-gray-400'}`}
+                >
+                  <img src={img} alt={`${product.title} - ${idx + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* Right Side: Product Info */}
         <div className="flex-1 space-y-6">
           <h1 className="text-4xl font-bold text-gray-900">{product.title}</h1>
           <div className="flex items-center gap-4">
@@ -144,7 +169,7 @@ export default function ProductDetails() {
       {isLightboxOpen && (
         <div className="fixed inset-0 z-[999] bg-black/95 flex items-center justify-center p-4 cursor-zoom-out" onClick={() => setIsLightboxOpen(false)}>
           <button onClick={() => setIsLightboxOpen(false)} className="absolute top-6 right-6 text-white text-5xl font-light hover:text-gray-300 transition z-10">&times;</button>
-          <img src={product.imageUrl} alt={product.title} className="max-w-full max-h-[90vh] object-contain rounded-lg cursor-default shadow-2xl" onClick={(e) => e.stopPropagation()} />
+          <img src={product.images?.[mainImageIndex] || product.imageUrl} alt={product.title} className="max-w-full max-h-[90vh] object-contain rounded-lg cursor-default shadow-2xl" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
 
@@ -160,7 +185,7 @@ export default function ProductDetails() {
                     id={item._id} 
                     title={item.title} 
                     price={item.price} 
-                    image={item.imageUrl} 
+                    image={item.images?.[0] || item.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
                     rating={4.5} 
                     reviewsCount={reviews.length} 
                     inStock={item.inStock} 
