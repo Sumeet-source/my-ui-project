@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
-  const [isSearchOpen, setIsSearchOpen] = useState(false); // New overlay state
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const inputRef = useRef(null);
   
@@ -84,23 +84,24 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <Link to="/" className="block shrink-0 md:ml-8 lg:ml-16 md:mr-4 lg:mr-6">
-          <svg width="44" height="26" viewBox="0 0 44 26" className="w-[44px] h-[26px] shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g clipPath="url(#clip0_115_2)">
-              <path d="M15.918 15.0189C15.918 15.0189 13.006 8.56122 11.002 0C11.002 0 10.004 7.38122 7.848 15.0189H15.918Z" fill="white"/>
-              <path d="M23.59 15.0189H7.848C7.848 15.0189 2.977 15.0189 0.142 15.0189C0.142 15.0189 2.929 22.0131 7.848 22.0131C12.767 22.0131 23.59 15.0189 23.59 15.0189Z" fill="white"/>
-              <path d="M9.653 0C9.653 0 1.981 0 0 0C0 0 0.22 1.285 1.204 3.408C2.277 5.732 5.665 13.329 8.084 15.019H9.653V0Z" fill="white"/>
-            </g>
-            <defs>
-              <clipPath id="clip0_115_2">
-                <rect width="23.59" height="22.013" fill="white"/>
-              </clipPath>
-            </defs>
+        {/* 🔥 UPDATED LOGO SECTION (Industrial Anvil + FORGE) */}
+        <Link to="/" className="flex items-center gap-2 md:ml-8 lg:ml-16 md:mr-4 lg:mr-6 shrink-0 text-white">
+          {/* Anvil SVG Icon */}
+          <svg width="35" height="35" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 60 H90 V70 H70 V90 H30 V70 H10 Z" fill="currentColor"/>
+            <path d="M20 20 H80 V40 H75 V50 H25 V40 H20 Z" fill="currentColor"/>
+            <path d="M40 40 C40 0, 60 0, 60 40 Z" fill="currentColor"/>
+            <path d="M90 30 C115 30, 115 60, 95 60 L90 60 Z" fill="currentColor"/>
+            <path d="M10 30 C-15 30, -15 60, 5 60 L10 60 Z" fill="currentColor"/>
           </svg>
+          
+          {/* FORGE Text */}
+          <span className="text-2xl md:text-3xl font-black tracking-[0.15em]">
+            FORGE
+          </span>
         </Link>
 
         <div className="flex items-center gap-4 md:hidden">
-          {/* UPDATED: Opens Full Screen Search Overlay */}
           <button onClick={() => setIsSearchOpen(true)} className="text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -150,7 +151,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- MOBILE FULL-SCREEN SEARCH OVERLAY (Exact match to Image 2) --- */}
+      {/* --- MOBILE FULL-SCREEN SEARCH OVERLAY --- */}
       {isSearchOpen && (
         <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
           <div className="flex items-center justify-between px-4 py-4 border-b border-gray-800">
@@ -174,7 +175,6 @@ export default function Navbar() {
             <button onClick={() => setIsSearchOpen(false)} className="text-white text-sm font-medium">Cancel</button>
           </div>
 
-          {/* Results placeholder or "No results found" message */}
           <div className="flex-1 flex items-center justify-center text-white/60 text-lg">
             {searchInput.trim() === '' ? (
               <p className="text-gray-500">Type to start searching</p>
