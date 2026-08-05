@@ -107,11 +107,17 @@ export default function Home() {
         </div>
 
         {/* FEATURED PRODUCTS */}
+               
         <h2 className="text-2xl font-bold mb-4">Featured Products</h2>
         {loading ? (
-          <p className="text-center py-10 text-gray-500">Loading products...</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 animate-pulse">
+               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="bg-gray-200 rounded-lg aspect-square"></div>
+            ))}
+          </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+           
             {products.slice(0, 8).map((product) => (
               <Link to={`/product/${product._id}`} key={product._id} className="group cursor-pointer">
                 <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square border border-gray-100">
