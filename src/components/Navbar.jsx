@@ -84,14 +84,12 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* 🔥 UPDATED LOGO SECTION (Industrial Anvil + FORGE) */}
-               {/* 🔥 TEXT ONLY LOGO (No images, no hassle) */}
+        {/* 🔥 TEXT ONLY LOGO (No images, no hassle) */}
         <Link to="/" className="flex items-center md:ml-8 lg:ml-16 md:mr-4 lg:mr-6 shrink-0">
           <span className="text-2xl md:text-3xl font-black tracking-[0.2em] text-white">
             FORGE
           </span>
         </Link>
-
 
         <div className="flex items-center gap-4 md:hidden">
           <button onClick={() => setIsSearchOpen(true)} className="text-white">
@@ -132,8 +130,20 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-6">
+          {/* 🟢 FIXED DESKTOP SEARCH INPUT (Added onKeyDown to navigate on Enter) */}
           <div className="hidden sm:flex items-center gap-2 border-b border-white/30 hover:border-white transition-colors pb-0.5 w-32">
-            <input type="text" value={searchTerm} onChange={handleDesktopSearch} placeholder="Search" className="bg-transparent text-white text-[15px] placeholder-white/70 focus:outline-none w-full" />
+            <input 
+              type="text" 
+              value={searchTerm} 
+              onChange={handleDesktopSearch}
+              onKeyDown={(e) => { // 🟢 Yahan fix kiya hai
+                if (e.key === 'Enter' && searchTerm.trim()) {
+                  navigate(`/search?q=${searchTerm}`);
+                }
+              }}
+              placeholder="Search" 
+              className="bg-transparent text-white text-[15px] placeholder-white/70 focus:outline-none w-full" 
+            />
             <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
           <Link to="/wishlist" className="relative"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg></Link>
