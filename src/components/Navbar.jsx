@@ -82,11 +82,11 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- MAIN NAVIGATION BAR --- */}
-      <div className="flex justify-between items-center px-4 py-3 md:px-6 md:py-5 max-w-[1600px] mx-auto relative">
+      {/* --- MAIN NAVIGATION BAR (Mobile padding badha diya) --- */}
+      <div className="flex justify-between items-center px-6 py-4 md:px-6 md:py-5 max-w-[1600px] mx-auto relative">
         
-        {/* Mobile Action Buttons */}
-        <div className="flex items-center gap-3 md:hidden">
+        {/* Mobile Action Buttons (Gap badha diya) */}
+        <div className="flex items-center gap-4 md:hidden">
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
@@ -95,11 +95,14 @@ export default function Navbar() {
           </Link>
         </div>
 
+        {/* LOGO (Mobile par aur bada kar diya) */}
         <Link to="/" className="flex items-center md:ml-8 lg:ml-16 md:mr-4 lg:mr-6 shrink-0">
-          <span className="text-3xl md:text-4xl font-black tracking-[0.2em] text-white">FORGE</span>
+          <span className="text-3xl md:text-4xl font-black tracking-[0.2em] text-white">
+            FORGE
+          </span>
         </Link>
 
-        {/* Mobile Right Icons */}
+        {/* Mobile Right Icons (Gap badha diya) */}
         <div className="flex items-center gap-4 md:hidden">
           <button onClick={() => setIsSearchOpen(true)} className="text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -160,13 +163,13 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* --- MOBILE DRAWER (FIXED: navigates without reloading page) --- */}
+      {/* --- MOBILE DRAWER (Font aur padding badha diya hai) --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col overflow-hidden">
-          <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 shrink-0">
+          <div className="flex justify-between items-center px-6 py-6 border-b border-gray-100 shrink-0">
             <div className="flex-1"></div>
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0">
-              <span className="text-xl font-black tracking-[0.2em] text-black">FORGE</span>
+              <span className="text-3xl font-black tracking-[0.2em] text-black">FORGE</span>
             </Link>
             <div className="flex-1 flex justify-end">
               <button onClick={() => setIsMenuOpen(false)} className="text-black p-1">
@@ -177,28 +180,28 @@ export default function Navbar() {
 
           <div className="flex-1 overflow-y-auto px-6 py-4">
             <div className="flex flex-col">
-              {/* 🔥 FIXED: 'window.location.href' ko 'navigate' se replace kar diya */}
-              <button onClick={() => { navigate('/new-arrivals'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+              {/* 🔥 Mobile Menu Links (Font bada aur padding zyada) */}
+              <button onClick={() => { navigate('/new-arrivals'); setIsMenuOpen(false); }} className="flex justify-between items-center py-5 border-b border-gray-100 text-[19px] font-bold text-left w-full">
                 <span>New <span className="text-orange-500 text-sm">🔥</span></span>
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
               </button>
-              <button onClick={() => { navigate('/men'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+              <button onClick={() => { navigate('/men'); setIsMenuOpen(false); }} className="flex justify-between items-center py-5 border-b border-gray-100 text-[19px] font-bold text-left w-full">
                 <span>Men</span>
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
               </button>
-              <button onClick={() => { navigate('/women'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+              <button onClick={() => { navigate('/women'); setIsMenuOpen(false); }} className="flex justify-between items-center py-5 border-b border-gray-100 text-[19px] font-bold text-left w-full">
                 <span>Women</span>
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
               </button>
-              <button onClick={() => { navigate('/shoes'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+              <button onClick={() => { navigate('/shoes'); setIsMenuOpen(false); }} className="flex justify-between items-center py-5 border-b border-gray-100 text-[19px] font-bold text-left w-full">
                 <span>Shoes</span>
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
               </button>
-              <button onClick={() => { navigate('/outlet'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
+              <button onClick={() => { navigate('/outlet'); setIsMenuOpen(false); }} className="flex justify-between items-center py-5 border-b border-gray-100 text-[19px] font-bold text-left w-full">
                 <span>Outlet</span>
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
               </button>
-              <div className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold">
+              <div className="flex justify-between items-center py-5 border-b border-gray-100 text-[19px] font-bold">
                 <span className="flex items-center gap-2">🇮🇳 IN</span>
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
               </div>
