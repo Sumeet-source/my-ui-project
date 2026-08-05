@@ -68,8 +68,9 @@ export default function Men() {
             filteredProducts.map((product) => (
               <Link to={`/product/${product._id}`} key={product._id} className="group cursor-pointer">
                 <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
+                  {/* 🟢 FIX: 'product.imageUrl' ko 'product.images?.[0]' se replace kar diya */}
                   <img 
-                    src={product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
+                    src={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
                     alt={product.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                     onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }}
