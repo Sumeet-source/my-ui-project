@@ -14,7 +14,7 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState('');
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const [mainImageIndex, setMainImageIndex] = useState(0); // 🟢 Add: Thumbnail index state
+  const [mainImageIndex, setMainImageIndex] = useState(0);
   const scrollContainerRef = useRef(null);
 
   const [reviews, setReviews] = useState([]);
@@ -74,7 +74,6 @@ export default function ProductDetails() {
       showToast("Please select a size!", "error");
       return;
     }
-    // Backend model ab 'images' array use kar raha hai, isliye 'imageUrl' fallback handle kiya hai
     addToCart({ 
       ...product, 
       id: product._id, 
@@ -104,18 +103,18 @@ export default function ProductDetails() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      {/* -- Product Details -- */}
-      <div className="flex flex-col md:flex-row gap-12 mb-12">
+    <div className="max-w-7xl mx-auto px-6 py-6 md:py-12">
+      {/* -- Product Details (Full Responsive Layout) -- */}
+      <div className="flex flex-col md:flex-row gap-6 md:gap-12 mb-12">
         
-        {/* Left Side: Image Gallery */}
+        {/* Image Gallery Section (Mobile optimized) */}
         <div className="flex-1 relative group">
-          {/* Main Image */}
-          <div className="cursor-pointer relative overflow-hidden rounded-xl shadow-lg bg-gray-100 aspect-square" onClick={() => setIsLightboxOpen(true)}>
+          {/* Main Image - Mobile par 'h-[40vh]' use kiya hai taaki screen ka 40% le */}
+          <div className="cursor-pointer relative overflow-hidden rounded-xl shadow-lg bg-gray-100" onClick={() => setIsLightboxOpen(true)}>
             <img 
               src={product.images?.[mainImageIndex] || product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
               alt={product.title} 
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+              className="w-full h-[40vh] md:h-[500px] object-cover transition-transform duration-500 group-hover:scale-105" 
               onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }} 
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition duration-300 flex items-center justify-center">
@@ -125,14 +124,14 @@ export default function ProductDetails() {
             </div>
           </div>
 
-          {/* Thumbnails (If multiple images exist) */}
+          {/* Thumbnails */}
           {(product.images && product.images.length > 1) && (
-            <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
+            <div className="flex flex-row gap-2 mt-2 overflow-x-auto pb-2">
               {product.images.map((img, idx) => (
                 <button 
                   key={idx}
                   onClick={() => setMainImageIndex(idx)}
-                  className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition flex-shrink-0 ${mainImageIndex === idx ? 'border-black' : 'border-gray-200 hover:border-gray-400'}`}
+                  className={`w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition flex-shrink-0 ${mainImageIndex === idx ? 'border-black' : 'border-gray-200 hover:border-gray-400'}`}
                 >
                   <img src={img} alt={`${product.title} - ${idx + 1}`} className="w-full h-full object-cover" />
                 </button>
@@ -141,16 +140,18 @@ export default function ProductDetails() {
           )}
         </div>
 
-        {/* Right Side: Product Info */}
-        <div className="flex-1 space-y-6">
-          <h1 className="text-4xl font-bold text-gray-900">{product.title}</h1>
+        {/* Product Info Section */}
+        <div className="flex-1 space-y-4 md:space-y-6">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{product.title}</h1>
+          
           <div className="flex items-center gap-4">
-            <span className="text-3xl font-bold text-gray-700">${product.price}</span>
+            <span className="text-2xl md:text-3xl font-bold text-gray-700">${product.price}</span>
             <div className="flex items-center gap-1">
               <span className="text-yellow-400 text-lg">{renderStars(4.5)}</span>
               <span className="text-sm text-gray-500 ml-1">({reviews.length} reviews)</span>
             </div>
           </div>
+          
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-gray-600 mb-2">Select Size</h3>
             <div className="flex gap-3">
@@ -159,9 +160,12 @@ export default function ProductDetails() {
               ))}
             </div>
           </div>
+          
           {!product.inStock && <div className="w-full md:w-auto bg-red-100 text-red-700 px-12 py-4 rounded-full font-bold uppercase tracking-wide text-center border border-red-200">Out of Stock</div>}
-          {product.inStock && <button onClick={handleAddToCart} className="w-full md:w-auto bg-black text-white px-12 py-4 rounded-full font-bold uppercase tracking-wide hover:bg-gray-800 transition shadow-lg">Add to Cart</button>}
-          <Link to="/" className="block text-gray-500 hover:text-black underline mt-4">Continue Shopping</Link>
+          
+          {product.inStock && <button onClick={handleAddToCart} className="w-full bg-black text-white py-4 rounded-full font-bold uppercase tracking-wide hover:bg-gray-800 transition shadow-lg">Add to Cart</button>}
+          
+          <Link to="/" className="block text-gray-500 hover:text-black underline mt-4 text-sm">Continue Shopping</Link>
         </div>
       </div>
 
