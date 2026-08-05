@@ -85,20 +85,8 @@ export default function Navbar() {
         </div>
 
         {/* 🔥 UPDATED LOGO SECTION (Industrial Anvil + FORGE) */}
-        <Link to="/" className="flex items-center gap-2 md:ml-8 lg:ml-16 md:mr-4 lg:mr-6 shrink-0 text-white">
-          {/* Anvil SVG Icon */}
-          <svg width="35" height="35" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 60 H90 V70 H70 V90 H30 V70 H10 Z" fill="currentColor"/>
-            <path d="M20 20 H80 V40 H75 V50 H25 V40 H20 Z" fill="currentColor"/>
-            <path d="M40 40 C40 0, 60 0, 60 40 Z" fill="currentColor"/>
-            <path d="M90 30 C115 30, 115 60, 95 60 L90 60 Z" fill="currentColor"/>
-            <path d="M10 30 C-15 30, -15 60, 5 60 L10 60 Z" fill="currentColor"/>
-          </svg>
-          
-          {/* FORGE Text */}
-          <span className="text-2xl md:text-3xl font-black tracking-[0.15em]">
-            FORGE
-          </span>
+        <Link to="/" className="flex items-center gap-2 md:ml-8 lg:ml-16 md:mr-4 lg:mr-6 shrink-0">
+          <img src="/forge-logo.png" alt="FORGE" className="h-8 md:h-10 w-auto object-contain" />
         </Link>
 
         <div className="flex items-center gap-4 md:hidden">
