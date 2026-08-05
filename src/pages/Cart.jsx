@@ -54,8 +54,7 @@ export default function Cart() {
       };
 
      const API_URL = 'https://forge-backend-production-1cef.up.railway.app/api';
-      await axios.post(`${API_URL}/orders`, orderData); // Note: "/orders" because "/api" already in URL
-      
+await axios.post('https://forge-backend-production-1cef.up.railway.app/api/orders', orderData);
       // Success actions
       clearCart();
       setIsModalOpen(false);
