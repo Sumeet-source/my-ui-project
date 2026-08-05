@@ -2,17 +2,15 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import ProductCard from '../components/ProductCard.jsx';
-import axiosClient from '../api/axiosClient'; // 🟢 Import backend API
+import axiosClient from '../api/axiosClient';
 
 export default function Search() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   
-  // 🟢 State for live search results and loading
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🟢 Fetch from backend whenever 'query' changes
   useEffect(() => {
     const fetchSearchResults = async () => {
       if (!query) {
@@ -38,8 +36,7 @@ export default function Search() {
 
   return (
     <div className="bg-white min-h-screen overflow-x-hidden">
-      
-      {/* --- MOBILE TOP BAR (Filters/Sort) --- */}
+      {/* --- MOBILE TOP BAR --- */}
       <div className="md:hidden flex justify-center items-center border-b border-gray-200 py-3 px-4 bg-white">
         <button className="text-sm font-medium text-black flex items-center gap-1">
           Filters/ Sort <ChevronDown className="w-4 h-4" />
@@ -51,7 +48,6 @@ export default function Search() {
         <div className="mb-2">
           <h1 className="text-xl font-bold text-gray-900">Search Results</h1>
           <h2 className="text-2xl font-bold text-gray-900 mt-1">"{query}"</h2>
-          {/* 🟢 Show real count from backend */}
           <p className="text-sm text-gray-500 mt-2">{loading ? 'Searching...' : `${products.length} items`}</p>
         </div>
 
@@ -69,11 +65,12 @@ export default function Search() {
           ) : (
             products.map((product, index) => (
               <ProductCard 
-                key={product._id} // 🟢 MongoDB uses '_id', not 'id'
-                {...product} 
-                image={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'} // 🟢 Safety fix for images
-                // Adds the "🔥 NEW" badge to the top 2 items
-                badge={index < 2 ? 'NEW' : null} 
+                key={product._id} // 🟢 FIX: '_id' use kiya
+                id={product._id}  // 🟢 FIX: '_id' pass kiya
+                title={product.title}
+                price={product.price}
+                image={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'}
+                badge={index < 2 ? 'NEW' : null}
               />
             ))
           )}

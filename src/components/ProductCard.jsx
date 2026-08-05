@@ -33,7 +33,7 @@ export default function ProductCard({ id, title, price, image, badge }) {
           onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Product+Image'; }} 
         />
         
-        {/* 🟢 FIXED HEART ICON (Backend connect) */}
+        {/* Heart Icon */}
         <button 
           onClick={handleWishlistToggle}
           className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition z-10"
