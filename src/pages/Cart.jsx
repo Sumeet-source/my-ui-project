@@ -58,7 +58,6 @@ export default function Cart() {
       setAddress({ name: '', address: '' });
       
       showToast("Payment successful! Order placed!", "success");
-      
       setTimeout(() => setOrderPlaced(false), 4000);
       
     } catch (error) {
@@ -76,7 +75,7 @@ export default function Cart() {
         
         {/* Register / Login Section (Sirf tabhi dikhega jab user logged out ho) */}
         {!user && (
-          <div className="flex flex-col md:flex-row gap-6 mb-10 border-b border-gray-200 pb-8">
+          <div className="flex flex-col md:flex-row gap-6 mb-10 pb-8">
             <div className="flex-1">
               <p className="text-green-700 text-sm font-medium mb-4">Create an account to get exclusive benefits.</p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -84,17 +83,28 @@ export default function Cart() {
                 <Link to="/login" className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Login</Link>
               </div>
             </div>
-            <div className="flex-1 md:border-l md:border-gray-200 md:pl-6 flex flex-col justify-center gap-2 text-sm text-gray-600">
-              <div className="flex items-center gap-2"><span className="text-lg">🛒</span> Faster checkout</div>
-              <div className="flex items-center gap-2"><span className="text-lg">↩️</span> Easier returns and exchanges</div>
-              <div className="flex items-center gap-2"><span className="text-lg">📦</span> Quick order information and tracking</div>
+            <div className="flex-1 md:border-l md:border-gray-200 md:pl-6 flex flex-col justify-center gap-3 text-sm text-gray-600">
+              {/* 🟢 UPDATED: SVGs instead of Emojis */}
+              <div className="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                Faster checkout
+              </div>
+              <div className="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                Easier returns and exchanges
+              </div>
+              <div className="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M12 22V12"/><path d="m3.3 7 8.7 5 8.7-5"/></svg>
+                Quick order information and tracking
+              </div>
             </div>
           </div>
         )}
 
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Bag</h1>
         
-        <div className="flex flex-col md:flex-row gap-12">
+        {/* 🟢 FIXED: gap-12 ko gap-6 kar diya aur gap properly set kiya */}
+        <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">
             <p className="text-gray-900 font-medium text-lg">You have no items in your bag.</p>
             <p className="text-gray-500 mt-1 text-sm">Don't know where to start? Here's the gear everyone's after.</p>
@@ -102,14 +112,14 @@ export default function Cart() {
             <Link to="/" className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</Link>
           </div>
           
-          {/* Right side placeholder (Bilkul Under Armour screenshot jaisa grey box) */}
-          <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[200px]"></div>
+          {/* Right side placeholder (Grey box) */}
+          <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[250px]"></div>
         </div>
       </div>
     );
   }
 
-  // --- CART WITH ITEMS UI ---
+  // --- CART WITH ITEMS UI (Same logic, clean layout) ---
   const subtotal = getTotalPrice();
 
   return (
