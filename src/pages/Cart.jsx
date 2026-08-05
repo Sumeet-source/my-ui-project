@@ -54,7 +54,6 @@ export default function Cart() {
 
       // 🟢 ULTIMATE HARDCODED API CALL (Ye `/api` fix kar dega)
       await axios.post('https://forge-backend-production-1cef.up.railway.app/api/orders', orderData);
-      
       clearCart();
       setIsModalOpen(false);
       setOrderPlaced(true);
