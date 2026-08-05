@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient'; // <--- IMPORT ADDED
+import axios from 'axios';
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart(); 
@@ -53,7 +54,7 @@ export default function Cart() {
       };
 
       const API_URL = 'https://forge-backend-production-1cef.up.railway.app';
-await axios.post(`${API_URL}/api/orders`, orderData);
+      await axios.post(`${API_URL}/api/orders`, orderData);
       
       // Success actions
       clearCart();
