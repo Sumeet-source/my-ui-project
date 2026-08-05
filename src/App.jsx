@@ -1,15 +1,29 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { WishlistProvider } from './context/WishlistContext'; // 🟢 Import karo
+import { WishlistProvider } from './context/WishlistContext';
 import { ToastProvider } from './context/ToastContext';
 
-// ... (Aapke saare pages ke imports yahan hain) ...
+// --- SAARE PAGES KO IMPORT KARO ---
+import Home from './pages/Home';
+import Men from './pages/Men';
+import Women from './pages/Women';
+import Shoes from './pages/Shoes';
+import Outlet from './pages/Outlet';
+import NewArrivals from './pages/NewArrivals';
+import ProductDetails from './pages/ProductDetails';
+import Cart from './pages/Cart';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
+import Admin from './pages/Admin';
+import Wishlist from './pages/Wishlist';
+import Search from './pages/Search';
 
 function App() {
   return (
     <BrowserRouter>
+      {/* ✅ Provider ka order bilkul sahi hona chahiye */}
       <AuthProvider>
-        {/* 🟢 WishlistProvider ko AuthProvider ke andar wrap karo */}
         <WishlistProvider>
           <ToastProvider>
             <Routes>
