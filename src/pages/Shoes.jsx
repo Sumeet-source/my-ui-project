@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // <--- IMPORT LINK
 import axiosClient from '../api/axiosClient';
 import FilterDrawer from '../components/FilterDrawer';
 
@@ -62,7 +63,7 @@ export default function Shoes() {
             <p className="col-span-full text-center py-10 text-gray-500">No products match your filters.</p>
           ) : (
             filteredProducts.map((product) => (
-              <div key={product._id} className="group cursor-pointer">
+              <Link to={`/product/${product._id}`} key={product._id} className="group cursor-pointer">
                 <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
                   <img 
                     src={product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
@@ -78,7 +79,7 @@ export default function Shoes() {
                   <p className="text-sm font-semibold text-gray-900">{product.title}</p>
                   <p className="text-sm text-gray-500">${product.price}</p>
                 </div>
-              </div>
+              </Link>
             ))
           )}
         </div>
