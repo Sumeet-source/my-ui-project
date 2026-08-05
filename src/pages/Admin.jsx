@@ -5,8 +5,8 @@ import axiosClient from '../api/axiosClient';
 export default function AdminDashboard() {
   const { showToast } = useToast();
   const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]); // Orders ka state add kiya
-  const [activeTab, setActiveTab] = useState('products'); // 'products' | 'orders'
+  const [orders, setOrders] = useState([]);
+  const [activeTab, setActiveTab] = useState('products');
   const [formData, setFormData] = useState({
     title: '', 
     price: '', 
@@ -16,18 +16,25 @@ export default function AdminDashboard() {
     inStock: true
   });
 
+  // 🟢 Page load hote hi Products aur Orders dono fetch kar lo (Fix yahi hai!)
   useEffect(() => {
     fetchProducts();
+    fetchOrders();
   }, []);
 
-  // 🔥 Admin ke liye saare orders fetch karne ka function
+  // 🔥 Agar tab change ho toh dubara fetch (Safe side ke liye)
+  useEffect(() => {
+    if (activeTab === 'orders') {
+      fetchOrders();
+    }
+  }, [activeTab]);
+
   const fetchOrders = async () => {
     try {
-      const res = await axiosClient.get('/api/orders/all'); // Naya admin route
+      const res = await axiosClient.get('/api/orders/all');
       setOrders(res.data);
     } catch (error) {
       console.error('Failed to fetch orders:', error);
-      showToast('Failed to load orders', 'error');
     }
   };
 
@@ -39,15 +46,6 @@ export default function AdminDashboard() {
       showToast('Failed to load products', 'error');
     }
   };
-
-  // Jab admin 'Order History' tab par click kare, toh orders fetch honge
-  useEffect(() => {
-    if (activeTab === 'orders') {
-      fetchOrders();
-    }
-  }, [activeTab]);
-
-  // ... (Aapka handleChange, handleAddProduct, handleDelete functions same rahenge)
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -97,11 +95,11 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab('orders')}
             className={`py-2 px-4 border-b-2 font-semibold transition ${activeTab === 'orders' ? 'border-black text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
           >
-            Order History ({orders.length})
+            Order History ({orders.length}) {/* 🟢 Yahan count sahi show hoga */}
           </button>
         </div>
 
-        {/* Add New Product Form (Sirf Manage Products tab par dikhega) */}
+        {/* Add New Product Form */}
         {activeTab === 'products' && (
           <>
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-8">
@@ -144,16 +142,15 @@ export default function AdminDashboard() {
               </form>
             </div>
 
-            {/* Manage Existing Products (With fixed images array) */}
+            {/* Manage Existing Products */}
             <div>
               <h2 className="text-xl font-semibold mb-4">Manage Existing Products</h2>
               {products.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">No products found. Add your first product above!</p>
+                <p className="text-gray-500 text-center py-8">No products found.</p>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {products.map((product) => (
                     <div key={product._id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex gap-4">
-                      {/* 🟢 FIX: 'images?.[0]' use kiya taaki real photos dikhein */}
                       <img 
                         src={product.images?.[0] || product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
                         alt={product.title} 
@@ -183,7 +180,7 @@ export default function AdminDashboard() {
           </>
         )}
 
-        {/* Order History Tab (Admin ke liye saare orders) */}
+        {/* Order History Tab */}
         {activeTab === 'orders' && (
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold mb-4">All Customer Orders</h2>
