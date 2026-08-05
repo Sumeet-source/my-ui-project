@@ -95,9 +95,11 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* LOGO */}
+        {/* 🔥 UPDATED LOGO (Bada aur bold) */}
         <Link to="/" className="flex items-center md:ml-8 lg:ml-16 md:mr-4 lg:mr-6 shrink-0">
-          <span className="text-2xl md:text-3xl font-black tracking-[0.2em] text-white">FORGE</span>
+          <span className="text-3xl md:text-4xl font-black tracking-[0.2em] text-white">
+            FORGE
+          </span>
         </Link>
 
         {/* Mobile Right Icons */}
@@ -111,8 +113,8 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* --- CLEAN DESKTOP LINKS (NO MEGA MENU) --- */}
-        <div className="hidden md:flex justify-center flex-1 gap-6 lg:gap-12 text-[15px] font-bold items-center h-10">
+        {/* --- CLEAN DESKTOP LINKS (Gap aur Font badha diya) --- */}
+        <div className="hidden md:flex justify-center flex-1 gap-10 lg:gap-20 text-[17px] lg:text-[19px] font-bold items-center h-12">
           <Link to="/new-arrivals" className="relative h-full flex items-center cursor-pointer">
             <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm">🔥</span></span>
           </Link>
