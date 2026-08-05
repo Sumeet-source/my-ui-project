@@ -67,8 +67,12 @@ export default function Cart() {
       setTimeout(() => setOrderPlaced(false), 4000);
       
     } catch (error) {
-      console.error('Order error:', error);
-      showToast("Failed to place order. Try again.", "error");
+      console.error('Order Error Details:', error); // Console mein pura error print karega
+      
+      // Backend se jo bhi error message aaya, use Toast par dikhao
+      const errorMessage = error.response?.data?.message || error.message || "Failed to place order. Try again.";
+      
+      showToast(errorMessage, "error");
       setIsProcessing(false);
     }
   };
