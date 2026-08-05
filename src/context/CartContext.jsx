@@ -8,99 +8,50 @@ export function CartProvider({ children }) {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
-  const [coupon, setCoupon] = useState(null);
-
-  const validCoupons = {
-    'SAVE10': 10,
-    'SAVE20': 20,
-    'WELCOME5': 5,
-  };
-
   useEffect(() => {
     localStorage.setItem('shopping_cart', JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.title === product.title);
+  const addToCart = (item) => {
+    setCart((prev) => {
+      // 🔥 FIX: Product ko ID aur Size dono se check karo
+      const existingItem = prev.find(
+        (i) => i.id === item.id && i.size === item.size
+      );
+
       if (existingItem) {
-        return prevCart.map((item) =>
-          item.title === product.title
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+        return prev.map((i) =>
+          i.id === item.id && i.size === item.size
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
         );
       }
-      return [...prevCart, { ...product, quantity: 1 }];
+      return [...prev, { ...item, quantity: 1 }];
     });
   };
 
-  const removeFromCart = (title) => {
-    setCart((prevCart) => prevCart.filter((item) => item.title !== title));
+  const removeFromCart = (idOrTitle) => {
+    setCart((prev) => prev.filter((item) => item.id !== idOrTitle && item.title !== idOrTitle));
   };
 
-  // NEW: Update quantity by +1 or -1
   const updateQuantity = (title, delta) => {
-    setCart((prevCart) => {
-      return prevCart
-        .map((item) => {
-          if (item.title === title) {
-            return { ...item, quantity: item.quantity + delta };
-          }
-          return item;
-        })
-        .filter((item) => item.quantity > 0); // Automatically removes item if quantity hits 0
-    });
-  };
-
-  const applyCoupon = (code) => {
-    const upperCode = code.toUpperCase();
-    if (validCoupons[upperCode]) {
-      setCoupon({ code: upperCode, discount: validCoupons[upperCode] });
-      return true;
-    }
-    return false;
-  };
-
-  const clearCoupon = () => {
-    setCoupon(null);
+    setCart((prev) =>
+      prev.map((item) =>
+        item.title === title
+          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
+          : item
+      )
+    );
   };
 
   const getTotalPrice = () => {
-    const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
-    if (coupon) {
-      const discountAmount = subtotal * (coupon.discount / 100);
-      return subtotal - discountAmount;
-    }
-    return subtotal;
+    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  const getDiscountAmount = () => {
-    const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
-    if (coupon) {
-      return subtotal * (coupon.discount / 100);
-    }
-    return 0;
-  };
-
-  const clearCart = () => {
-    setCart([]);
-    setCoupon(null);
-    localStorage.removeItem('shopping_cart');
-  };
+  const clearCart = () => setCart([]);
 
   return (
-    <CartContext.Provider value={{ 
-      cart, 
-      addToCart, 
-      removeFromCart, 
-      updateQuantity, // Added this!
-      getTotalPrice, 
-      getDiscountAmount, 
-      clearCart, 
-      coupon, 
-      applyCoupon, 
-      clearCoupon 
-    }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, getTotalPrice, clearCart }}>
       {children}
     </CartContext.Provider>
   );
