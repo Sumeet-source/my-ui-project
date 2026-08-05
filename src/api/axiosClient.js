@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-// Vite ka environment variable uthayega
-const API_URL = import.meta.env.VITE_BACKEND_URL;
+// 🔥 HARDCODED FIX: Backend URL directly set kiya hai (Vercel env variable issue bypass)
+const API_URL = 'https://forge-backend-production-1cef.up.railway.app';
 
 const api = axios.create({
-  baseURL: API_URL, // Directly Railway ka URL use karo
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
