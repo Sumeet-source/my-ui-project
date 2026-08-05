@@ -53,8 +53,8 @@ export default function Cart() {
         shippingAddress: address // Modal se uthaya hua address
       };
 
-      const API_URL = 'https://forge-backend-production-1cef.up.railway.app';
-      await axios.post(`${API_URL}/api/orders`, orderData);
+     const API_URL = 'https://forge-backend-production-1cef.up.railway.app/api';
+      await axios.post(`${API_URL}/orders`, orderData); // Note: "/orders" because "/api" already in URL
       
       // Success actions
       clearCart();
