@@ -13,7 +13,6 @@ export default function NewArrivals() {
   const fetchNewArrivals = async () => {
     try {
       const res = await axiosClient.get('/api/products');
-      // Backend se 'createdAt' ke hisaab se sabse naye 8 products dikhao
       const sortedProducts = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 8);
       setProducts(sortedProducts);
     } catch (error) {
@@ -26,7 +25,6 @@ export default function NewArrivals() {
   return (
     <div className="p-6 md:p-10 bg-white min-h-screen">
       <h1 className="text-3xl font-bold mb-6">New Arrivals 🔥</h1>
-      
       {loading ? (
         <p className="text-center py-10 text-gray-500">Loading new arrivals...</p>
       ) : (
@@ -38,7 +36,7 @@ export default function NewArrivals() {
               <Link to={`/product/${product._id}`} key={product._id} className="group cursor-pointer">
                 <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
                   <img 
-                    src={product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
+                    src={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
                     alt={product.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                     onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }}

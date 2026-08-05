@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // <--- IMPORT LINK
+\import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import FilterDrawer from '../components/FilterDrawer';
 
@@ -66,7 +66,7 @@ export default function Shoes() {
               <Link to={`/product/${product._id}`} key={product._id} className="group cursor-pointer">
                 <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
                   <img 
-                    src={product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
+                    src={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
                     alt={product.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                     onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }}
