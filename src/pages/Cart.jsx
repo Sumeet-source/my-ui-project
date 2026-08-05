@@ -3,6 +3,7 @@ import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { Link } from 'react-router-dom';
+import axiosClient from '../api/axiosClient'; // <--- IMPORT ADDED
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart(); 
@@ -12,48 +13,66 @@ export default function Cart() {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [upiId, setUpiId] = useState('');
+  
+  // Shipping Address state (Modal se collect karne ke liye)
+  const [address, setAddress] = useState({ name: '', address: '' });
 
-  // --- BULLETPROOF ORDER HANDLER ---
-  const handlePlaceOrder = () => {
+  // --- REAL BACKEND ORDER HANDLER ---
+  const handlePlaceOrder = async () => {
     if (!upiId) {
       showToast("Please enter your UPI ID!", "error");
       return;
     }
+    if (!address.name || !address.address) {
+      showToast("Please fill in your name and address!", "error");
+      return;
+    }
+    if (!user) {
+      showToast("Please login to place an order!", "error");
+      return;
+    }
 
-    // 1. Force the UI to immediately show the spinner
     setIsProcessing(true);
 
-    // 2. Simulate a network/database delay
-    setTimeout(() => {
-      const order = {
-        id: Date.now(),
-        date: new Date().toLocaleDateString(),
-        items: cart,
-        total: getTotalPrice(),
+    try {
+      // Backend API call to create order
+      const orderData = {
+        user: user.id, // MongoDB ka user id
+        items: cart.map(item => ({
+          productId: item.id, // MongoDB ka product id
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity,
+          size: item.size,
+          image: item.image
+        })),
+        totalAmount: getTotalPrice(),
         paymentMethod: 'UPI',
-        upiId: upiId
+        upiId: upiId,
+        shippingAddress: address // Modal se uthaya hua address
       };
 
-      // 3. Save to user's order history in localStorage
-      if (user) {
-        const existingOrders = JSON.parse(localStorage.getItem(`orders_${user.email}`) || '[]');
-        localStorage.setItem(`orders_${user.email}`, JSON.stringify([order, ...existingOrders]));
-      }
-
-      // 4. Reset the UI and show success
+      await axiosClient.post('/api/orders', orderData);
+      
+      // Success actions
       clearCart();
       setIsModalOpen(false);
       setOrderPlaced(true);
       setIsProcessing(false);
       setUpiId('');
+      setAddress({ name: '', address: '' }); // Address reset
       
       showToast("Payment successful! Order placed!", "success");
       
-      // 5. Hide the success banner after 4 seconds
       setTimeout(() => setOrderPlaced(false), 4000);
-    }, 2000); // 2-second simulated delay
+      
+    } catch (error) {
+      console.error('Order error:', error);
+      showToast("Failed to place order. Try again.", "error");
+      setIsProcessing(false);
+    }
   };
-  // --- END OF BULLETPROOF ORDER HANDLER ---
+  // --- END OF BACKEND ORDER HANDLER ---
 
   if (cart.length === 0 && !orderPlaced) {
     return (
@@ -65,7 +84,7 @@ export default function Cart() {
     );
   }
 
-  const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const subtotal = getTotalPrice(); // CartContext se total nikal rahe hain
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
@@ -118,8 +137,26 @@ export default function Cart() {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Complete Payment</h2>
             <p className="text-gray-500 text-sm mb-6">Pay securely via UPI.</p>
             <div className="space-y-4">
-              <div><label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label><input type="text" className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" placeholder="John Doe" /></div>
-              <div><label className="block text-sm font-semibold text-gray-700 mb-1">Address</label><input type="text" className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" placeholder="123 Main St" /></div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
+                <input 
+                  type="text" 
+                  value={address.name}
+                  onChange={(e) => setAddress({...address, name: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" 
+                  placeholder="John Doe" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
+                <input 
+                  type="text" 
+                  value={address.address}
+                  onChange={(e) => setAddress({...address, address: e.target.value})}
+                  className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" 
+                  placeholder="123 Main St" 
+                />
+              </div>
               <div className="border-t border-gray-200 pt-4 mt-4">
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4 flex items-center gap-2"><span className="text-2xl">📱</span><span className="text-sm text-blue-800 font-medium">UPI / QR Code Payment</span></div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Enter your UPI ID</label>
