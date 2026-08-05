@@ -1,61 +1,58 @@
 import { Link } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext.jsx';
-import { useCart } from '../context/CartContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
 
-export default function ProductCard({ id, title, price, image, colors = [], discount, badge }) {
-  const { toggleWishlist, isInWishlist } = useWishlist();
-  const { addToCart } = useCart();
+export default function ProductCard({ id, title, price, image, badge }) {
+  const { user } = useAuth();
+  const { showToast } = useToast();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  
+  const isLiked = isInWishlist(id);
+
+  const handleWishlistToggle = (e) => {
+    e.preventDefault(); // Link click hone se rokne ke liye
+    if (!user) {
+      showToast('Please login to save items to wishlist', 'error');
+      return;
+    }
+    if (isLiked) {
+      removeFromWishlist(id);
+    } else {
+      addToWishlist(id);
+    }
+  };
 
   return (
-    <div className="bg-white p-4 group relative border border-transparent hover:border-gray-200 transition-all duration-300">
-      
-      {/* DYNAMIC BADGE (Matches your screenshot exactly) */}
-      {badge === 'NEW' && (
-        <div className="absolute top-3 left-3 z-10 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 text-black">
-          <span className="text-orange-500 text-sm">🔥</span> NEW
-        </div>
-      )}
-      {badge === 'FEATURED' && (
-        <div className="absolute top-3 left-3 z-10 bg-black text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm">
-          FEATURED
-        </div>
-      )}
-
-      {/* Heart Icon */}
-      <button 
-        onClick={() => toggleWishlist({ id, title, price, image })}
-        className="absolute top-3 right-3 z-10 transition-transform hover:scale-110"
-      >
-        <svg className={`w-6 h-6 transition-colors ${isInWishlist(id) ? 'fill-black' : 'fill-none stroke-black'}`} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-        </svg>
-      </button>
-
-      {/* Product Image */}
-      <Link to={`/product/${id}`}>
-        <div className="relative w-full aspect-square overflow-hidden bg-gray-50 mb-4 rounded-md">
-          <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-        </div>
-      </Link>
-
-      {/* Color Swatches */}
-      {colors && colors.length > 0 && (
-        <div className="flex gap-1.5 mb-3">
-          {colors.map((color, idx) => (
-            <div key={idx} className={`w-4 h-4 rounded-full border border-gray-200 ${color === 'white' ? 'bg-white border-gray-300' : `bg-[${color}]`}`}></div>
-          ))}
-          {colors.length > 2 && <span className="text-xs text-gray-400 mt-0.5">+{colors.length - 2} More</span>}
-        </div>
-      )}
-
-      {/* Title & Price */}
-      <Link to={`/product/${id}`} className="block mb-2">
-        <h3 className="text-sm font-bold text-gray-900 hover:underline leading-tight">{title}</h3>
-      </Link>
-      
-      <div className="flex items-center gap-2 text-sm">
-        <span className="font-bold text-black">₹{price}</span>
+    <Link to={`/product/${id}`} className="group cursor-pointer">
+      <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
+        <img 
+          src={image} 
+          alt={title} 
+          className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
+          onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Product+Image'; }} 
+        />
+        
+        {/* 🟢 FIXED HEART ICON (Backend connect) */}
+        <button 
+          onClick={handleWishlistToggle}
+          className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition z-10"
+        >
+          <svg className={`w-5 h-5 transition ${isLiked ? 'fill-red-500 text-red-500' : 'fill-none text-gray-700 hover:text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
+        
+        {badge && (
+          <span className="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded">
+            {badge}
+          </span>
+        )}
       </div>
-    </div>
+      <div className="mt-3">
+        <p className="text-sm font-semibold text-gray-900">{title}</p>
+        <p className="text-sm text-gray-500">${price}</p>
+      </div>
+    </Link>
   );
 }

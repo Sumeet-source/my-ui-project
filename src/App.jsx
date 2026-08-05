@@ -1,51 +1,38 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Layout from "./components/Layout.jsx";
-import Home from "./pages/Home.jsx";
-import About from "./pages/About.jsx";
-import Contact from "./pages/Contact.jsx";
-import Cart from "./pages/Cart.jsx";
-import ProductDetails from "./pages/ProductDetails.jsx";
-import Wishlist from "./pages/Wishlist.jsx";
-import Login from "./pages/Login.jsx";
-import Signup from "./pages/Signup.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import Admin from "./pages/Admin.jsx";
-import Outlet from "./pages/Outlet.jsx";
-import Echo from "./pages/Echo.jsx";
-import Men from "./pages/Men.jsx";
-import Women from "./pages/Women.jsx";
-import Shoes from "./pages/Shoes.jsx";
-import NewArrivals from "./pages/NewArrivals.jsx";
-import Search from "./pages/Search.jsx";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { WishlistProvider } from './context/WishlistContext'; // 🟢 Import karo
+import { ToastProvider } from './context/ToastContext';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Layout />,
-    children: [
-      { index: true, element: <Home /> },
-      { path: "about", element: <About /> },
-      { path: "contact", element: <Contact /> },
-      { path: "cart", element: <Cart /> },
-      { path: "wishlist", element: <Wishlist /> },
-      { path: "product/:id", element: <ProductDetails /> },
-      { path: "login", element: <Login /> },
-      { path: "signup", element: <Signup /> },
-      { path: "dashboard", element: <Dashboard /> },
-      { path: "admin", element: <Admin /> },
-      { path: "outlet", element: <Outlet /> },
-      { path: "echo", element: <Echo /> },
-      { path: "men", element: <Men /> },
-      { path: "women", element: <Women /> },
-      { path: "shoes", element: <Shoes /> },
-      { path: "new-arrivals", element: <NewArrivals /> },
-      { path: "search", element: <Search /> },
-    ]
-  }
-]);
+// ... (Aapke saare pages ke imports yahan hain) ...
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        {/* 🟢 WishlistProvider ko AuthProvider ke andar wrap karo */}
+        <WishlistProvider>
+          <ToastProvider>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/men" element={<Men />} />
+              <Route path="/women" element={<Women />} />
+              <Route path="/shoes" element={<Shoes />} />
+              <Route path="/outlet" element={<Outlet />} />
+              <Route path="/new-arrivals" element={<NewArrivals />} />
+              <Route path="/product/:id" element={<ProductDetails />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/search" element={<Search />} />
+            </Routes>
+          </ToastProvider>
+        </WishlistProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  );
 }
 
 export default App;

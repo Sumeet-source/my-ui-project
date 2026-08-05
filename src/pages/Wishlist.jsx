@@ -1,50 +1,58 @@
-import { useWishlist } from '../context/WishlistContext.jsx';
 import { Link } from 'react-router-dom';
+import { useWishlist } from '../context/WishlistContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
 
-export default function Wishlist() {
-  const { wishlist, toggleWishlist } = useWishlist();
+export default function ProductCard({ id, title, price, image, badge }) {
+  const { user } = useAuth();
+  const { showToast } = useToast();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  
+  const isLiked = isInWishlist(id);
 
-  if (wishlist.length === 0) {
-    return (
-      <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Wishlist is Empty</h1>
-        <p className="text-gray-600 mb-8">Save your favorite gear here!</p>
-        <Link to="/" className="bg-black text-white px-8 py-3 rounded font-bold hover:bg-gray-800 transition">
-          Browse Products
-        </Link>
-      </div>
-    );
-  }
+  const handleWishlistToggle = (e) => {
+    e.preventDefault(); // Link click hone se rokne ke liye
+    if (!user) {
+      showToast('Please login to save items to wishlist', 'error');
+      return;
+    }
+    if (isLiked) {
+      removeFromWishlist(id);
+    } else {
+      addToWishlist(id);
+    }
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12 overflow-x-hidden">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">My Wishlist</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {wishlist.map((item) => (
-          <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 relative">
-            
-            {/* Remove Button */}
-            <button 
-              onClick={() => toggleWishlist(item)}
-              className="absolute top-3 right-3 z-10 p-2 bg-red-100 text-red-500 rounded-full hover:bg-red-200 transition"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            <Link to={`/product/${item.id}`}>
-              <img src={item.image} alt={item.title} className="w-full h-64 object-cover" />
-            </Link>
-            <div className="p-4 text-center">
-              <Link to={`/product/${item.id}`}>
-                <h3 className="text-lg font-bold text-gray-900 hover:text-blue-600 transition">{item.title}</h3>
-              </Link>
-              <p className="text-gray-600 mt-1">${item.price}</p>
-            </div>
-          </div>
-        ))}
+    <Link to={`/product/${id}`} className="group cursor-pointer">
+      <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
+        <img 
+          src={image} 
+          alt={title} 
+          className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
+          onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Product+Image'; }} 
+        />
+        
+        {/* 🟢 FIXED HEART ICON (Backend connect) */}
+        <button 
+          onClick={handleWishlistToggle}
+          className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition z-10"
+        >
+          <svg className={`w-5 h-5 transition ${isLiked ? 'fill-red-500 text-red-500' : 'fill-none text-gray-700 hover:text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
+        
+        {badge && (
+          <span className="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded">
+            {badge}
+          </span>
+        )}
       </div>
-    </div>
+      <div className="mt-3">
+        <p className="text-sm font-semibold text-gray-900">{title}</p>
+        <p className="text-sm text-gray-500">${price}</p>
+      </div>
+    </Link>
   );
 }
