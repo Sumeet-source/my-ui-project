@@ -52,7 +52,7 @@ export default function Cart() {
         shippingAddress: address
       };
 
-      // 🟢 ULTIMATE HARDCODED API CALL (Ye `/api` fix kar dega)
+      // git add src/pages/Cart.jsx ULTIMATE HARDCODED API CALL (Ye `/api` fix kar dega)
       await axios.post('https://forge-backend-production-1cef.up.railway.app/api/orders', orderData);
       clearCart();
       setIsModalOpen(false);
