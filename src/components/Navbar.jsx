@@ -161,7 +161,7 @@ export default function Navbar() {
           <div className="relative h-full flex items-center group" onMouseEnter={() => setActiveSubmenu('men')} onMouseLeave={() => setActiveSubmenu(null)}>
             <Link to="/men" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveMen)}>Men</span></Link>
             {activeSubmenu === 'men' && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 w-[95%] max-w-[1400px] bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
+              <div className="absolute top-full left-0 w-screen bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
                 <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-6 gap-8">
                   <div className="flex flex-col gap-3">
                     <img src={megaImages.men} alt="Men" className="w-full h-48 object-cover rounded-lg" />
@@ -187,7 +187,7 @@ export default function Navbar() {
           <div className="relative h-full flex items-center group" onMouseEnter={() => setActiveSubmenu('women')} onMouseLeave={() => setActiveSubmenu(null)}>
             <Link to="/women" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveWomen)}>Women</span></Link>
             {activeSubmenu === 'women' && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 w-[95%] max-w-[1400px] bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
+              <div className="absolute top-full left-0 w-screen bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
                 <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-6 gap-8">
                   <div className="flex flex-col gap-3">
                     <img src={megaImages.women} alt="Women" className="w-full h-48 object-cover rounded-lg" />
@@ -213,7 +213,7 @@ export default function Navbar() {
           <div className="relative h-full flex items-center group" onMouseEnter={() => setActiveSubmenu('shoes')} onMouseLeave={() => setActiveSubmenu(null)}>
             <Link to="/shoes" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveShoes)}>Shoes</span></Link>
             {activeSubmenu === 'shoes' && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 w-[95%] max-w-[1400px] bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
+              <div className="absolute top-full left-0 w-screen bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
                 <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-6 gap-8">
                   <div className="flex flex-col gap-3">
                     <img src={megaImages.shoes} alt="Shoes" className="w-full h-48 object-cover rounded-lg" />
@@ -239,7 +239,7 @@ export default function Navbar() {
           <div className="relative h-full flex items-center group" onMouseEnter={() => setActiveSubmenu('outlet')} onMouseLeave={() => setActiveSubmenu(null)}>
             <Link to="/outlet" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveOutlet)}>Outlet</span></Link>
             {activeSubmenu === 'outlet' && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 w-[95%] max-w-[1400px] bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
+              <div className="absolute top-full left-0 w-screen bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
                 <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-6 gap-8">
                   <div className="flex flex-col gap-3">
                     <img src={megaImages.outlet} alt="Outlet" className="w-full h-48 object-cover rounded-lg" />
