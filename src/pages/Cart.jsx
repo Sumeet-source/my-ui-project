@@ -73,7 +73,7 @@ export default function Cart() {
     return (
       <div className="max-w-6xl mx-auto px-6 py-12">
         
-        {/* Register / Login Section (Sirf tabhi dikhega jab user logged out ho) */}
+        {/* 🟢 Register / Login Section (Sirf tabhi jab user logged out ho) */}
         {!user && (
           <div className="flex flex-col md:flex-row gap-6 mb-10 pb-8">
             <div className="flex-1">
@@ -84,7 +84,6 @@ export default function Cart() {
               </div>
             </div>
             <div className="flex-1 md:border-l md:border-gray-200 md:pl-6 flex flex-col justify-center gap-3 text-sm text-gray-600">
-              {/* 🟢 UPDATED: SVGs instead of Emojis */}
               <div className="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                 Faster checkout
@@ -103,17 +102,19 @@ export default function Cart() {
 
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Bag</h1>
         
-        {/* 🟢 FIXED: gap-12 ko gap-6 kar diya aur gap properly set kiya */}
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="flex-1">
+        {/* 🟢 FIXED: Layout automatically adjusts based on Login/Logout */}
+        <div className={`flex flex-col ${!user ? 'md:flex-row gap-6' : ''}`}>
+          <div className={!user ? 'flex-1' : ''}>
             <p className="text-gray-900 font-medium text-lg">You have no items in your bag.</p>
             <p className="text-gray-500 mt-1 text-sm">Don't know where to start? Here's the gear everyone's after.</p>
             <Link to="/men" className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition">Shop Best Sellers</Link>
             <Link to="/" className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</Link>
           </div>
           
-          {/* Right side placeholder (Grey box) */}
-          <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[250px]"></div>
+          {/* 🟢 FIXED: Grey box Sirf tabhi dikhega jab user LOGGED OUT ho (Under Armour exact logic) */}
+          {!user && (
+            <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[250px]"></div>
+          )}
         </div>
       </div>
     );
