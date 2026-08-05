@@ -1,81 +1,67 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
-  const [email, setEmail] = useState('');
-  const [isSubscribed, setIsSubscribed] = useState(false);
-
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (email) {
-      setIsSubscribed(true);
-      setEmail('');
-      setTimeout(() => setIsSubscribed(false), 4000);
-    }
-  };
-
   return (
-    <footer className="bg-[#f4f4f4] text-black mt-20 pt-16 pb-8 border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+    <footer className="bg-[#1d1d1d] text-white/80 border-t border-white/10 mt-12">
+      <div className="max-w-[1600px] mx-auto px-6 py-12 md:py-16 grid grid-cols-1 md:grid-cols-4 gap-8">
         
-        {/* Column 1: Newsletter */}
-        <div>
-          <h3 className="font-bold text-lg mb-2">Stay in the loop.</h3>
-          <p className="text-sm text-gray-600 mb-6">Sign up for email updates today.</p>
-          <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
-            <input 
-              type="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email Address" 
-              required
-              className="w-full border border-black px-4 py-3 bg-transparent placeholder-gray-500 focus:outline-none"
-            />
-            <button type="submit" className="bg-black text-white py-3 font-bold tracking-wider hover:bg-gray-800 transition">
-              Sign Up
-            </button>
-          </form>
-          {isSubscribed && <p className="mt-3 text-green-700 text-sm font-semibold">✅ Thanks for subscribing!</p>}
-          <p className="mt-4 text-[10px] text-gray-500">By providing your email, you agree to the Terms of Use and Privacy Policy.</p>
+        {/* Column 1: Brand */}
+        <div className="space-y-4">
+          <span className="text-2xl font-black tracking-[0.2em] text-white">
+            FORGE
+          </span>
+          <p className="text-sm leading-relaxed">
+            Premium athletic wear engineered for your peak performance. Gear up and conquer your fitness goals.
+          </p>
         </div>
 
-        {/* Column 2: Support Info */}
-        <div>
-          <h4 className="font-bold text-sm tracking-wider mb-4">Phone Support</h4>
-          <p className="text-sm text-gray-600">1800-102-8343</p>
-          <p className="text-xs text-gray-500 mt-1">Monday - Saturday (9 AM - 6 PM)</p>
-          
-          <h4 className="font-bold text-sm tracking-wider mt-6 mb-2">Email Support</h4>
-          <p className="text-sm text-gray-600">care@forge.com</p>
-          <p className="text-xs text-gray-500 mt-1">Monday - Saturday (9 AM - 6 PM)</p>
-        </div>
-
-        {/* Column 3: Customer Service & About */}
-        <div>
-          <h4 className="font-bold text-sm tracking-wider mb-4">Customer Service</h4>
-          <ul className="space-y-2 text-sm text-gray-600">
-            <li><Link to="#" className="hover:underline">Help & FAQ</Link></li>
-            <li><Link to="#" className="hover:underline">Size Guide</Link></li>
-            <li><Link to="#" className="hover:underline">Shipping & Delivery</Link></li>
-            <li><Link to="#" className="hover:underline">Cancellation & Returns</Link></li>
-            <li><Link to="#" className="hover:underline">Track Your Order</Link></li>
+        {/* Column 2: Quick Links */}
+        <div className="space-y-4">
+          <h4 className="text-white font-bold text-sm uppercase tracking-wider">Quick Links</h4>
+          <ul className="space-y-2 text-sm">
+            <li><Link to="/men" className="hover:text-white transition">Men</Link></li>
+            <li><Link to="/women" className="hover:text-white transition">Women</Link></li>
+            <li><Link to="/shoes" className="hover:text-white transition">Shoes</Link></li>
+            <li><Link to="/outlet" className="hover:text-white transition">Outlet</Link></li>
           </ul>
         </div>
 
-        {/* Column 4: Socials & Legal */}
-        <div>
-          <h4 className="font-bold text-sm tracking-wider mb-4">FORGE Social</h4>
-          <ul className="space-y-2 text-sm font-medium text-gray-700">
-            <li><Link to="#" className="flex items-center gap-2 hover:underline"><span className="text-lg">📸</span> Instagram</Link></li>
-            <li><Link to="#" className="flex items-center gap-2 hover:underline"><span className="text-lg">👤</span> Facebook</Link></li>
-            <li><Link to="#" className="flex items-center gap-2 hover:underline"><span className="text-lg">▶</span> YouTube</Link></li>
+        {/* Column 3: Support */}
+        <div className="space-y-4">
+          <h4 className="text-white font-bold text-sm uppercase tracking-wider">Support</h4>
+          <ul className="space-y-2 text-sm">
+            <li><Link to="#" className="hover:text-white transition">Help Center</Link></li>
+            <li><Link to="#" className="hover:text-white transition">Returns & Exchanges</Link></li>
+            <li><Link to="#" className="hover:text-white transition">Shipping Info</Link></li>
           </ul>
-          <div className="mt-8 flex gap-3 text-gray-600">
-             <span className="border p-1 rounded text-xs">VISA</span>
-             <span className="border p-1 rounded text-xs">MC</span>
-             <span className="border p-1 rounded text-xs">AMEX</span>
+        </div>
+
+        {/* Column 4: Contact */}
+        <div className="space-y-4">
+          <h4 className="text-white font-bold text-sm uppercase tracking-wider">Contact Us</h4>
+          <div className="space-y-2 text-sm">
+            <p className="flex items-center gap-2">
+              <span className="text-white">📞</span> 
+              <span>+91 8700290497</span> {/* ✅ UPDATED NUMBER */}
+            </p>
+            <p className="flex items-center gap-2">
+              <span className="text-white">✉️</span> 
+              <span>support@forge.com</span>
+            </p>
           </div>
-          <p className="mt-4 text-[10px] text-gray-500">© 2024 FORGE. All rights reserved.</p>
+        </div>
+      </div>
+
+      {/* Bottom Copyright Section */}
+      <div className="border-t border-white/10 bg-black/30 py-6">
+        <div className="max-w-[1600px] mx-auto px-6 flex flex-col sm:flex-row justify-between items-center text-xs text-white/60">
+          <p>
+            &copy; {new Date().getFullYear() === 2026 ? '2026' : '2026'} FORGE. All rights reserved. {/* ✅ UPDATED TO 2026 (or dynamic) */}
+          </p>
+          <div className="flex gap-4 mt-4 sm:mt-0">
+            <a href="#" className="hover:text-white transition">Privacy Policy</a>
+            <a href="#" className="hover:text-white transition">Terms of Service</a>
+          </div>
         </div>
       </div>
     </footer>
