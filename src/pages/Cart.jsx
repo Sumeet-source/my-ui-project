@@ -19,7 +19,7 @@ export default function Cart() {
   const [address, setAddress] = useState({ name: '', address: '' });
 
   // --- REAL BACKEND ORDER HANDLER ---
-  const handlePlaceOrder = async () => {
+    const handlePlaceOrder = async () => {
     if (!upiId) {
       showToast("Please enter your UPI ID!", "error");
       return;
@@ -36,11 +36,10 @@ export default function Cart() {
     setIsProcessing(true);
 
     try {
-      // Backend API call to create order
       const orderData = {
-        user: user.id, // MongoDB ka user id
+        user: user.id,
         items: cart.map(item => ({
-          productId: item.id, // MongoDB ka product id
+          productId: item.id,
           title: item.title,
           price: item.price,
           quantity: item.quantity,
@@ -50,29 +49,26 @@ export default function Cart() {
         totalAmount: getTotalPrice(),
         paymentMethod: 'UPI',
         upiId: upiId,
-        shippingAddress: address // Modal se uthaya hua address
+        shippingAddress: address
       };
 
-     const API_URL = 'https://forge-backend-production-1cef.up.railway.app/api';
-await axios.post('https://forge-backend-production-1cef.up.railway.app/api/orders', orderData);
-      // Success actions
+      // 🟢 ULTIMATE HARDCODED API CALL (Ye `/api` fix kar dega)
+      await axios.post('https://forge-backend-production-1cef.up.railway.app/api/orders', orderData);
+      
       clearCart();
       setIsModalOpen(false);
       setOrderPlaced(true);
       setIsProcessing(false);
       setUpiId('');
-      setAddress({ name: '', address: '' }); // Address reset
+      setAddress({ name: '', address: '' });
       
       showToast("Payment successful! Order placed!", "success");
       
       setTimeout(() => setOrderPlaced(false), 4000);
       
     } catch (error) {
-      console.error('Order Error Details:', error); // Console mein pura error print karega
-      
-      // Backend se jo bhi error message aaya, use Toast par dikhao
+      console.error('Order Error Details:', error);
       const errorMessage = error.response?.data?.message || error.message || "Failed to place order. Try again.";
-      
       showToast(errorMessage, "error");
       setIsProcessing(false);
     }
