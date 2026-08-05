@@ -21,11 +21,28 @@ export default function Home() {
     }
   };
 
+  // 🔥 UPDATED: Category-Specific High-Quality Images
   const categories = [
-    { name: 'Men', link: '/men', img: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?q=80&w=800&auto=format&fit=crop' },
-    { name: 'Women', link: '/women', img: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=800&auto=format&fit=crop' },
-    { name: 'Shoes', link: '/shoes', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop' },
-    { name: 'Outlet', link: '/outlet', img: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=800&auto=format&fit=crop' }
+    { 
+      name: 'Men', 
+      link: '/men', 
+      img: 'https://images.unsplash.com/photo-1517931524326-bdd55b5415f7?q=80&w=800&auto=format&fit=crop' 
+    },
+    { 
+      name: 'Women', 
+      link: '/women', 
+      img: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=800&auto=format&fit=crop' 
+    },
+    { 
+      name: 'Shoes', 
+      link: '/shoes', 
+      img: 'https://images.unsplash.com/photo-1512374382149-233c42b6a83b?q=80&w=800&auto=format&fit=crop' 
+    },
+    { 
+      name: 'Outlet', 
+      link: '/outlet', 
+      img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800&auto=format&fit=crop' 
+    }
   ];
 
   const instaImages = [
@@ -37,7 +54,7 @@ export default function Home() {
 
   return (
     <div className="bg-white min-h-screen">
-      {/* HERO BANNERS... (Same as before) */}
+      {/* --- HERO BANNER 1 --- */}
       <div className="relative w-full h-[500px] md:h-[700px] lg:h-[800px] overflow-hidden mt-0 pt-0">
         <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop" alt="Gym Hero" className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://picsum.photos/2070/800?random=1'; }} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
@@ -48,12 +65,12 @@ export default function Home() {
         </div>
       </div>
 
-      {/* HERO BANNER 2 */}
+      {/* --- HERO BANNER 2 --- */}
       <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden mt-0">
         <img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=2070&auto=format&fit=crop" alt="HeatGear Elite" className="w-full h-full object-cover brightness-75" onError={(e) => { e.target.src = 'https://picsum.photos/2070/800?random=2'; }} />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
           <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-wider mb-2">HEATGEAR<span className="text-red-500">®</span> ELITE</h2>
-          <p className="text-sm md:text-lg text-white max-w-xl mb-6">Compression that stretches the way you need it.</p>
+          <p className="text-sm md:text-lg text-white max-w-xl mb-6">Compression that stretches the way you need it. Fresh new colors.</p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/men" className="bg-black text-white font-semibold py-3 px-8 rounded hover:bg-gray-800 hover:scale-105 transition-all duration-300 border border-white/20">Shop Men</Link>
             <Link to="/women" className="bg-white text-black font-semibold py-3 px-8 rounded hover:bg-gray-100 hover:scale-105 transition-all duration-300">Shop Women</Link>
@@ -61,10 +78,10 @@ export default function Home() {
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
+      {/* --- MAIN CONTENT --- */}
       <div className="px-6 md:px-10 pb-12 pt-4">
         
-        {/* CATEGORY GRID */}
+        {/* CATEGORY GRID (Ab bilkul category specific photos hain) */}
         <h1 className="text-3xl font-bold mb-6 pt-8">Shop by Category</h1>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
           {categories.map((cat) => (
@@ -90,13 +107,7 @@ export default function Home() {
             {products.slice(0, 8).map((product) => (
               <Link to={`/product/${product._id}`} key={product._id} className="group cursor-pointer">
                 <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square border border-gray-100">
-                  {/* 🟢 FIX: 'imageUrl' ko 'images?.[0]' se replace kar diya */}
-                  <img 
-                    src={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
-                    alt={product.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                    onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }} 
-                  />
+                  <img src={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }} />
                   <button className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                   </button>
@@ -110,7 +121,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* INSTAGRAM SECTION (Same as before) */}
+        {/* INSTAGRAM SECTION */}
         <div className="border-t border-gray-200 pt-10 mt-4">
           <div className="flex justify-between items-end mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Follow Our Journey</h2>
