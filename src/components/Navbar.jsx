@@ -85,9 +85,14 @@ export default function Navbar() {
         </div>
 
         {/* 🔥 UPDATED LOGO SECTION (Industrial Anvil + FORGE) */}
-        <Link to="/" className="flex items-center gap-2 md:ml-8 lg:ml-16 md:mr-4 lg:mr-6 shrink-0">
-          <img src="/logo.png" alt="FORGE" className="h-8 md:h-10 w-auto object-contain" />
+       <Link to="/" className="flex items-center gap-3 md:ml-8 lg:ml-16 md:mr-4 lg:mr-6 shrink-0">
+          <img 
+            src="/logo.png" 
+            alt="FORGE" 
+            className="h-12 md:h-14 w-auto object-contain" 
+          />
         </Link>
+
 
         <div className="flex items-center gap-4 md:hidden">
           <button onClick={() => setIsSearchOpen(true)} className="text-white">
