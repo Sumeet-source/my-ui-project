@@ -43,6 +43,11 @@ export default function Navbar() {
     navigate('/');
   };
 
+  const handleSearchClear = () => {
+    setSearchInput('');
+    if (inputRef.current) inputRef.current.focus();
+  };
+
   const getUnderlineSpanClasses = (isActive) =>
     `relative inline-block 
     after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white 
@@ -145,20 +150,78 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* --- MOBILE FULL-SCREEN SEARCH OVERLAY --- */}
+      {/* 🔥 UPDATED MOBILE FULL-SCREEN SEARCH OVERLAY (Myntra Style) */}
       {isSearchOpen && (
-        <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
-          <div className="flex items-center justify-between px-4 py-4 border-b border-gray-800">
-            <button onClick={() => setIsSearchOpen(false)} className="text-white p-1">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+        <div className="fixed inset-0 z-[9999] bg-white flex flex-col">
+          {/* Top Search Header */}
+          <div className="flex items-center px-4 py-4 border-b border-gray-200 shadow-sm">
+            {/* Back/Cancel Button */}
+            <button 
+              onClick={() => setIsSearchOpen(false)} 
+              className="text-gray-600 text-base font-medium pr-4 hover:text-black transition"
+            >
+              Cancel
             </button>
-            <div className="flex-1 mx-4">
-              <input ref={inputRef} type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} onKeyDown={handleSearchSubmit} placeholder="Search..." className="w-full bg-transparent text-white text-base border-b border-gray-600 focus:border-white focus:outline-none pb-1 transition-colors placeholder-gray-400" autoFocus />
+            
+            {/* Search Input Wrapper */}
+            <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 py-2">
+              <svg className="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input 
+                ref={inputRef}
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={handleSearchSubmit}
+                placeholder="Search for products, brands and more..." 
+                className="flex-1 bg-transparent text-base text-gray-900 focus:outline-none ml-3 placeholder-gray-400"
+                autoFocus
+              />
+              {/* Clear 'X' Button */}
+              {searchInput.trim() !== '' && (
+                <button 
+                  onClick={handleSearchClear}
+                  className="text-gray-400 hover:text-gray-600 p-1 rounded-full transition"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                  </svg>
+                </button>
+              )}
             </div>
-            <button onClick={() => setIsSearchOpen(false)} className="text-white text-sm font-medium">Cancel</button>
+            
+            {/* Search Action Button */}
+            <button 
+              onClick={() => { if(searchInput.trim()) { navigate(`/search?q=${searchInput}`); setIsSearchOpen(false); } }}
+              className="ml-3 text-sm font-semibold text-black hover:underline"
+            >
+              Search
+            </button>
           </div>
-          <div className="flex-1 flex items-center justify-center text-white/60 text-lg">
-            {searchInput.trim() === '' ? <p className="text-gray-500">Type to start searching</p> : <p className="text-gray-500">No results found!</p>}
+
+          {/* Suggestions / Trending Area */}
+          <div className="flex-1 px-6 py-6 overflow-y-auto">
+            {searchInput.trim() === '' ? (
+              <>
+                <h3 className="text-sm font-bold text-gray-900 mb-4">Trending on FORGE</h3>
+                <div className="flex flex-wrap gap-2">
+                  {['Men', 'Women', 'Shoes', 'Outlet', 'Hoodies', 'Leggings'].map((tag) => (
+                    <button 
+                      key={tag}
+                      onClick={() => { navigate(`/search?q=${tag}`); setIsSearchOpen(false); }}
+                      className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-10 text-gray-500 text-sm">
+                Press <span className="font-bold text-black">Search</span> or hit <span className="font-bold text-black">Enter</span> to find results for "{searchInput}"
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -180,7 +243,6 @@ export default function Navbar() {
 
           <div className="flex-1 overflow-y-auto px-6 py-4">
             <div className="flex flex-col">
-              {/* 🟢 FIXED: 'window.location.href' ko 'navigate' se replace kar diya hai */}
               <button onClick={() => { navigate('/new-arrivals'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
                 <span>New <span className="text-orange-500 text-sm">🔥</span></span>
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
