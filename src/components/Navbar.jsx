@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSubmenu, setActiveSubmenu] = useState(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const inputRef = useRef(null);
@@ -55,44 +54,6 @@ export default function Navbar() {
   const isActiveWomen = location.pathname === '/women';
   const isActiveShoes = location.pathname === '/shoes';
   const isActiveOutlet = location.pathname === '/outlet';
-
-  const megaImages = {
-    men: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?q=80&w=800&auto=format&fit=crop',
-    women: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=800&auto=format&fit=crop',
-    shoes: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop',
-    outlet: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=800&auto=format&fit=crop'
-  };
-
-  const megaMenuColumns = {
-    men: [
-      { title: 'Featured', items: ['Best Sellers', 'New Arrivals', 'Shop All Men'] },
-      { title: 'Shop by Category', items: ['Tops', 'Bottoms', 'Hoodies & Sweatshirts', 'Jackets & Vests'] },
-      { title: 'Shop by Sport', items: ['Running', 'Training', 'Golf', 'Sportswear'] },
-      { title: 'Shop by Collection', items: ['Project Rock', 'UA Flow', 'UA Charged'] },
-      { title: 'Accessories', items: ['Bags', 'Hats', 'Socks', 'Gloves'] }
-    ],
-    women: [
-      { title: 'Featured', items: ['Best Sellers', 'New Arrivals', 'Shop All Women'] },
-      { title: 'Shop by Category', items: ['Sports Bras', 'Tops', 'Leggings', 'Shorts'] },
-      { title: 'Shop by Sport', items: ['Running', 'Training', 'Yoga', 'Golf'] },
-      { title: 'Shop by Collection', items: ['UA HOVR', 'UA Flow', 'UA Smartform'] },
-      { title: 'Accessories', items: ['Bags', 'Hats', 'Water Bottles'] }
-    ],
-    shoes: [
-      { title: 'Featured', items: ['Best Sellers', 'New Arrivals', 'Shop All Shoes'] },
-      { title: 'Shop by Category', items: ['Running', 'Training', 'Hiking', 'Casual'] },
-      { title: 'Shop by Sport', items: ['Running', 'Basketball', 'Training', 'Golf'] },
-      { title: 'Shop by Collection', items: ['UA HOVR', 'UA Flow', 'Project Rock'] },
-      { title: 'Accessories', items: ['Socks', 'Insoles', 'Shoe Care'] }
-    ],
-    outlet: [
-      { title: 'Featured', items: ['Best Sellers', 'Clearance Deals', 'Shop All Outlet'] },
-      { title: 'Shop by Category', items: ['Men', 'Women', 'Shoes', 'Accessories'] },
-      { title: 'Shop by Sport', items: ['Training', 'Running', 'Golf'] },
-      { title: 'Shop by Collection', items: ['Past Seasons', 'Clearance Hoodies'] },
-      { title: 'Accessories', items: ['Bags', 'Hats', 'Socks'] }
-    ]
-  };
 
   return (
     <nav className="bg-[#1d1d1d] text-white relative z-50">
@@ -150,116 +111,23 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* --- DESKTOP LINKS WITH MEGA MENU --- */}
+        {/* --- CLEAN DESKTOP LINKS (NO MEGA MENU) --- */}
         <div className="hidden md:flex justify-center flex-1 gap-6 lg:gap-12 text-[15px] font-bold items-center h-10">
-          
           <Link to="/new-arrivals" className="relative h-full flex items-center cursor-pointer">
             <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm">🔥</span></span>
           </Link>
-
-          {/* MEGA MENU: Men */}
-          <div className="relative h-full flex items-center group" onMouseEnter={() => setActiveSubmenu('men')} onMouseLeave={() => setActiveSubmenu(null)}>
-            <Link to="/men" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveMen)}>Men</span></Link>
-            {activeSubmenu === 'men' && (
-              <div className="absolute top-full left-0 w-screen bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
-                <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-6 gap-8">
-                  <div className="flex flex-col gap-3">
-                    <img src={megaImages.men} alt="Men" className="w-full h-48 object-cover rounded-lg" />
-                    <h3 className="font-bold text-lg">Shop All Men</h3>
-                    <Link to="/men" className="text-sm font-semibold underline underline-offset-4 decoration-2 hover:text-black transition">Shop Now →</Link>
-                  </div>
-                  {megaMenuColumns.men.map((col, idx) => (
-                    <div key={idx}>
-                      <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-gray-900">{col.title}</h4>
-                      <ul className="space-y-2 text-sm font-normal">
-                        {col.items.map((item, i) => (
-                          <li key={i}><Link to={`/men`} className="text-gray-600 hover:text-black transition">{item}</Link></li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* MEGA MENU: Women */}
-          <div className="relative h-full flex items-center group" onMouseEnter={() => setActiveSubmenu('women')} onMouseLeave={() => setActiveSubmenu(null)}>
-            <Link to="/women" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveWomen)}>Women</span></Link>
-            {activeSubmenu === 'women' && (
-              <div className="absolute top-full left-0 w-screen bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
-                <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-6 gap-8">
-                  <div className="flex flex-col gap-3">
-                    <img src={megaImages.women} alt="Women" className="w-full h-48 object-cover rounded-lg" />
-                    <h3 className="font-bold text-lg">Shop All Women</h3>
-                    <Link to="/women" className="text-sm font-semibold underline underline-offset-4 decoration-2 hover:text-black transition">Shop Now →</Link>
-                  </div>
-                  {megaMenuColumns.women.map((col, idx) => (
-                    <div key={idx}>
-                      <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-gray-900">{col.title}</h4>
-                      <ul className="space-y-2 text-sm font-normal">
-                        {col.items.map((item, i) => (
-                          <li key={i}><Link to={`/women`} className="text-gray-600 hover:text-black transition">{item}</Link></li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* MEGA MENU: Shoes */}
-          <div className="relative h-full flex items-center group" onMouseEnter={() => setActiveSubmenu('shoes')} onMouseLeave={() => setActiveSubmenu(null)}>
-            <Link to="/shoes" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveShoes)}>Shoes</span></Link>
-            {activeSubmenu === 'shoes' && (
-              <div className="absolute top-full left-0 w-screen bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
-                <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-6 gap-8">
-                  <div className="flex flex-col gap-3">
-                    <img src={megaImages.shoes} alt="Shoes" className="w-full h-48 object-cover rounded-lg" />
-                    <h3 className="font-bold text-lg">Shop All Shoes</h3>
-                    <Link to="/shoes" className="text-sm font-semibold underline underline-offset-4 decoration-2 hover:text-black transition">Shop Now →</Link>
-                  </div>
-                  {megaMenuColumns.shoes.map((col, idx) => (
-                    <div key={idx}>
-                      <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-gray-900">{col.title}</h4>
-                      <ul className="space-y-2 text-sm font-normal">
-                        {col.items.map((item, i) => (
-                          <li key={i}><Link to={`/shoes`} className="text-gray-600 hover:text-black transition">{item}</Link></li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* MEGA MENU: Outlet */}
-          <div className="relative h-full flex items-center group" onMouseEnter={() => setActiveSubmenu('outlet')} onMouseLeave={() => setActiveSubmenu(null)}>
-            <Link to="/outlet" className="relative h-full flex items-center cursor-pointer"><span className={getUnderlineSpanClasses(isActiveOutlet)}>Outlet</span></Link>
-            {activeSubmenu === 'outlet' && (
-              <div className="absolute top-full left-0 w-screen bg-white text-black shadow-2xl py-8 border-t border-gray-200 rounded-b-xl">
-                <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-6 gap-8">
-                  <div className="flex flex-col gap-3">
-                    <img src={megaImages.outlet} alt="Outlet" className="w-full h-48 object-cover rounded-lg" />
-                    <h3 className="font-bold text-lg">Shop All Outlet</h3>
-                    <Link to="/outlet" className="text-sm font-semibold underline underline-offset-4 decoration-2 hover:text-black transition">Shop Now →</Link>
-                  </div>
-                  {megaMenuColumns.outlet.map((col, idx) => (
-                    <div key={idx}>
-                      <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-gray-900">{col.title}</h4>
-                      <ul className="space-y-2 text-sm font-normal">
-                        {col.items.map((item, i) => (
-                          <li key={i}><Link to={`/outlet`} className="text-gray-600 hover:text-black transition">{item}</Link></li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <Link to="/men" className="relative h-full flex items-center cursor-pointer">
+            <span className={getUnderlineSpanClasses(isActiveMen)}>Men</span>
+          </Link>
+          <Link to="/women" className="relative h-full flex items-center cursor-pointer">
+            <span className={getUnderlineSpanClasses(isActiveWomen)}>Women</span>
+          </Link>
+          <Link to="/shoes" className="relative h-full flex items-center cursor-pointer">
+            <span className={getUnderlineSpanClasses(isActiveShoes)}>Shoes</span>
+          </Link>
+          <Link to="/outlet" className="relative h-full flex items-center cursor-pointer">
+            <span className={getUnderlineSpanClasses(isActiveOutlet)}>Outlet</span>
+          </Link>
         </div>
 
         {/* --- DESKTOP RIGHT ICONS --- */}
