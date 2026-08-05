@@ -1,4 +1,4 @@
-\import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import FilterDrawer from '../components/FilterDrawer';
