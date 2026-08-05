@@ -3,7 +3,11 @@ import { AuthProvider } from './context/AuthContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { ToastProvider } from './context/ToastContext';
 
-// --- SAARE PAGES KO IMPORT KARO ---
+// --- COMPONENTS ---
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+
+// --- SAARE PAGES KA IMPORT ---
 import Home from './pages/Home';
 import Men from './pages/Men';
 import Women from './pages/Women';
@@ -22,26 +26,35 @@ import Search from './pages/Search';
 function App() {
   return (
     <BrowserRouter>
-      {/* ✅ Provider ka order bilkul sahi hona chahiye */}
       <AuthProvider>
         <WishlistProvider>
           <ToastProvider>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/men" element={<Men />} />
-              <Route path="/women" element={<Women />} />
-              <Route path="/shoes" element={<Shoes />} />
-              <Route path="/outlet" element={<Outlet />} />
-              <Route path="/new-arrivals" element={<NewArrivals />} />
-              <Route path="/product/:id" element={<ProductDetails />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/search" element={<Search />} />
-            </Routes>
+            
+            {/* 🟢 NAVBAR KO ROUTES KE BAHAR RAKHO - HAMESHA DIKHEGA */}
+            <Navbar />
+            
+            <div className="min-h-screen flex flex-col">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/men" element={<Men />} />
+                <Route path="/women" element={<Women />} />
+                <Route path="/shoes" element={<Shoes />} />
+                <Route path="/outlet" element={<Outlet />} />
+                <Route path="/new-arrivals" element={<NewArrivals />} />
+                <Route path="/product/:id" element={<ProductDetails />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/search" element={<Search />} />
+              </Routes>
+              
+              {/* 🟢 FOOTER KO BHI ROUTES KE BAHAR RAKHO */}
+              <Footer />
+            </div>
+
           </ToastProvider>
         </WishlistProvider>
       </AuthProvider>
