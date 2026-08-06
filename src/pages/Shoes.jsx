@@ -13,14 +13,14 @@ export default function Shoes() {
     fetchShoesProducts();
   }, []);
 
-  const fetchShoesProducts = async () => {
+   const fetchMenProducts = async () => {
     try {
-      const res = await axiosClient.get('/api/products');
-      const shoesProducts = res.data.filter(p => p.category === 'Shoes');
-      setProducts(shoesProducts);
-      setFilteredProducts(shoesProducts);
+      
+      const res = await axiosClient.get('/api/products', { params: { category: 'Shoes' } });
+      setProducts(res.data);
+      setFilteredProducts(res.data);
     } catch (error) {
-      console.error('Error fetching shoes products:', error);
+      console.error('Error fetching men products:', error);
     } finally {
       setLoading(false);
     }

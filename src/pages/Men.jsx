@@ -13,12 +13,12 @@ export default function Men() {
     fetchMenProducts();
   }, []);
 
-  const fetchMenProducts = async () => {
+    const fetchMenProducts = async () => {
     try {
-      const res = await axiosClient.get('/api/products');
-      const menProducts = res.data.filter(p => p.category === 'Men');
-      setProducts(menProducts);
-      setFilteredProducts(menProducts);
+    
+      const res = await axiosClient.get('/api/products', { params: { category: 'Men' } });
+      setProducts(res.data);
+      setFilteredProducts(res.data);
     } catch (error) {
       console.error('Error fetching men products:', error);
     } finally {

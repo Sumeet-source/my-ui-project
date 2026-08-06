@@ -13,14 +13,14 @@ export default function Outlet() {
     fetchOutletProducts();
   }, []);
 
-  const fetchOutletProducts = async () => {
+  const fetchMenProducts = async () => {
     try {
-      const res = await axiosClient.get('/api/products');
-      const outletProducts = res.data.filter(p => p.category === 'Outlet');
-      setProducts(outletProducts);
-      setFilteredProducts(outletProducts);
+      
+      const res = await axiosClient.get('/api/products', { params: { category: 'Outlet' } });
+      setProducts(res.data);
+      setFilteredProducts(res.data);
     } catch (error) {
-      console.error('Error fetching outlet products:', error);
+      console.error('Error fetching men products:', error);
     } finally {
       setLoading(false);
     }
