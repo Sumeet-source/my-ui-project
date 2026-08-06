@@ -14,7 +14,7 @@ export function CartProvider({ children }) {
 
   const addToCart = (item) => {
     setCart((prev) => {
-      // 🔥 FIX: Product ko ID aur Size dono se check karo
+      // 🔥 FIX: Product ko ID aur Size dono se check karo (Ye pehle se sahi tha)
       const existingItem = prev.find(
         (i) => i.id === item.id && i.size === item.size
       );
@@ -30,14 +30,16 @@ export function CartProvider({ children }) {
     });
   };
 
-  const removeFromCart = (idOrTitle) => {
-    setCart((prev) => prev.filter((item) => item.id !== idOrTitle && item.title !== idOrTitle));
+  // 🟢 FIX: ab ID aur Size dono check karega
+  const removeFromCart = (id, size) => {
+    setCart((prev) => prev.filter((item) => !(item.id === id && item.size === size)));
   };
 
-  const updateQuantity = (title, delta) => {
+  // 🟢 FIX: ab ID aur Size dono check karega (Title ki jagah)
+  const updateQuantity = (id, size, delta) => {
     setCart((prev) =>
       prev.map((item) =>
-        item.title === title
+        item.id === id && item.size === size
           ? { ...item, quantity: Math.max(1, item.quantity + delta) }
           : item
       )

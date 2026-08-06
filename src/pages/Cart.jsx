@@ -14,8 +14,7 @@ export default function Cart() {
   if (cart.length === 0 && !orderPlaced) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-12">
-        
-        {/* Register / Login Section (Sirf tabhi jab user logged out ho) */}
+        {/* ... (Empty cart UI same rahega) ... */}
         {!user && (
           <div className="flex flex-col md:flex-row gap-6 mb-10 pb-8">
             <div className="flex-1">
@@ -51,10 +50,7 @@ export default function Cart() {
             <Link to="/men" className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition">Shop Best Sellers</Link>
             <Link to="/" className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</Link>
           </div>
-          
-          {!user && (
-            <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[250px]"></div>
-          )}
+          {!user && <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[250px]"></div>}
         </div>
       </div>
     );
@@ -78,19 +74,22 @@ export default function Cart() {
         {/* Cart Items List */}
         <div className="flex-1 space-y-4">
           {cart.map((item, index) => (
-            <div key={index} className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+            // 🟢 FIX: Key unique banane ke liye id aur size dono use kiye
+            <div key={`${item.id}-${item.size}-${index}`} className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
               <img src={item.image} alt={item.title} className="w-20 h-20 object-cover rounded" />
               <div className="flex-1">
-                <h3 className="font-bold text-gray-900">{item.title}</h3>
+                <h3 className="font-bold text-gray-900">{item.title} ({item.size})</h3>
                 <div className="flex items-center gap-2 mt-1">
-                  <button onClick={() => updateQuantity(item.title, -1)} className="w-6 h-6 border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center text-gray-600 transition">-</button>
+                  {/* 🟢 FIX: ID aur Size dono pass kar rahe hain */}
+                  <button onClick={() => updateQuantity(item.id, item.size, -1)} className="w-6 h-6 border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center text-gray-600 transition">-</button>
                   <span className="text-gray-600 font-medium w-4 text-center">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.title, 1)} className="w-6 h-6 border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center text-gray-600 transition">+</button>
+                  <button onClick={() => updateQuantity(item.id, item.size, 1)} className="w-6 h-6 border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center text-gray-600 transition">+</button>
                   <span className="text-gray-500 text-sm ml-2 font-medium">($ {(item.price * item.quantity).toFixed(2)})</span>
                 </div>
                 {item.size && <p className="text-xs text-gray-400">Size: {item.size}</p>}
               </div>
-              <button onClick={() => removeFromCart(item.title)} className="text-red-500 hover:text-red-700 text-sm font-semibold">Remove</button>
+              {/* 🟢 FIX: ID aur Size dono pass kar rahe hain */}
+              <button onClick={() => removeFromCart(item.id, item.size)} className="text-red-500 hover:text-red-700 text-sm font-semibold">Remove</button>
             </div>
           ))}
         </div>
@@ -107,7 +106,6 @@ export default function Cart() {
             <span>${subtotal.toFixed(2)}</span>
           </div>
           
-          {/* 🟢 UPDATED: UPI Modal ki jagah Checkout Page ka Link */}
           <Link 
             to="/checkout" 
             className="w-full bg-black text-white py-3 mt-6 rounded font-bold hover:bg-gray-800 transition uppercase tracking-wider text-center block"
