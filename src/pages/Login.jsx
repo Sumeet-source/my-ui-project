@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; 
-import { useToast } from '../context/ToastContext'; // <--- Toast import kiya
+import { useToast } from '../context/ToastContext';
 
 export default function Login() {
   const [loginMode, setLoginMode] = useState('password');
@@ -12,14 +12,14 @@ export default function Login() {
   const navigate = useNavigate();
   
   const { login } = useAuth(); 
-  const { showToast } = useToast(); // <--- Toast function le liya
+  const { showToast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (loginMode === 'password') {
       if (!email || !password) {
-        showToast('Please enter email and password', 'error'); // <--- Alert hata ke Toast
+        showToast('Please enter email and password', 'error');
         return;
       }
 
@@ -27,10 +27,10 @@ export default function Login() {
       
       if (result.success) {
         console.log('✅ Login Success:', result.user);
-        showToast('Logged in successfully!', 'success'); // <--- Alert hata ke Toast
+        showToast('Logged in successfully!', 'success');
         navigate('/');
       } else {
-        showToast(result.message, 'error'); // <--- Alert hata ke Toast
+        showToast(result.message, 'error');
       }
 
     } else {
@@ -111,7 +111,10 @@ export default function Login() {
               </div>
 
               <div className="text-right">
-                <a href="#" className="text-sm text-gray-700 hover:text-black underline">Forgot Password?</a>
+                {/* 🟢 UPDATED: Simple HTML anchor replaced with React Router Link */}
+                <Link to="/forgot-password" className="text-sm text-gray-700 hover:text-black underline">
+                  Forgot Password?
+                </Link>
               </div>
             </>
           )}
