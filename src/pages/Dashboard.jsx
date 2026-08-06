@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '../context/ToastContext.jsx';
+import axiosClient from '../api/axiosClient'; // 🟢 Import backend API
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [view, setView] = useState('profile');
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
 
   const getDateFromObjectId = (id) => {
     if (!id) return 'N/A';
@@ -28,6 +31,27 @@ export default function Dashboard() {
     return stored ? JSON.parse(stored) : null;
   })();
 
+  // 🟢 Page load hote hi backend se orders fetch kar lo
+  useEffect(() => {
+    if (effectiveUser) {
+      fetchOrders();
+    }
+  }, [effectiveUser, view]);
+
+  const fetchOrders = async () => {
+    if (!effectiveUser) return;
+    setLoadingOrders(true);
+    try {
+      // Backend se real orders fetch karo
+      const res = await axiosClient.get(`/api/orders/my-orders?userId=${effectiveUser.id}`);
+      setOrders(res.data);
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
   const handleLogout = () => {
     logout();
     showToast("Logged out successfully.", "info");
@@ -44,8 +68,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  const orders = JSON.parse(localStorage.getItem(`orders_${effectiveUser.email}`) || '[]');
   
   // Get Initials for Avatar
   const getInitials = (name) => {
@@ -69,16 +91,13 @@ export default function Dashboard() {
             </div>
           </div>
           
-          {/* Logout Button - Mobile friendly */}
           <button 
             onClick={handleLogout} 
             className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-3 sm:px-4 sm:py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition text-sm font-medium"
           >
-            {/* Mobile Icon */}
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            {/* Desktop Text */}
             <span className="hidden sm:inline">Log Out</span>
           </button>
         </div>
@@ -86,7 +105,6 @@ export default function Dashboard() {
         {/* Main Dashboard Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          {/* Stats & Quick Actions (Left Side) */}
           <div className="md:col-span-1 space-y-6">
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Stats</h3>
@@ -102,7 +120,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Quick Links */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Quick Actions</h3>
               <div className="space-y-2">
@@ -132,15 +149,17 @@ export default function Dashboard() {
             {view === 'orders' && (
               <div>
                 <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Order History</h3>
-                {orders.length === 0 ? (
-                  <p className="text-gray-500 italic py-8 text-center">You haven't placed any orders yet. <Link to="/shop" className="text-black underline">Start shopping</Link></p>
+                {loadingOrders ? (
+                  <p className="text-gray-500 italic py-8 text-center">Loading your orders...</p>
+                ) : orders.length === 0 ? (
+                  <p className="text-gray-500 italic py-8 text-center">You haven't placed any orders yet. <Link to="/" className="text-black underline">Start shopping</Link></p>
                 ) : (
                   <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
                     {orders.map((order) => (
-                      <div key={order.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition">
+                      <div key={order._id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition">
                         <div className="flex justify-between items-center mb-2 border-b border-gray-200 pb-2">
-                          <span className="font-bold text-gray-900 text-sm">Order #{order.id}</span>
-                          <span className="text-xs text-gray-500">{order.date}</span>
+                          <span className="font-bold text-gray-900 text-sm">Order #{order._id.slice(-6)}</span>
+                          <span className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</span>
                         </div>
                         <div className="space-y-1 mb-2">
                           {order.items.slice(0, 2).map((item, idx) => (
@@ -153,7 +172,7 @@ export default function Dashboard() {
                         </div>
                         <div className="flex justify-between font-bold text-sm text-gray-900 border-t border-gray-300 pt-2">
                           <span>Total</span>
-                          <span>${order.total.toFixed(2)}</span>
+                          <span>${order.totalAmount.toFixed(2)}</span>
                         </div>
                       </div>
                     ))}
