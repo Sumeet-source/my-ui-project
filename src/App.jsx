@@ -23,6 +23,11 @@ import Admin from './pages/Admin';
 import Wishlist from './pages/Wishlist';
 import Search from './pages/Search';
 
+import Checkout from './pages/Checkout';
+
+// Routes ke andar ye line add karo:
+<Route path="/checkout" element={<Checkout />} />
+
 function App() {
   return (
     <BrowserRouter>
