@@ -13,21 +13,32 @@ export default function Outlet() {
     fetchOutletProducts();
   }, []);
 
-  const fetchMenProducts = async () => {
+  const fetchOutletProducts = async () => {
     try {
-      
+      // 🟢 Backend ko category filter bhej rahe hain
       const res = await axiosClient.get('/api/products', { params: { category: 'Outlet' } });
-      setProducts(res.data);
-      setFilteredProducts(res.data);
+      
+      // 🟢 SAFETY CHECK
+      if (Array.isArray(res.data)) {
+        setProducts(res.data);
+        setFilteredProducts(res.data);
+      } else {
+        console.warn('Received non-array data:', res.data);
+        setProducts([]);
+        setFilteredProducts([]);
+      }
     } catch (error) {
-      console.error('Error fetching men products:', error);
+      console.error('Error fetching outlet products:', error);
+      setProducts([]);
+      setFilteredProducts([]);
     } finally {
       setLoading(false);
     }
   };
 
   const applyFilters = (filters) => {
-    let result = [...products];
+    let result = [...(Array.isArray(products) ? products : [])];
+
     if (filters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (filters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     else if (filters.sort === 'newest') result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
