@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import ForgeLogo from './ForgeLogo';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -101,9 +102,8 @@ export default function Navbar() {
         </div>
 
         {/* 🔥 UPDATED LOGO */}
-        <Link to="/" className="flex items-center md:ml-8 lg:ml-16 md:mr-4 lg:mr-6 shrink-0">
-          <span className="text-3xl md:text-4xl font-black tracking-[0.2em] text-white">FORGE</span>
-        </Link>
+                {/* 🔥 NEW STYLISH LOGO COMPONENT */}
+        <ForgeLogo />
 
         {/* Mobile Right Icons */}
         <div className="flex items-center gap-4 md:hidden">
