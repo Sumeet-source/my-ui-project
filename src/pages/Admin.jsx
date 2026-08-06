@@ -7,6 +7,8 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [activeTab, setActiveTab] = useState('products');
+  
+  // --- State for Adding Product ---
   const [formData, setFormData] = useState({
     title: '', 
     price: '', 
@@ -16,13 +18,24 @@ export default function AdminDashboard() {
     inStock: true
   });
 
-  // 🟢 Page load hote hi Products aur Orders dono fetch kar lo (Fix yahi hai!)
+  // --- State for Editing Product ---
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingProductId, setEditingProductId] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    title: '', 
+    price: '', 
+    description: '', 
+    imageUrl: '', 
+    category: 'Men', 
+    inStock: true
+  });
+
+  // --- Fetch Data ---
   useEffect(() => {
     fetchProducts();
     fetchOrders();
   }, []);
 
-  // 🔥 Agar tab change ho toh dubara fetch (Safe side ke liye)
   useEffect(() => {
     if (activeTab === 'orders') {
       fetchOrders();
@@ -47,6 +60,7 @@ export default function AdminDashboard() {
     }
   };
 
+  // --- Handlers for Adding Product ---
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -67,6 +81,42 @@ export default function AdminDashboard() {
     }
   };
 
+  // --- Handlers for Editing Product ---
+  const handleEditClick = (product) => {
+    setEditingProductId(product._id);
+    setEditFormData({
+      title: product.title,
+      price: product.price,
+      description: product.description || '',
+      imageUrl: product.imageUrl || '',
+      category: product.category,
+      inStock: product.inStock
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axiosClient.put(`/api/products/${editingProductId}`, editFormData);
+      showToast('Product updated successfully!', 'success');
+      setIsEditModalOpen(false);
+      setEditingProductId(null);
+      fetchProducts(); // List refresh karo
+    } catch (error) {
+      showToast('Failed to update product', 'error');
+    }
+  };
+
+  // --- Handler for Deleting Product ---
   const handleDelete = async (id) => {
     if(!confirm('Are you sure you want to delete this product?')) return;
     try {
@@ -95,7 +145,7 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab('orders')}
             className={`py-2 px-4 border-b-2 font-semibold transition ${activeTab === 'orders' ? 'border-black text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
           >
-            Order History ({orders.length}) {/* 🟢 Yahan count sahi show hoga */}
+            Order History ({orders.length})
           </button>
         </div>
 
@@ -168,7 +218,19 @@ export default function AdminDashboard() {
                             {product.inStock ? 'In Stock' : 'OOS'}
                           </span>
                           <div className="flex gap-2">
-                            <button className="text-sm text-red-600 hover:underline" onClick={() => handleDelete(product._id)}>Delete</button>
+                            {/* 🟢 ADDED EDIT BUTTON */}
+                            <button 
+                              onClick={() => handleEditClick(product)} 
+                              className="text-sm text-blue-600 hover:underline"
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(product._id)} 
+                              className="text-sm text-red-600 hover:underline"
+                            >
+                              Delete
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -214,6 +276,102 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {/* 🟢 EDIT PRODUCT MODAL */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Edit Product</h2>
+            
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-900">Product Title</label>
+                <input 
+                  type="text" 
+                  name="title" 
+                  value={editFormData.title} 
+                  onChange={handleEditChange} 
+                  className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" 
+                  required 
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Price ($)</label>
+                  <input 
+                    type="number" 
+                    name="price" 
+                    value={editFormData.price} 
+                    onChange={handleEditChange} 
+                    className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" 
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Image URL</label>
+                  <input 
+                    type="text" 
+                    name="imageUrl" 
+                    value={editFormData.imageUrl} 
+                    onChange={handleEditChange} 
+                    className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" 
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-900">Description</label>
+                <textarea 
+                  name="description" 
+                  value={editFormData.description} 
+                  onChange={handleEditChange} 
+                  className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20" 
+                />
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold text-gray-900">Category</label>
+                  <select 
+                    name="category" 
+                    value={editFormData.category} 
+                    onChange={handleEditChange} 
+                    className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"
+                  >
+                    <option value="Men">Men</option>
+                    <option value="Women">Women</option>
+                    <option value="Shoes">Shoes</option>
+                    <option value="Outlet">Outlet</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2 mt-6">
+                  <input 
+                    type="checkbox" 
+                    name="inStock" 
+                    checked={editFormData.inStock} 
+                    onChange={handleEditChange} 
+                    className="h-5 w-5 accent-black" 
+                  />
+                  <label className="text-sm font-medium">In Stock</label>
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button 
+                  type="submit" 
+                  className="flex-1 bg-black text-white py-2 rounded font-semibold hover:bg-gray-800 transition"
+                >
+                  Save Changes
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setIsEditModalOpen(false)} 
+                  className="flex-1 bg-gray-200 text-gray-800 py-2 rounded font-semibold hover:bg-gray-300 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
