@@ -23,12 +23,14 @@ export default function ProductDetails() {
   
   const carouselRef = useRef(null);
 
+  // 🟢 Reviews state (Backend se fetch hoga)
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchProductData();
+    fetchReviews(); // 🟢 Product load hote hi reviews fetch karo
   }, [id]);
 
   const fetchProductData = async () => {
@@ -36,17 +38,25 @@ export default function ProductDetails() {
       setLoading(true);
       const allRes = await axiosClient.get('/api/products');
       setAllProducts(allRes.data);
+
       const singleRes = await axiosClient.get(`/api/products/${id}`);
       setProduct(singleRes.data);
-      setReviews(singleRes.data.reviews || [
-        { user: 'Customer 1', comment: 'Great quality, fits perfectly!', rating: 5 },
-        { user: 'Customer 2', comment: 'Good fabric, but runs a bit small.', rating: 4 }
-      ]);
     } catch (error) {
       console.error('Error fetching product:', error);
       showToast('Failed to load product details', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 🟢 Backend se reviews fetch karne ka naya function
+  const fetchReviews = async () => {
+    try {
+      const res = await axiosClient.get(`/api/reviews/product/${id}`);
+      setReviews(res.data);
+    } catch (error) {
+      console.error("Failed to fetch reviews", error);
+      setReviews([]);
     }
   };
 
@@ -96,15 +106,35 @@ export default function ProductDetails() {
     }
   };
 
-  const handleReviewSubmit = (e) => {
+  // 🟢 Reviews Submit karne ka update function (Backend API call)
+  const handleReviewSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      showToast("Please login to write a review", "error");
+      return;
+    }
     if (!newReview.user || !newReview.comment) {
       showToast("Please fill in your name and comment.", "error");
       return;
     }
-    setReviews([...reviews, newReview]);
-    setNewReview({ user: '', comment: '', rating: 5 });
-    showToast("Review submitted successfully!", "success");
+
+    try {
+      const reviewData = {
+        user: user.id,
+        product: product._id,
+        rating: newReview.rating,
+        comment: newReview.comment
+      };
+      
+      await axiosClient.post('/api/reviews', reviewData);
+      
+      setNewReview({ user: '', comment: '', rating: 5 });
+      fetchReviews(); // 🟢 Submit ke baad list refresh karo
+      showToast("Review submitted successfully!", "success");
+    } catch (error) {
+      console.error("Review error:", error);
+      showToast("Failed to submit review. Try again.", "error");
+    }
   };
 
   const renderStars = (rating) => {
@@ -186,7 +216,7 @@ export default function ProductDetails() {
           <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
 
-        {/* 🔥 You Might Also Like (Moved UP, before Reviews) */}
+        {/* You Might Also Like */}
         {relatedProducts.length > 0 && (
           <div className="px-4 py-6 border-t border-gray-100">
             <h2 className="text-base font-bold text-gray-900 mb-4">You Might Also Like</h2>
@@ -208,19 +238,24 @@ export default function ProductDetails() {
           </div>
         )}
 
-        {/* Ratings & Reviews (Moved DOWN, below You Might Also Like) */}
+        {/* Ratings & Reviews */}
         <div className="px-4 py-4 border-t border-gray-100 bg-gray-50">
           <h3 className="text-sm font-bold text-gray-900 mb-4">Ratings & Reviews</h3>
           <div className="space-y-4 mb-6">
-            {reviews.map((review, index) => (
-              <div key={index} className="bg-white p-3 rounded border border-gray-100">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-bold text-xs text-gray-800">{review.user}</span>
-                  <span className="text-yellow-400 text-xs">{renderStars(review.rating)}</span>
+            {reviews.length === 0 ? (
+              <p className="text-gray-500 italic text-sm text-center py-4">No reviews yet. Be the first to review!</p>
+            ) : (
+              reviews.map((review, index) => (
+                <div key={index} className="bg-white p-3 rounded border border-gray-100">
+                  <div className="flex justify-between items-center mb-1">
+                    {/* 🟢 Backend se populated user ka name utha raha hai */}
+                    <span className="font-bold text-xs text-gray-800">{review.user?.name || review.user || 'Anonymous'}</span>
+                    <span className="text-yellow-400 text-xs">{renderStars(review.rating)}</span>
+                  </div>
+                  <p className="text-xs text-gray-600">{review.comment}</p>
                 </div>
-                <p className="text-xs text-gray-600">{review.comment}</p>
-              </div>
-            ))}
+              ))
+            )}
           </div>
           <div className="bg-white border border-gray-200 rounded p-4">
             <h4 className="text-sm font-bold text-gray-900 mb-3">Write a Review</h4>
@@ -234,7 +269,7 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      {/* --- Desktop Section (Existing Clean Layout) --- */}
+      {/* --- Desktop Section (Same as before) --- */}
       <div className="hidden md:block max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row gap-12 mb-12">
           <div className="flex-1 relative group">
@@ -278,14 +313,14 @@ export default function ProductDetails() {
           </div>
         </div>
 
-        {/* Desktop Reviews */}
+        {/* Desktop Reviews Section */}
         <section className="border-t border-gray-200 pt-10 max-w-4xl">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
           <div className="space-y-6 mb-8">
             {reviews.map((review, index) => (
               <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="font-bold text-gray-800">{review.user}</span>
+                  <span className="font-bold text-gray-800">{review.user?.name || review.user || 'Anonymous'}</span>
                   <span className="text-yellow-400 text-sm">{renderStars(review.rating)}</span>
                 </div>
                 <p className="text-gray-600 text-sm">{review.comment}</p>
@@ -306,7 +341,7 @@ export default function ProductDetails() {
         </section>
       </div>
 
-      {/* Lightbox Modal (For Desktop mainly) */}
+      {/* Lightbox Modal */}
       {isLightboxOpen && (
         <div className="fixed inset-0 z-[999] bg-black/95 flex items-center justify-center p-4 cursor-zoom-out" onClick={() => setIsLightboxOpen(false)}>
           <button onClick={() => setIsLightboxOpen(false)} className="absolute top-6 right-6 text-white text-5xl font-light hover:text-gray-300 transition z-10">&times;</button>
