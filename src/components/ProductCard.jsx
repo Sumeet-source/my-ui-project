@@ -1,9 +1,10 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // 🟢 Import navigate
 import { useWishlist } from '../context/WishlistContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
 export default function ProductCard({ id, title, price, image, badge }) {
+  const navigate = useNavigate(); // 🟢 Hook initialize kiya
   const { user } = useAuth();
   const { showToast } = useToast();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
@@ -11,8 +12,7 @@ export default function ProductCard({ id, title, price, image, badge }) {
   const isLiked = isInWishlist(id);
 
   const handleWishlistToggle = (e) => {
-    e.preventDefault();
-    e.stopPropagation(); // 🟢 FIX: Desktop par Link ko trigger hone se rokega
+    e.stopPropagation(); // 🟢 Parent div ke click ko rokega
 
     if (!id) {
       showToast('Invalid product ID. Please refresh the page.', 'error');
@@ -31,8 +31,15 @@ export default function ProductCard({ id, title, price, image, badge }) {
     }
   };
 
+  // Card click par product details page par le jayega
+  const handleCardClick = () => {
+    if (id) {
+      navigate(`/product/${id}`);
+    }
+  };
+
   return (
-    <Link to={id ? `/product/${id}` : '#'} className="group cursor-pointer">
+    <div onClick={handleCardClick} className="group cursor-pointer">
       <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
         <img 
           src={image || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
@@ -41,6 +48,7 @@ export default function ProductCard({ id, title, price, image, badge }) {
           onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Product+Image'; }} 
         />
         
+        {/* 🟢 Heart Button - Click hone par sirf wishlist toggle hoga, page open nahi hoga */}
         <button 
           onClick={handleWishlistToggle}
           className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white hover:scale-110 transition duration-200 z-30 shadow-sm"
@@ -60,6 +68,6 @@ export default function ProductCard({ id, title, price, image, badge }) {
         <p className="text-sm font-semibold text-gray-900">{title}</p>
         <p className="text-sm text-gray-500">${price}</p>
       </div>
-    </Link>
+    </div>
   );
 }
