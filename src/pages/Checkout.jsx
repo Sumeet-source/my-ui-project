@@ -4,14 +4,12 @@ import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import axiosClient from '../api/axiosClient';
-import useRazorpay from 'react-razorpay';
 
 export default function Checkout() {
   const { cart, getTotalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const Razorpay = useRazorpay();
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -47,12 +45,13 @@ export default function Checkout() {
       const deliveryCharge = subtotal > 50 ? 0 : 5.99;
       const totalAmount = subtotal + deliveryCharge;
 
+      // 1. Backend se Razorpay Order ID generate karwayein
       const orderRes = await axiosClient.post('/api/orders/create-razorpay-order', { 
         amount: totalAmount
       });
       const { id: razorpayOrderId, amount } = orderRes.data;
 
-      // 🔥 Updated with your real Test API Key
+      // 2. Razorpay Payment Popup open karein (using window.Razorpay)
       const options = {
         key: 'rzp_test_TMNIPPznSJ7D',
         amount: amount,
@@ -91,7 +90,8 @@ export default function Checkout() {
         theme: { color: '#000000' },
       };
 
-      const rzp = new Razorpay(options);
+      // 🟢 react-razorpay package ki jagah direct window.Razorpay use kiya
+      const rzp = new window.Razorpay(options);
       rzp.open();
 
     } catch (error) {
@@ -120,76 +120,30 @@ export default function Checkout() {
         
         <div className="flex-1 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Delivery Address</h1>
-          
           <form onSubmit={handlePlaceOrder} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-              <input 
-                type="text" 
-                name="fullName" 
-                value={formData.fullName} 
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:border-black" 
-                placeholder="John Doe" 
-                required 
-              />
+              <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:border-black" placeholder="John Doe" required />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
-              <input 
-                type="text" 
-                name="address" 
-                value={formData.address} 
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:border-black" 
-                placeholder="123 Main St" 
-                required 
-              />
+              <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:border-black" placeholder="123 Main St" required />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">City</label>
-                <input 
-                  type="text" 
-                  name="city" 
-                  value={formData.city} 
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:border-black" 
-                  placeholder="Mumbai" 
-                  required 
-                />
+                <input type="text" name="city" value={formData.city} onChange={handleChange} className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:border-black" placeholder="Mumbai" required />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Pincode</label>
-                <input 
-                  type="text" 
-                  name="pincode" 
-                  value={formData.pincode} 
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:border-black" 
-                  placeholder="400001" 
-                  required 
-                />
+                <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:border-black" placeholder="400001" required />
               </div>
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-              <input 
-                type="text" 
-                name="phone" 
-                value={formData.phone} 
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:border-black" 
-                placeholder="+91 9876543210" 
-                required 
-              />
+              <input type="text" name="phone" value={formData.phone} onChange={handleChange} className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:border-black" placeholder="+91 9876543210" required />
             </div>
-
-            <button 
-              type="submit" 
-              disabled={isProcessing}
-              className={`w-full py-3 mt-4 rounded font-bold text-white transition ${isProcessing ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'}`}
-            >
+            <button type="submit" disabled={isProcessing} className={`w-full py-3 mt-4 rounded font-bold text-white transition ${isProcessing ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'}`}>
               {isProcessing ? 'Processing...' : `Pay ₹${(total * 83).toFixed(0)}`}
             </button>
           </form>
@@ -197,7 +151,6 @@ export default function Checkout() {
 
         <div className="lg:w-1/3 bg-white p-6 rounded-lg shadow-sm border border-gray-200 h-fit">
           <h2 className="text-lg font-bold text-gray-900 border-b border-gray-200 pb-4 mb-4">Order Summary</h2>
-          
           <div className="space-y-3 text-sm text-gray-600">
             {cart.map((item, idx) => (
               <div key={idx} className="flex justify-between">
@@ -206,7 +159,6 @@ export default function Checkout() {
               </div>
             ))}
           </div>
-
           <div className="border-t border-gray-200 mt-4 pt-4 space-y-2 text-sm">
             <div className="flex justify-between text-gray-600">
               <span>Subtotal</span>
@@ -222,7 +174,6 @@ export default function Checkout() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
