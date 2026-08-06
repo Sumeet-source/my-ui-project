@@ -51,7 +51,14 @@ export default function Checkout() {
       });
       const { id: razorpayOrderId, amount } = orderRes.data;
 
-      // 2. Razorpay Payment Popup open karein (using window.Razorpay)
+      // 2. Check karo ki Razorpay script load hui hai ya nahi
+      if (typeof window.Razorpay === 'undefined') {
+        showToast("Razorpay script didn't load. Please disable ad-blocker and refresh.", "error");
+        setIsProcessing(false);
+        return;
+      }
+
+      // 3. Razorpay Payment Popup open karein
       const options = {
         key: 'rzp_test_TMNIPPznSJ7D',
         amount: amount,
@@ -90,13 +97,21 @@ export default function Checkout() {
         theme: { color: '#000000' },
       };
 
-      // 🟢 react-razorpay package ki jagah direct window.Razorpay use kiya
       const rzp = new window.Razorpay(options);
       rzp.open();
 
     } catch (error) {
       console.error('Payment error:', error);
-      showToast("Failed to process payment", "error");
+      
+      // 🟢 FIXED: Better Error Message for debugging
+      let errorMsg = "Failed to process payment. Please try again.";
+      if (error.response && error.response.status === 404) {
+        errorMsg = "Payment backend route not found. Please redeploy Railway and try again.";
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+      
+      showToast(errorMsg, "error");
       setIsProcessing(false);
     }
   };
@@ -174,6 +189,7 @@ export default function Checkout() {
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
