@@ -62,9 +62,20 @@ export default function Home() {
         </div>
       </div>
 
-      {/* === MAIN CONTENT === */}
-      <div className="px-6 md:px-10 pb-12 pt-4">
+      {/* === MIDDLE CONTENT (WHITESPACE FIXED WITH BACKGROUND BANNER) === */}
+      {/* 🟢 FIX: Added relative container + absolute background image behind content */}
+      <div className="relative px-6 md:px-10 pt-4 overflow-hidden">
         
+        {/* Subtle Background Banner to fill whitespace */}
+        <div className="absolute inset-0 -z-10 w-full h-full">
+          <img 
+            src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop" 
+            alt="Background Texture" 
+            className="w-full h-full object-cover opacity-5"
+          />
+          <div className="absolute inset-0 bg-white/80"></div> {/* White overlay to keep text readable */}
+        </div>
+
         {/* CATEGORY GRID */}
         <h1 className="text-3xl font-bold mb-6 pt-8">Shop by Category</h1>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
@@ -126,40 +137,40 @@ export default function Home() {
              </Link>
           </div>
         </div>
-
-        {/* 🟢 2 BOTTOM BANNERS (Instagram ke neeche) */}
-        
-        {/* Bottom Banner 1: Shop the Latest */}
-        <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden mt-8 rounded-2xl">
-          <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070&auto=format&fit=crop" alt="New Arrivals" className="w-full h-full object-cover brightness-75" onError={(e) => { e.target.src = 'https://picsum.photos/seed/bottom1/2070/400'; }} />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-            <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-wider mb-2">SHOP THE LATEST</h2>
-            <p className="text-sm md:text-lg text-white max-w-xl mb-6">Discover new arrivals and exclusive collections.</p>
-            <Link to="/new-arrivals" className="bg-white text-black font-bold py-3 px-8 rounded-full hover:bg-gray-100 hover:scale-105 transition-all duration-300">Shop Now</Link>
-          </div>
-        </div>
-
-        {/* Bottom Banner 2: Built to Last */}
-        <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden mt-4 rounded-2xl">
-          <img src="https://images.unsplash.com/photo-1595341888016-a392ef81b7de?q=80&w=2070&auto=format&fit=crop" alt="Essentials" className="w-full h-full object-cover brightness-75" onError={(e) => { e.target.src = 'https://picsum.photos/seed/bottom2/2070/400'; }} />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-            <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-wider mb-2">BUILT TO LAST</h2>
-            <p className="text-sm md:text-lg text-white max-w-xl mb-6">Premium quality gear designed for endurance.</p>
-            <Link to="/outlet" className="bg-black text-white font-bold py-3 px-8 rounded-full hover:bg-gray-800 hover:scale-105 transition-all duration-300 border border-white/20">Shop Outlet</Link>
-          </div>
-        </div>
-
-        {/* 🟢 NEW: 3rd BOTTOM BANNER (2 banners ke neeche) */}
-        <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden mt-4 rounded-2xl">
-          <img src="https://images.unsplash.com/photo-1574680096144-f9ca08522613?q=80&w=2070&auto=format&fit=crop" alt="Limited Drop" className="w-full h-full object-cover brightness-75" onError={(e) => { e.target.src = 'https://picsum.photos/seed/bottom3/2070/400'; }} />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-            <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-wider mb-2">LIMITED DROP</h2>
-            <p className="text-sm md:text-lg text-white max-w-xl mb-6">Exclusive styles. Limited quantities. Get yours before they're gone.</p>
-            <Link to="/shoes" className="bg-white text-black font-bold py-3 px-8 rounded-full hover:bg-gray-100 hover:scale-105 transition-all duration-300">Shop Now</Link>
-          </div>
-        </div>
-
       </div>
+
+      {/* === BOTTOM BANNERS (EDGE-TO-EDGE) === */}
+      
+      {/* Bottom Banner 1 */}
+      <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden mt-0">
+        <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070&auto=format&fit=crop" alt="New Arrivals" className="w-full h-full object-cover brightness-75" onError={(e) => { e.target.src = 'https://picsum.photos/seed/bottom1/2070/400'; }} />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-wider mb-2">SHOP THE LATEST</h2>
+          <p className="text-sm md:text-lg text-white max-w-xl mb-6">Discover new arrivals and exclusive collections.</p>
+          <Link to="/new-arrivals" className="bg-white text-black font-bold py-3 px-8 rounded-full hover:bg-gray-100 hover:scale-105 transition-all duration-300">Shop Now</Link>
+        </div>
+      </div>
+
+      {/* Bottom Banner 2 */}
+      <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden mt-0">
+        <img src="https://images.unsplash.com/photo-1595341888016-a392ef81b7de?q=80&w=2070&auto=format&fit=crop" alt="Essentials" className="w-full h-full object-cover brightness-75" onError={(e) => { e.target.src = 'https://picsum.photos/seed/bottom2/2070/400'; }} />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-wider mb-2">BUILT TO LAST</h2>
+          <p className="text-sm md:text-lg text-white max-w-xl mb-6">Premium quality gear designed for endurance.</p>
+          <Link to="/outlet" className="bg-black text-white font-bold py-3 px-8 rounded-full hover:bg-gray-800 hover:scale-105 transition-all duration-300 border border-white/20">Shop Outlet</Link>
+        </div>
+      </div>
+
+      {/* Bottom Banner 3 */}
+      <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden mt-0">
+        <img src="https://images.unsplash.com/photo-1574680096144-f9ca08522613?q=80&w=2070&auto=format&fit=crop" alt="Limited Drop" className="w-full h-full object-cover brightness-75" onError={(e) => { e.target.src = 'https://picsum.photos/seed/bottom3/2070/400'; }} />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-wider mb-2">LIMITED DROP</h2>
+          <p className="text-sm md:text-lg text-white max-w-xl mb-6">Exclusive styles. Limited quantities. Get yours before they're gone.</p>
+          <Link to="/shoes" className="bg-white text-black font-bold py-3 px-8 rounded-full hover:bg-gray-100 hover:scale-105 transition-all duration-300">Shop Now</Link>
+        </div>
+      </div>
+
     </div>
   );
 }
