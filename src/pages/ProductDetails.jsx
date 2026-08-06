@@ -9,6 +9,8 @@ import ProductCard from '../components/ProductCard';
 
 export default function ProductDetails() {
   const { id } = useParams();
+  console.log('🔍 Current ID from URL:', id);
+
   const { addToCart } = useCart();
   const { showToast } = useToast();
   const { user } = useAuth();
@@ -20,17 +22,15 @@ export default function ProductDetails() {
   const [selectedSize, setSelectedSize] = useState('');
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [mainImageIndex, setMainImageIndex] = useState(0);
-  
   const carouselRef = useRef(null);
 
-  // 🟢 Reviews state (Backend se fetch hoga)
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchProductData();
-    fetchReviews(); // 🟢 Product load hote hi reviews fetch karo
+    fetchReviews();
   }, [id]);
 
   const fetchProductData = async () => {
@@ -40,16 +40,21 @@ export default function ProductDetails() {
       setAllProducts(allRes.data);
 
       const singleRes = await axiosClient.get(`/api/products/${id}`);
-      setProduct(singleRes.data);
+      console.log('📦 Backend Response for Product:', singleRes.data);
+
+      if (!singleRes.data || Object.keys(singleRes.data).length === 0) {
+        setProduct(null);
+      } else {
+        setProduct(singleRes.data);
+      }
     } catch (error) {
-      console.error('Error fetching product:', error);
-      showToast('Failed to load product details', 'error');
+      console.error('❌ Error fetching product:', error);
+      setProduct(null);
     } finally {
       setLoading(false);
     }
   };
 
-  // 🟢 Backend se reviews fetch karne ka naya function
   const fetchReviews = async () => {
     try {
       const res = await axiosClient.get(`/api/reviews/product/${id}`);
@@ -106,7 +111,6 @@ export default function ProductDetails() {
     }
   };
 
-  // 🟢 Reviews Submit karne ka update function (Backend API call)
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
@@ -125,11 +129,9 @@ export default function ProductDetails() {
         rating: newReview.rating,
         comment: newReview.comment
       };
-      
       await axiosClient.post('/api/reviews', reviewData);
-      
       setNewReview({ user: '', comment: '', rating: 5 });
-      fetchReviews(); // 🟢 Submit ke baad list refresh karo
+      fetchReviews();
       showToast("Review submitted successfully!", "success");
     } catch (error) {
       console.error("Review error:", error);
@@ -149,6 +151,7 @@ export default function ProductDetails() {
 
   return (
     <div className="bg-white min-h-screen pb-20">
+      {/* --- MOBILE SECTION --- */}
       <div className="md:hidden">
         {/* Carousel */}
         <div className="relative w-full bg-gray-50">
@@ -184,7 +187,7 @@ export default function ProductDetails() {
           <div className="mt-6">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-sm font-bold text-gray-900">SELECT SIZE</h3>
-              <button onClick={() => alert('Size chart is coming soon! For now, standard sizes are S, M, L, XL.')} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">Size Chart</button>
+              <button onClick={() => alert('Size chart is coming soon!')} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">Size Chart</button>
             </div>
             <div className="flex flex-wrap gap-2">
               {['S', 'M', 'L', 'XL'].map((size) => (
@@ -248,7 +251,6 @@ export default function ProductDetails() {
               reviews.map((review, index) => (
                 <div key={index} className="bg-white p-3 rounded border border-gray-100">
                   <div className="flex justify-between items-center mb-1">
-                    {/* 🟢 Backend se populated user ka name utha raha hai */}
                     <span className="font-bold text-xs text-gray-800">{review.user?.name || review.user || 'Anonymous'}</span>
                     <span className="text-yellow-400 text-xs">{renderStars(review.rating)}</span>
                   </div>
@@ -269,7 +271,7 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      {/* --- Desktop Section (Same as before) --- */}
+      {/* --- DESKTOP SECTION --- */}
       <div className="hidden md:block max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row gap-12 mb-12">
           <div className="flex-1 relative group">
@@ -313,7 +315,7 @@ export default function ProductDetails() {
           </div>
         </div>
 
-        {/* Desktop Reviews Section */}
+        {/* Desktop Reviews */}
         <section className="border-t border-gray-200 pt-10 max-w-4xl">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
           <div className="space-y-6 mb-8">
@@ -332,7 +334,7 @@ export default function ProductDetails() {
             <form onSubmit={handleReviewSubmit} className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1"><label className="block text-sm font-semibold text-gray-700 mb-1">Your Name</label><input type="text" value={newReview.user} onChange={(e) => setNewReview({...newReview, user: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" placeholder="John Doe" /></div>
-                <div><label className="block text-sm font-semibold text-gray-700 mb-1">Rating</label><select value={newReview.rating} onChange={(e) => setNewReview({...newReview, rating: Number(e.target.value)})} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black"><option value="5">5 Stars ⭐⭐⭐⭐⭐</option><option value="4">4 Stars ⭐⭐⭐⭐</option><option value="3">3 Stars ⭐⭐⭐</option><option value="2">2 Stars ⭐⭐</option><option value="1">1 Star ⭐</option></select></div>
+                <div><label className="block text-sm font-semibold text-gray-700 mb-1">Rating</label><select value={newReview.rating} onChange={(e) => setNewReview({...newReview, rating: Number(e.target.value)})} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black"><option value="5">5 Stars</option><option value="4">4 Stars</option><option value="3">3 Stars</option><option value="2">2 Stars</option><option value="1">1 Star</option></select></div>
               </div>
               <div><label className="block text-sm font-semibold text-gray-700 mb-1">Comment</label><textarea value={newReview.comment} onChange={(e) => setNewReview({...newReview, comment: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black h-24 resize-none" placeholder="Tell us what you think..."></textarea></div>
               <button type="submit" className="bg-black text-white px-6 py-2 rounded font-bold hover:bg-gray-800 transition text-sm uppercase tracking-wider">Submit Review</button>
