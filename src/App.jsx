@@ -22,14 +22,7 @@ import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import Wishlist from './pages/Wishlist';
 import Search from './pages/Search';
-
 import Checkout from './pages/Checkout';
-
-// Routes ke andar ye line add karo:
-// Cache bust
-<Route path="/checkout" element={<Checkout />} />
-
-
 
 function App() {
   return (
@@ -38,7 +31,6 @@ function App() {
         <WishlistProvider>
           <ToastProvider>
             
-            {/* 🟢 NAVBAR KO ROUTES KE BAHAR RAKHO - HAMESHA DIKHEGA */}
             <Navbar />
             
             <div className="min-h-screen flex flex-col">
@@ -57,9 +49,11 @@ function App() {
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/search" element={<Search />} />
+                
+                {/* 🟢 FIXED: Route ko yahaan <Routes> ke andar daal diya */}
+                <Route path="/checkout" element={<Checkout />} />
               </Routes>
               
-              {/* 🟢 FOOTER KO BHI ROUTES KE BAHAR RAKHO */}
               <Footer />
             </div>
 
