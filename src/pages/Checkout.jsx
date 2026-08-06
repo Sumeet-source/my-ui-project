@@ -41,26 +41,28 @@ export default function Checkout() {
     setIsProcessing(true);
 
     try {
-      const subtotal = getTotalPrice();
+      const subtotal = getTotalPrice(); // Dollars
       const deliveryCharge = subtotal > 50 ? 0 : 5.99;
-      const totalAmount = subtotal + deliveryCharge;
+      const total = subtotal + deliveryCharge; // Dollars
+      
+      // 🟢 FIX: Total ko Dollars se INR mein convert karo aur integer banao
+      const totalInINR = Math.round(total * 83); // 83 is the exchange rate
 
-      // 1. Backend se Razorpay Order ID generate karwayein
+      // Backend ko INR integer bhejo
       const orderRes = await axiosClient.post('/api/orders/create-razorpay-order', { 
-        amount: totalAmount
+        amount: totalInINR 
       });
       const { id: razorpayOrderId, amount } = orderRes.data;
 
-      // 2. Check karo ki Razorpay script load hui hai ya nahi
+      // Safety check for Razorpay script
       if (typeof window.Razorpay === 'undefined') {
         showToast("Razorpay script didn't load. Please disable ad-blocker and refresh.", "error");
         setIsProcessing(false);
         return;
       }
 
-      // 3. Razorpay Payment Popup open karein
       const options = {
-        key: 'rzp_test_TMNIPPznSJ7D',
+        key: 'rzp_test_TMPiYtHOb57IVs', // Your API Key
         amount: amount,
         currency: 'INR',
         name: 'FORGE',
@@ -77,7 +79,7 @@ export default function Checkout() {
               size: item.size,
               image: item.image
             })),
-            totalAmount: totalAmount,
+            totalAmount: total, // Store in dollars
             paymentMethod: 'Razorpay',
             shippingAddress: formData
           };
@@ -102,15 +104,12 @@ export default function Checkout() {
 
     } catch (error) {
       console.error('Payment error:', error);
-      
-      // 🟢 FIXED: Better Error Message for debugging
       let errorMsg = "Failed to process payment. Please try again.";
       if (error.response && error.response.status === 404) {
         errorMsg = "Payment backend route not found. Please redeploy Railway and try again.";
       } else if (error.message) {
         errorMsg = error.message;
       }
-      
       showToast(errorMsg, "error");
       setIsProcessing(false);
     }
