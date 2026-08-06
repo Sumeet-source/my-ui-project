@@ -34,13 +34,12 @@ function App() {
           <WishlistProvider>
             <ToastProvider>
               
-              {/* 🟢 Full page flex column layout */}
               <div className="min-h-screen flex flex-col">
                 
                 <Navbar />
                 
-                {/* 🟢 flex-1 added here: Ye saari extra space lega aur footer ko neeche push karega */}
-                <div className="flex-1">
+                {/* 🟢 FIX: 'bg-white' add kar diya taaki transparent gap na dikhe */}
+                <div className="flex-1 bg-white">
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/men" element={<Men />} />
