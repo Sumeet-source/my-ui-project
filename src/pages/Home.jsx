@@ -62,7 +62,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* === MIDDLE SECTION (NOW FULL WIDTH EDGE-TO-EDGE LIKE BANNER 2) === */}
+      {/* === MIDDLE SECTION (FULL WIDTH BANNER WITH SUBTLE BACKGROUND TEXTURE) === */}
       <div className="relative w-full py-10 md:py-16 overflow-hidden mt-0">
         
         {/* Background Image for the middle section */}
@@ -70,13 +70,12 @@ export default function Home() {
           <img 
             src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop" 
             alt="Background Texture" 
-            className="w-full h-full object-cover opacity-5"
+            className="w-full h-full object-cover opacity-20"
           />
-          {/* Overlay to ensure text remains perfectly readable */}
-          <div className="absolute inset-0 bg-white/80"></div>
+          <div className="absolute inset-0 bg-white/60"></div>
         </div>
 
-        {/* Inner Content container with padding (to keep text aligned and not touch edges) */}
+        {/* Inner Content container with padding */}
         <div className="relative px-6 md:px-10 max-w-[1600px] mx-auto">
           
           {/* CATEGORY GRID */}
