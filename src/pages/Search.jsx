@@ -21,7 +21,8 @@ export default function Search() {
 
       setLoading(true);
       try {
-        const res = await axiosClient.get('/api/products/search', { params: { q: query } });
+        // 🟢 FIX: '/api/products/search' ki jagah '/api/products' call karo aur 'q' param bhejo
+        const res = await axiosClient.get('/api/products', { params: { q: query } });
         setProducts(res.data);
       } catch (error) {
         console.error('Search error:', error);
@@ -36,6 +37,7 @@ export default function Search() {
 
   return (
     <div className="bg-white min-h-screen overflow-x-hidden">
+      
       {/* --- MOBILE TOP BAR --- */}
       <div className="md:hidden flex justify-center items-center border-b border-gray-200 py-3 px-4 bg-white">
         <button className="text-sm font-medium text-black flex items-center gap-1">
@@ -65,12 +67,12 @@ export default function Search() {
           ) : (
             products.map((product, index) => (
               <ProductCard 
-                key={product._id} // 🟢 FIX: '_id' use kiya
-                id={product._id}  // 🟢 FIX: '_id' pass kiya
-                title={product.title}
-                price={product.price}
-                image={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'}
-                badge={index < 2 ? 'NEW' : null}
+                key={product._id} 
+                id={product._id} 
+                title={product.title} 
+                price={product.price} 
+                image={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
+                badge={index < 2 ? 'NEW' : null} 
               />
             ))
           )}
