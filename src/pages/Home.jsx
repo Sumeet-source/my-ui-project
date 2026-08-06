@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 export default function Home() {
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white"> {/* 🟢 FIX: 'min-h-screen' hata diya */}
       
       {/* === HERO BANNER 1 === */}
       <div className="relative w-full h-[500px] md:h-[700px] lg:h-[800px] overflow-hidden mt-0 pt-0">
