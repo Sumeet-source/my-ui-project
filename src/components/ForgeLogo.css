@@ -30,3 +30,40 @@
     margin-top: 0;
   }
 }
+
+/* --- FORGE LOGO STYLES (WIDE & STRETCHED) --- */
+.forge-logo {
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: #ffffff;
+  line-height: 1;
+  display: inline-block;
+  /* 🟢 YAHAN MAGIC HAI: Text ko horizontal stretch kar diya */
+  transform: scaleX(1.15);
+  transform-origin: left center;
+}
+
+.forge-tagline {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  margin-top: 2px;
+  display: block;
+  text-align: left;
+}
+
+/* Desktop ke liye fonts thoda bada */
+@media (min-width: 768px) {
+  .forge-logo {
+    font-size: 2.8rem;
+    transform: scaleX(1.15); /* Desktop par bhi wide rahega */
+  }
+  .forge-tagline {
+    font-size: 0.7rem;
+    letter-spacing: 0.5em;
+    margin-top: 0;
+  }
+}
