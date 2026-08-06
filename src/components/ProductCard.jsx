@@ -12,10 +12,18 @@ export default function ProductCard({ id, title, price, image, badge }) {
 
   const handleWishlistToggle = (e) => {
     e.preventDefault(); // Link click hone se rokne ke liye
+    
+    // 🟢 SAFETY CHECK: Agar ID undefined hai toh error dikhao
+    if (!id) {
+      showToast('Invalid product ID. Please refresh the page.', 'error');
+      return;
+    }
+
     if (!user) {
       showToast('Please login to save items to wishlist', 'error');
       return;
     }
+    
     if (isLiked) {
       removeFromWishlist(id);
     } else {
@@ -24,21 +32,20 @@ export default function ProductCard({ id, title, price, image, badge }) {
   };
 
   return (
-    <Link to={`/product/${id}`} className="group cursor-pointer">
-      <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
+    <Link to={id ? `/product/${id}` : '#'} className="group cursor-pointer">
+      <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
         <img 
-          src={image} 
+          src={image || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
           alt={title} 
           className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
           onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Product+Image'; }} 
         />
         
-        {/* Heart Icon */}
         <button 
           onClick={handleWishlistToggle}
-          className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition z-10"
+          className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white hover:scale-110 transition duration-200 z-20 shadow-sm"
         >
-          <svg className={`w-5 h-5 transition ${isLiked ? 'fill-red-500 text-red-500' : 'fill-none text-gray-700 hover:text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-5 h-5 transition duration-200 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-700 hover:text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>

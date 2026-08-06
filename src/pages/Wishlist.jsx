@@ -1,58 +1,55 @@
 import { Link } from 'react-router-dom';
-import { useWishlist } from '../context/WishlistContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import { useToast } from '../context/ToastContext.jsx';
+import { useWishlist } from '../context/WishlistContext.jsx';
+import ProductCard from '../components/ProductCard.jsx';
 
-export default function ProductCard({ id, title, price, image, badge }) {
+export default function Wishlist() {
   const { user } = useAuth();
-  const { showToast } = useToast();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-  
-  const isLiked = isInWishlist(id);
+  const { wishlist, loading } = useWishlist();
 
-  const handleWishlistToggle = (e) => {
-    e.preventDefault(); // Link click hone se rokne ke liye
-    if (!user) {
-      showToast('Please login to save items to wishlist', 'error');
-      return;
-    }
-    if (isLiked) {
-      removeFromWishlist(id);
-    } else {
-      addToWishlist(id);
-    }
-  };
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-20">
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">Please Login</h2>
+        <p className="text-gray-500 mb-8">Login to view and manage your wishlist.</p>
+        <Link to="/login" className="bg-black text-white px-8 py-3 rounded font-bold hover:bg-gray-800 transition">Go to Login</Link>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return <div className="text-center py-20 text-gray-500 text-lg">Loading your wishlist...</div>;
+  }
 
   return (
-    <Link to={`/product/${id}`} className="group cursor-pointer">
-      <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
-        <img 
-          src={image} 
-          alt={title} 
-          className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
-          onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Product+Image'; }} 
-        />
-        
-        {/* 🟢 FIXED HEART ICON (Backend connect) */}
-        <button 
-          onClick={handleWishlistToggle}
-          className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition z-10"
-        >
-          <svg className={`w-5 h-5 transition ${isLiked ? 'fill-red-500 text-red-500' : 'fill-none text-gray-700 hover:text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-        </button>
-        
-        {badge && (
-          <span className="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded">
-            {badge}
-          </span>
-        )}
-      </div>
-      <div className="mt-3">
-        <p className="text-sm font-semibold text-gray-900">{title}</p>
-        <p className="text-sm text-gray-500">${price}</p>
-      </div>
-    </Link>
+    <div className="p-6 md:p-10 bg-white min-h-screen">
+      <h1 className="text-3xl font-bold mb-6">My Wishlist ({wishlist.length})</h1>
+      
+      {wishlist.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-xl text-gray-500 mb-4">Your wishlist is empty.</p>
+          <Link to="/" className="bg-black text-white px-6 py-2 rounded font-medium hover:bg-gray-800 transition">
+            Start Shopping
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {wishlist.map((product) => {
+            // 🟢 SAFETY CHECK: Agar product invalid hai toh skip karo
+            if (!product || !product._id) return null; 
+
+            return (
+              <ProductCard 
+                key={product._id}
+                id={product._id}
+                title={product.title}
+                price={product.price}
+                image={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'}
+              />
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
