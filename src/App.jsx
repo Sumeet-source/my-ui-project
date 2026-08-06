@@ -23,6 +23,8 @@ import Admin from './pages/Admin';
 import Wishlist from './pages/Wishlist';
 import Search from './pages/Search';
 import Checkout from './pages/Checkout';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -50,8 +52,10 @@ function App() {
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/search" element={<Search />} />
                 
-                {/* 🟢 FIXED: Route ko yahaan <Routes> ke andar daal diya */}
+                {/* FIXED: Route */}
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password/:token" element={<ResetPassword />} />
               </Routes>
               
               <Footer />
