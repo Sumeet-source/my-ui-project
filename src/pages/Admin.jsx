@@ -60,6 +60,18 @@ export default function AdminDashboard() {
     }
   };
 
+  // 🟢 NEW: Handle Order Status Update
+  const handleStatusUpdate = async (orderId, newStatus) => {
+    try {
+      await axiosClient.put(`/api/orders/${orderId}/status`, { status: newStatus });
+      showToast('Order status updated successfully!', 'success');
+      fetchOrders(); // List refresh karo
+    } catch (error) {
+      console.error('Status update error:', error);
+      showToast('Failed to update order status', 'error');
+    }
+  };
+
   // --- Handlers for Adding Product ---
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -110,7 +122,7 @@ export default function AdminDashboard() {
       showToast('Product updated successfully!', 'success');
       setIsEditModalOpen(false);
       setEditingProductId(null);
-      fetchProducts(); // List refresh karo
+      fetchProducts();
     } catch (error) {
       showToast('Failed to update product', 'error');
     }
@@ -218,19 +230,8 @@ export default function AdminDashboard() {
                             {product.inStock ? 'In Stock' : 'OOS'}
                           </span>
                           <div className="flex gap-2">
-                            {/* 🟢 ADDED EDIT BUTTON */}
-                            <button 
-                              onClick={() => handleEditClick(product)} 
-                              className="text-sm text-blue-600 hover:underline"
-                            >
-                              Edit
-                            </button>
-                            <button 
-                              onClick={() => handleDelete(product._id)} 
-                              className="text-sm text-red-600 hover:underline"
-                            >
-                              Delete
-                            </button>
+                            <button onClick={() => handleEditClick(product)} className="text-sm text-blue-600 hover:underline">Edit</button>
+                            <button onClick={() => handleDelete(product._id)} className="text-sm text-red-600 hover:underline">Delete</button>
                           </div>
                         </div>
                       </div>
@@ -242,7 +243,7 @@ export default function AdminDashboard() {
           </>
         )}
 
-        {/* Order History Tab */}
+        {/* 🟢 UPDATED: Order History Tab with Status Dropdown */}
         {activeTab === 'orders' && (
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold mb-4">All Customer Orders</h2>
@@ -265,9 +266,23 @@ export default function AdminDashboard() {
                       ))}
                       {order.items.length > 2 && <p className="text-xs text-gray-400">+ {order.items.length - 2} more items</p>}
                     </div>
-                    <div className="flex justify-between font-bold text-sm text-gray-900 border-t border-gray-300 pt-2">
-                      <span>Total</span>
-                      <span>${order.totalAmount.toFixed(2)}</span>
+                    <div className="flex justify-between items-center mt-2 border-t border-gray-300 pt-2">
+                      <span className="font-bold text-sm text-gray-900">Total: ${order.totalAmount.toFixed(2)}</span>
+                      
+                      {/* 🟢 STATUS DROPDOWN */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs font-semibold text-gray-500">Status:</label>
+                        <select 
+                          value={order.status || 'Pending'} 
+                          onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
+                          className="text-sm border border-gray-300 rounded px-2 py-1 bg-white focus:outline-none focus:border-black"
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Delivered">Delivered</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -282,92 +297,18 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Edit Product</h2>
-            
             <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-900">Product Title</label>
-                <input 
-                  type="text" 
-                  name="title" 
-                  value={editFormData.title} 
-                  onChange={handleEditChange} 
-                  className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" 
-                  required 
-                />
-              </div>
+              <div><label className="block text-sm font-semibold text-gray-900">Product Title</label><input type="text" name="title" value={editFormData.title} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">Price ($)</label>
-                  <input 
-                    type="number" 
-                    name="price" 
-                    value={editFormData.price} 
-                    onChange={handleEditChange} 
-                    className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" 
-                    required 
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">Image URL</label>
-                  <input 
-                    type="text" 
-                    name="imageUrl" 
-                    value={editFormData.imageUrl} 
-                    onChange={handleEditChange} 
-                    className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" 
-                  />
-                </div>
+                <div><label className="block text-sm font-semibold text-gray-900">Price ($)</label><input type="number" name="price" value={editFormData.price} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
+                <div><label className="block text-sm font-semibold text-gray-900">Image URL</label><input type="text" name="imageUrl" value={editFormData.imageUrl} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" /></div>
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-900">Description</label>
-                <textarea 
-                  name="description" 
-                  value={editFormData.description} 
-                  onChange={handleEditChange} 
-                  className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20" 
-                />
-              </div>
+              <div><label className="block text-sm font-semibold text-gray-900">Description</label><textarea name="description" value={editFormData.description} onChange={handleEditChange} className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20" /></div>
               <div className="flex items-center gap-6">
-                <div className="flex-1">
-                  <label className="block text-sm font-semibold text-gray-900">Category</label>
-                  <select 
-                    name="category" 
-                    value={editFormData.category} 
-                    onChange={handleEditChange} 
-                    className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"
-                  >
-                    <option value="Men">Men</option>
-                    <option value="Women">Women</option>
-                    <option value="Shoes">Shoes</option>
-                    <option value="Outlet">Outlet</option>
-                  </select>
-                </div>
-                <div className="flex items-center gap-2 mt-6">
-                  <input 
-                    type="checkbox" 
-                    name="inStock" 
-                    checked={editFormData.inStock} 
-                    onChange={handleEditChange} 
-                    className="h-5 w-5 accent-black" 
-                  />
-                  <label className="text-sm font-medium">In Stock</label>
-                </div>
+                <div className="flex-1"><label className="block text-sm font-semibold text-gray-900">Category</label><select name="category" value={editFormData.category} onChange={handleEditChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Outlet">Outlet</option></select></div>
+                <div className="flex items-center gap-2 mt-6"><input type="checkbox" name="inStock" checked={editFormData.inStock} onChange={handleEditChange} className="h-5 w-5 accent-black" /><label className="text-sm font-medium">In Stock</label></div>
               </div>
-              <div className="flex gap-3 pt-2">
-                <button 
-                  type="submit" 
-                  className="flex-1 bg-black text-white py-2 rounded font-semibold hover:bg-gray-800 transition"
-                >
-                  Save Changes
-                </button>
-                <button 
-                  type="button" 
-                  onClick={() => setIsEditModalOpen(false)} 
-                  className="flex-1 bg-gray-200 text-gray-800 py-2 rounded font-semibold hover:bg-gray-300 transition"
-                >
-                  Cancel
-                </button>
-              </div>
+              <div className="flex gap-3 pt-2"><button type="submit" className="flex-1 bg-black text-white py-2 rounded font-semibold hover:bg-gray-800 transition">Save Changes</button><button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 bg-gray-200 text-gray-800 py-2 rounded font-semibold hover:bg-gray-300 transition">Cancel</button></div>
             </form>
           </div>
         </div>
