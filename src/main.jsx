@@ -7,7 +7,7 @@ import { WishlistProvider } from './context/WishlistContext.jsx'
 import { ToastProvider } from './context/ToastContext.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { AdminProvider } from './context/AdminContext.jsx'
-import './keep-alive.js';
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
