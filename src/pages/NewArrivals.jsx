@@ -18,10 +18,8 @@ export default function NewArrivals() {
     }
 
     try {
-      // 🟢 FIX: '/products' ki jagah '/api/products' use kiya
       const res = await axiosClient.get('/api/products', { params: { limit: 8, page: page } });
       
-      // 🟢 FIX: Agar data undefined aaye toh fallback empty array set karo
       const newProducts = res.data?.products || [];
       const totalPages = res.data?.totalPages || 1;
       
