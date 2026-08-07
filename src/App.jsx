@@ -14,7 +14,6 @@ import Men from './pages/Men';
 import Women from './pages/Women';
 import Shoes from './pages/Shoes';
 import Outlet from './pages/Outlet';
-import NewArrivalsFixed from './pages/NewArrivalsFixed';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
@@ -26,6 +25,7 @@ import Search from './pages/Search';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Checkout from './pages/Checkout';
+import NewArrivalsFixed from './pages/NewArrivalsFixed';
 
 function App() {
   return (
@@ -34,11 +34,8 @@ function App() {
         <CartProvider>
           <WishlistProvider>
             <ToastProvider>
-              
               <div className="min-h-screen flex flex-col">
                 <Navbar />
-                
-                {/* 🟢 flex-1 bg-white layout */}
                 <div className="flex-1 bg-white">
                   <Routes>
                     <Route path="/" element={<Home />} />
@@ -60,10 +57,8 @@ function App() {
                     <Route path="/checkout" element={<Checkout />} />
                   </Routes>
                 </div>
-
                 <Footer />
               </div>
-
             </ToastProvider>
           </WishlistProvider>
         </CartProvider>
