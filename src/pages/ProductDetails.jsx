@@ -35,10 +35,10 @@ export default function ProductDetails() {
     try {
       setLoading(true);
       const allRes = await axiosClient.get('/api/products');
-      setAllProducts(allRes.data);
+      setAllProducts(Array.isArray(allRes.data) ? allRes.data : []);
 
       const singleRes = await axiosClient.get(`/api/products/${id}`);
-      if (!singleRes.data || Object.keys(singleRes.data).length === 0) {
+      if (!singleRes.data || typeof singleRes.data !== 'object' || Object.keys(singleRes.data).length === 0) {
         setProduct(null);
       } else {
         setProduct(singleRes.data);
@@ -54,7 +54,7 @@ export default function ProductDetails() {
   const fetchReviews = async () => {
     try {
       const res = await axiosClient.get(`/api/reviews/product/${id}`);
-      setReviews(res.data);
+      setReviews(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
       console.error("Failed to fetch reviews", error);
       setReviews([]);
@@ -71,13 +71,12 @@ export default function ProductDetails() {
   };
 
   if (loading) return <div className="text-center py-20 text-lg text-gray-500">Loading product...</div>;
-  
-  // 🟢 FIX: Agar product null hai, toh niche ka code run hi nahi hoga
   if (!product) return <div className="text-center py-20 text-xl text-gray-600">Product not found!</div>;
 
-  const relatedProducts = allProducts
-    .filter((p) => p.category === product.category && p._id !== product._id)
-    .slice(0, 8);
+  // 🟢 Safety Check: Ensure allProducts is an array before filtering
+  const relatedProducts = Array.isArray(allProducts)
+    ? allProducts.filter((p) => p.category === product.category && p._id !== product._id).slice(0, 8)
+    : [];
 
   const handleAddToCart = () => {
     if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
@@ -107,9 +106,9 @@ export default function ProductDetails() {
     } catch (error) { showToast("Failed to submit review. Try again.", "error"); }
   };
 
-  const renderStars = (rating) => Array.from({ length: 5 }, (_, i) => <span key={i} className={i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"}>★</span>);
+  const renderStars = (rating) => Array.from({ length: 5 }, (_, i) => <span key={i} className={i < Math.round(rating || 0) ? "text-yellow-400" : "text-gray-300"}>★</span>);
 
-  // 🟢 FIX: product null nahi hai, toh ab images safely access kar sakte hain
+  // 🟢 Safety Check: images ko safely access karo
   const images = product.images?.length > 0 ? product.images : [product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'];
 
   return (
