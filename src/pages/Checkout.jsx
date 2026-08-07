@@ -41,28 +41,24 @@ export default function Checkout() {
     setIsProcessing(true);
 
     try {
-      const subtotal = getTotalPrice(); // Dollars
+      const subtotal = getTotalPrice();
       const deliveryCharge = subtotal > 50 ? 0 : 5.99;
-      const total = subtotal + deliveryCharge; // Dollars
-      
-      // 🟢 FIX: Total ko Dollars se INR mein convert karo aur integer banao
-      const totalInINR = Math.round(total * 83); // 83 is the exchange rate
+      const totalAmount = subtotal + deliveryCharge;
+      const totalInINR = Math.round(totalAmount * 83);
 
-      // Backend ko INR integer bhejo
       const orderRes = await axiosClient.post('/api/orders/create-razorpay-order', { 
         amount: totalInINR 
       });
       const { id: razorpayOrderId, amount } = orderRes.data;
 
-      // Safety check for Razorpay script
       if (typeof window.Razorpay === 'undefined') {
-        showToast("Razorpay script didn't load. Please disable ad-blocker and refresh.", "error");
+        showToast("Razorpay script didn't load. Please refresh.", "error");
         setIsProcessing(false);
         return;
       }
 
       const options = {
-        key: 'rzp_test_TMPiYtHOb57IVs', // Your API Key
+        key: 'rzp_test_TMPiYtHOb57IVs',
         amount: amount,
         currency: 'INR',
         name: 'FORGE',
@@ -79,7 +75,7 @@ export default function Checkout() {
               size: item.size,
               image: item.image
             })),
-            totalAmount: total, // Store in dollars
+            totalAmount: totalAmount,
             paymentMethod: 'Razorpay',
             shippingAddress: formData
           };
@@ -106,7 +102,7 @@ export default function Checkout() {
       console.error('Payment error:', error);
       let errorMsg = "Failed to process payment. Please try again.";
       if (error.response && error.response.status === 404) {
-        errorMsg = "Payment backend route not found. Please redeploy Railway and try again.";
+        errorMsg = "Payment backend route not found. Please redeploy Railway.";
       } else if (error.message) {
         errorMsg = error.message;
       }
@@ -131,7 +127,6 @@ export default function Checkout() {
   return (
     <div className="bg-gray-50 min-h-screen py-8 px-4 md:px-8">
       <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
-        
         <div className="flex-1 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Delivery Address</h1>
           <form onSubmit={handlePlaceOrder} className="space-y-4">
@@ -162,7 +157,6 @@ export default function Checkout() {
             </button>
           </form>
         </div>
-
         <div className="lg:w-1/3 bg-white p-6 rounded-lg shadow-sm border border-gray-200 h-fit">
           <h2 className="text-lg font-bold text-gray-900 border-b border-gray-200 pb-4 mb-4">Order Summary</h2>
           <div className="space-y-3 text-sm text-gray-600">
@@ -188,7 +182,6 @@ export default function Checkout() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
