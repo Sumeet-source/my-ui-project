@@ -17,27 +17,22 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  // --- LOGIN ---
   const login = async (email, password) => {
     try {
       const response = await axiosClient.post('/api/auth/login', { email, password });
       const { token, refreshToken, user } = response.data;
       
       localStorage.setItem('token', token);
-      localStorage.setItem('refreshToken', refreshToken); // 🟢 Save refresh token
+      localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('user', JSON.stringify(user));
       
       setUser(user);
       return { success: true, user };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Login failed. Please try again.' 
-      };
+      return { success: false, message: error.response?.data?.message || 'Login failed' };
     }
   };
 
-  // --- SIGNUP ---
   const signup = async (name, email, password) => {
     try {
       const response = await axiosClient.post('/api/auth/signup', { name, email, password });
@@ -50,18 +45,16 @@ export function AuthProvider({ children }) {
       setUser(user);
       return { success: true, message: response.data.message };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Signup failed.' 
-      };
+      return { success: false, message: error.response?.data?.message || 'Signup failed.' };
     }
   };
 
-  // --- LOGOUT ---
   const logout = async () => {
     const refreshToken = localStorage.getItem('refreshToken');
     try {
-      await axiosClient.post('/api/auth/logout', { refreshToken });
+      if (refreshToken) {
+        await axiosClient.post('/api/auth/logout', { refreshToken });
+      }
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -72,7 +65,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // 🟢 Axios Interceptor for Auto Refresh
   useEffect(() => {
     const interceptor = axiosClient.interceptors.response.use(
       (response) => response,
@@ -108,7 +100,7 @@ export function AuthProvider({ children }) {
     return () => {
       axiosClient.interceptors.response.eject(interceptor);
     };
-  }, [logout]);
+  }, []); // 🟢 FIXED: Removed 'logout' dependency to prevent infinite loop
 
   return (
     <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
