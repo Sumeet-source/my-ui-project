@@ -12,9 +12,12 @@ export default function NewArrivals() {
 
   const fetchNewArrivals = async () => {
     try {
-      const res = await axiosClient.get('/api/products');
-      const sortedProducts = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 8);
-      setProducts(sortedProducts);
+      // Backend se new arrivals fetch karo (limit 8)
+      const res = await axiosClient.get('/api/products', { params: { limit: 8 } });
+      
+      // 🟢 FIX: res.data se products array nikal rahe hain
+      const { products: newProducts } = res.data;
+      setProducts(newProducts || []); // Safety check
     } catch (error) {
       console.error('Error fetching new arrivals:', error);
     } finally {
@@ -35,12 +38,7 @@ export default function NewArrivals() {
             products.map((product) => (
               <Link to={`/product/${product._id}`} key={product._id} className="group cursor-pointer">
                 <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
-                  <img 
-                    src={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
-                    alt={product.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                    onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }}
-                  />
+                  <img src={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }} />
                   <button className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                   </button>
