@@ -3,18 +3,49 @@ import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { Link } from 'react-router-dom';
+import axiosClient from '../api/axiosClient';
 
 export default function Cart() {
-  const { cart, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart(); 
+  const { cart, removeFromCart, updateQuantity, getTotalPrice, clearCart, discount, applyDiscount, clearDiscount } = useCart(); 
   const { user } = useAuth();
   const { showToast } = useToast();
   const [orderPlaced, setOrderPlaced] = useState(false);
+  
+  // 🟢 Coupon Input State
+  const [couponCode, setCouponCode] = useState('');
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      showToast('Please enter a coupon code.', 'error');
+      return;
+    }
+
+    setApplyingCoupon(true);
+    try {
+      const subtotal = getTotalPrice();
+      const res = await axiosClient.post('/api/coupons/apply', { 
+        code: couponCode.trim(), 
+        cartTotal: subtotal 
+      });
+      
+      if (res.data.success) {
+        applyDiscount(res.data.discountAmount, res.data.couponCode);
+        showToast(`Coupon applied! You saved $${res.data.discountAmount}`, 'success');
+        setCouponCode('');
+      }
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Invalid coupon code.';
+      showToast(msg, 'error');
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
 
   // --- EMPTY CART UI ---
   if (cart.length === 0 && !orderPlaced) {
     return (
       <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* ... (Empty cart UI same rahega) ... */}
         {!user && (
           <div className="flex flex-col md:flex-row gap-6 mb-10 pb-8">
             <div className="flex-1">
@@ -40,9 +71,7 @@ export default function Cart() {
             </div>
           </div>
         )}
-
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Bag</h1>
-        
         <div className={`flex flex-col ${!user ? 'md:flex-row gap-6' : ''}`}>
           <div className={!user ? 'flex-1' : ''}>
             <p className="text-gray-900 font-medium text-lg">You have no items in your bag.</p>
@@ -58,6 +87,7 @@ export default function Cart() {
 
   // --- CART WITH ITEMS UI ---
   const subtotal = getTotalPrice();
+  const finalTotal = subtotal - discount.amount;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
@@ -74,13 +104,11 @@ export default function Cart() {
         {/* Cart Items List */}
         <div className="flex-1 space-y-4">
           {cart.map((item, index) => (
-            // 🟢 FIX: Key unique banane ke liye id aur size dono use kiye
             <div key={`${item.id}-${item.size}-${index}`} className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
               <img src={item.image} alt={item.title} className="w-20 h-20 object-cover rounded" />
               <div className="flex-1">
                 <h3 className="font-bold text-gray-900">{item.title} ({item.size})</h3>
                 <div className="flex items-center gap-2 mt-1">
-                  {/* 🟢 FIX: ID aur Size dono pass kar rahe hain */}
                   <button onClick={() => updateQuantity(item.id, item.size, -1)} className="w-6 h-6 border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center text-gray-600 transition">-</button>
                   <span className="text-gray-600 font-medium w-4 text-center">{item.quantity}</span>
                   <button onClick={() => updateQuantity(item.id, item.size, 1)} className="w-6 h-6 border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center text-gray-600 transition">+</button>
@@ -88,7 +116,6 @@ export default function Cart() {
                 </div>
                 {item.size && <p className="text-xs text-gray-400">Size: {item.size}</p>}
               </div>
-              {/* 🟢 FIX: ID aur Size dono pass kar rahe hain */}
               <button onClick={() => removeFromCart(item.id, item.size)} className="text-red-500 hover:text-red-700 text-sm font-semibold">Remove</button>
             </div>
           ))}
@@ -101,9 +128,36 @@ export default function Cart() {
             <span>Subtotal</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
+          
+          {/* 🟢 COUPON INPUT SECTION */}
+          <div className="flex gap-2 mt-2">
+            <input 
+              type="text" 
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+              placeholder="Coupon Code"
+              className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black"
+            />
+            <button 
+              onClick={handleApplyCoupon}
+              disabled={applyingCoupon}
+              className="bg-black text-white px-3 py-2 text-sm font-medium rounded hover:bg-gray-800 transition disabled:opacity-50"
+            >
+              {applyingCoupon ? '...' : 'Apply'}
+            </button>
+          </div>
+
+          {/* Discount Display */}
+          {discount.amount > 0 && (
+            <div className="flex justify-between text-green-600 text-sm mt-2">
+              <span>Discount ({discount.code})</span>
+              <span>-${discount.amount.toFixed(2)}</span>
+            </div>
+          )}
+
           <div className="flex justify-between font-bold text-lg border-t border-gray-200 pt-4 mt-2">
             <span>Total</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>${finalTotal.toFixed(2)}</span>
           </div>
           
           <Link 

@@ -8,17 +8,16 @@ export function CartProvider({ children }) {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
+  // 🟢 New state for coupon
+  const [discount, setDiscount] = useState({ amount: 0, code: '' });
+
   useEffect(() => {
     localStorage.setItem('shopping_cart', JSON.stringify(cart));
   }, [cart]);
 
   const addToCart = (item) => {
     setCart((prev) => {
-      // 🔥 FIX: Product ko ID aur Size dono se check karo (Ye pehle se sahi tha)
-      const existingItem = prev.find(
-        (i) => i.id === item.id && i.size === item.size
-      );
-
+      const existingItem = prev.find((i) => i.id === item.id && i.size === item.size);
       if (existingItem) {
         return prev.map((i) =>
           i.id === item.id && i.size === item.size
@@ -30,12 +29,10 @@ export function CartProvider({ children }) {
     });
   };
 
-  // 🟢 FIX: ab ID aur Size dono check karega
   const removeFromCart = (id, size) => {
     setCart((prev) => prev.filter((item) => !(item.id === id && item.size === size)));
   };
 
-  // 🟢 FIX: ab ID aur Size dono check karega (Title ki jagah)
   const updateQuantity = (id, size, delta) => {
     setCart((prev) =>
       prev.map((item) =>
@@ -50,10 +47,32 @@ export function CartProvider({ children }) {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart([]);
+    setDiscount({ amount: 0, code: '' }); // Clear discount too
+  };
+
+  // 🟢 Coupon set karne ka function
+  const applyDiscount = (amount, code) => {
+    setDiscount({ amount, code });
+  };
+
+  const clearDiscount = () => {
+    setDiscount({ amount: 0, code: '' });
+  };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, getTotalPrice, clearCart }}>
+    <CartContext.Provider value={{ 
+      cart, 
+      addToCart, 
+      removeFromCart, 
+      updateQuantity, 
+      getTotalPrice, 
+      clearCart, 
+      discount, 
+      applyDiscount,
+      clearDiscount 
+    }}>
       {children}
     </CartContext.Provider>
   );
