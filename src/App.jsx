@@ -14,7 +14,7 @@ import Men from './pages/Men';
 import Women from './pages/Women';
 import Shoes from './pages/Shoes';
 import Outlet from './pages/Outlet';
-import NewArrivals from './pages/NewArrivals';
+import NewArrivalsFixed from './pages/NewArrivalsFixed';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
@@ -46,7 +46,7 @@ function App() {
                     <Route path="/women" element={<Women />} />
                     <Route path="/shoes" element={<Shoes />} />
                     <Route path="/outlet" element={<Outlet />} />
-                    <Route path="/new-arrivals" element={<NewArrivals />} />
+                    <Route path="/new-arrivals" element={<NewArrivalsFixed />} />
                     <Route path="/product/:id" element={<ProductDetails />} />
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/login" element={<Login />} />
