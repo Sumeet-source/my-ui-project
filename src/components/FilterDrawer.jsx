@@ -26,34 +26,43 @@ export default function FilterDrawer({ isOpen, onClose, onApply, onClear }) {
 
   return (
     <div className="fixed inset-0 z-[9999] flex justify-end">
-      {/* Backdrop Overlay */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose}></div>
+      {/* Backdrop Overlay with subtle blur */}
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300" 
+        onClick={onClose}
+      ></div>
 
       {/* Drawer Panel */}
-      <div className="relative w-full max-w-sm bg-white h-full shadow-2xl flex flex-col animate-slide-in-right">
+      <div className="relative w-full max-w-sm bg-[#1d1d1d] text-white h-full shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out">
+        
         {/* Header */}
-        <div className="flex justify-between items-center px-6 py-5 border-b border-gray-200">
+        <div className="flex justify-between items-center px-6 py-6 border-b border-white/10">
           <div className="flex items-center gap-4">
-            <button onClick={onClose} className="text-gray-500 hover:text-black text-sm">
-              Close
+            <button onClick={onClose} className="text-white/60 hover:text-white transition">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
-            <span className="text-sm font-medium text-gray-400">|</span>
-            <button onClick={handleClearAll} className="text-sm text-gray-700 hover:text-black">
-              Clear all
-            </button>
+            <h2 className="text-xl font-bold tracking-wider">Filters</h2>
           </div>
-          <h2 className="text-lg font-bold">Filter</h2>
+          <button 
+            onClick={handleClearAll} 
+            className="text-sm text-white/50 hover:text-white underline transition"
+          >
+            Clear all
+          </button>
         </div>
 
         {/* Filter Options (Scrollable Area) */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+          
           {/* Sort */}
-          <div className="border-b border-gray-100 pb-4">
-            <p className="font-semibold text-sm mb-3">Sort</p>
+          <div className="border-b border-white/10 pb-4">
+            <p className="font-semibold text-sm uppercase tracking-wider mb-3 text-white/70">Sort</p>
             <select 
               value={localFilters.sort} 
               onChange={(e) => handleChange('sort', e.target.value)}
-              className="w-full border border-gray-300 rounded p-2 text-sm"
+              className="w-full bg-[#2a2a2a] border border-white/10 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-white/50 transition"
             >
               <option value="featured">Featured</option>
               <option value="newest">Newest</option>
@@ -63,18 +72,18 @@ export default function FilterDrawer({ isOpen, onClose, onApply, onClear }) {
           </div>
 
           {/* Gender */}
-          <div className="border-b border-gray-100 pb-4">
-            <p className="font-semibold text-sm mb-3">Gender</p>
+          <div className="border-b border-white/10 pb-4">
+            <p className="font-semibold text-sm uppercase tracking-wider mb-3 text-white/70">Gender</p>
             <div className="space-y-2">
               {['Men', 'Women', 'Unisex'].map((g) => (
-                <label key={g} className="flex items-center gap-2 text-sm">
+                <label key={g} className="flex items-center gap-3 text-sm text-white/80 hover:text-white cursor-pointer transition">
                   <input
                     type="radio"
                     name="gender"
                     value={g}
                     checked={localFilters.gender === g}
                     onChange={(e) => handleChange('gender', e.target.value)}
-                    className="accent-black"
+                    className="w-4 h-4 accent-white focus:ring-white/50"
                   />
                   {g}
                 </label>
@@ -82,17 +91,17 @@ export default function FilterDrawer({ isOpen, onClose, onApply, onClear }) {
             </div>
           </div>
 
-          {/* Product Category (For Men/Women pages) */}
-          <div className="border-b border-gray-100 pb-4">
-            <p className="font-semibold text-sm mb-3">Product Category</p>
-            <div className="space-y-2 text-sm">
+          {/* Product Category */}
+          <div className="border-b border-white/10 pb-4">
+            <p className="font-semibold text-sm uppercase tracking-wider mb-3 text-white/70">Category</p>
+            <div className="space-y-2 text-sm text-white/80">
               {['Clothing', 'Shoes', 'Accessories'].map((c) => (
-                <label key={c} className="flex items-center gap-2">
+                <label key={c} className="flex items-center gap-3 cursor-pointer hover:text-white transition">
                   <input
                     type="checkbox"
                     checked={localFilters.productType === c}
                     onChange={(e) => handleChange('productType', e.target.checked ? c : '')}
-                    className="accent-black"
+                    className="w-4 h-4 accent-white rounded focus:ring-white/50"
                   />
                   {c}
                 </label>
@@ -101,12 +110,12 @@ export default function FilterDrawer({ isOpen, onClose, onApply, onClear }) {
           </div>
 
           {/* Price Range */}
-          <div className="border-b border-gray-100 pb-4">
-            <p className="font-semibold text-sm mb-3">Price</p>
+          <div className="border-b border-white/10 pb-4">
+            <p className="font-semibold text-sm uppercase tracking-wider mb-3 text-white/70">Price</p>
             <select 
               value={localFilters.price} 
               onChange={(e) => handleChange('price', e.target.value)}
-              className="w-full border border-gray-300 rounded p-2 text-sm"
+              className="w-full bg-[#2a2a2a] border border-white/10 rounded-lg p-3 text-white text-sm focus:outline-none focus:border-white/50 transition"
             >
               <option value="">All Prices</option>
               <option value="0-50">Under $50</option>
@@ -114,15 +123,16 @@ export default function FilterDrawer({ isOpen, onClose, onApply, onClear }) {
               <option value="100+">Over $100</option>
             </select>
           </div>
+
         </div>
 
         {/* Footer Apply Button */}
-        <div className="p-6 border-t border-gray-200 bg-white">
+        <div className="p-6 border-t border-white/10 bg-[#1d1d1d]">
           <button 
             onClick={handleApply}
-            className="w-full h-12 bg-black text-white text-sm font-semibold hover:bg-gray-800 transition"
+            className="w-full py-4 bg-white text-black font-bold text-base tracking-wider hover:bg-gray-200 transition"
           >
-            Apply
+            Apply Filters
           </button>
         </div>
       </div>
