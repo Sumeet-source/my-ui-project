@@ -6,7 +6,6 @@ export default function NewArrivals() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // 🟢 Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -19,19 +18,21 @@ export default function NewArrivals() {
     }
 
     try {
-      // 🟢 Page param bhej rahe hain
+      // 🟢 FIX: '/products' ki jagah '/api/products' use kiya
       const res = await axiosClient.get('/api/products', { params: { limit: 8, page: page } });
       
-      const { products: newProducts, totalCount, currentPage: pageReturned, totalPages } = res.data;
-
+      // 🟢 FIX: Agar data undefined aaye toh fallback empty array set karo
+      const newProducts = res.data?.products || [];
+      const totalPages = res.data?.totalPages || 1;
+      
       if (reset) {
-        setProducts(newProducts || []);
+        setProducts(newProducts);
       } else {
-        setProducts(prev => [...prev, ...(newProducts || [])]);
+        setProducts(prev => [...prev, ...newProducts]);
       }
       
-      setCurrentPage(pageReturned || 1);
-      setHasMore(pageReturned < totalPages);
+      setCurrentPage(page);
+      setHasMore(page < totalPages);
     } catch (error) {
       console.error('Error fetching new arrivals:', error);
       if (reset) {
@@ -81,15 +82,9 @@ export default function NewArrivals() {
             )}
           </div>
 
-          {/* 🟢 Load More Button */}
           {hasMore && !loadingMore && (
             <div className="flex justify-center mt-8">
-              <button
-                onClick={handleLoadMore}
-                className="px-6 py-3 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition"
-              >
-                Load More
-              </button>
+              <button onClick={handleLoadMore} className="px-6 py-3 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition">Load More</button>
             </div>
           )}
           {loadingMore && (
