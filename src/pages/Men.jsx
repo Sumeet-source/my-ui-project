@@ -15,12 +15,12 @@ export default function Men() {
 
   const fetchMenProducts = async () => {
     try {
-      const res = await axiosClient.get('/api/products', { params: { category: 'Men' } });
+      const res = await axiosClient.get('/api/products');
       if (Array.isArray(res.data)) {
         setProducts(res.data);
-        setFilteredProducts(res.data);
+        // 🟢 Default view: Sirf Men category ke products dikhao
+        setFilteredProducts(res.data.filter(p => p.category === 'Men'));
       } else {
-        console.warn('Received non-array data:', res.data);
         setProducts([]);
         setFilteredProducts([]);
       }
@@ -36,18 +36,26 @@ export default function Men() {
   const applyFilters = (filters) => {
     let result = [...(Array.isArray(products) ? products : [])];
 
+    // Sort
     if (filters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (filters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     else if (filters.sort === 'newest') result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
+    // Gender
     if (filters.gender) {
       result = result.filter(p => p.title.toLowerCase().includes(filters.gender.toLowerCase()));
     }
 
+    // 🟢 Category Filter (Smart Logic)
     if (filters.category) {
+      // Agar user kisi specific category (jaise Shoes) select karta hai
       result = result.filter(p => p.category.toLowerCase() === filters.category.toLowerCase());
+    } else {
+      // Agar filter clear hai, toh default 'Men' hi dikhao
+      result = result.filter(p => p.category === 'Men');
     }
 
+    // Price
     if (filters.price) {
       result = result.filter(p => p.price <= parseInt(filters.price));
     }
@@ -55,7 +63,10 @@ export default function Men() {
     setFilteredProducts(result);
   };
 
-  const clearFilters = () => setFilteredProducts(products);
+  const clearFilters = () => {
+    // 🟢 Clear filters always resets to default 'Men' category
+    setFilteredProducts(products.filter(p => p.category === 'Men'));
+  };
 
   return (
     <div className="p-6 md:p-10 bg-white min-h-screen">
@@ -101,6 +112,7 @@ export default function Men() {
         onApply={applyFilters}
         onClear={clearFilters}
         products={products}
+        defaultCategory="Men"
       />
     </div>
   );

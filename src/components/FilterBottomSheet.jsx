@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function FilterBottomSheet({ isOpen, onClose, onApply, onClear, products }) {
+export default function FilterBottomSheet({ isOpen, onClose, onApply, onClear, products, defaultCategory = '' }) {
   const [localFilters, setLocalFilters] = useState({
     sort: 'featured',
     gender: '',
@@ -16,8 +16,11 @@ export default function FilterBottomSheet({ isOpen, onClose, onApply, onClear, p
     if (localFilters.gender) {
       result = result.filter(p => p.title.toLowerCase().includes(localFilters.gender.toLowerCase()));
     }
+    // Category filter logic - matches Men.jsx logic
     if (localFilters.category) {
       result = result.filter(p => p.category.toLowerCase() === localFilters.category.toLowerCase());
+    } else if (defaultCategory) {
+      result = result.filter(p => p.category.toLowerCase() === defaultCategory.toLowerCase());
     }
     if (localFilters.price) {
       result = result.filter(p => p.price <= parseInt(localFilters.price));
