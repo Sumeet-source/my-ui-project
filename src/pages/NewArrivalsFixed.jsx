@@ -1,3 +1,5 @@
+
+cat > src/pages/NewArrivalsFixed.jsx << 'EOF'
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
@@ -54,7 +56,6 @@ export default function NewArrivalsFixed() {
   return (
     <div className="p-6 md:p-10 bg-white min-h-screen">
       <h1 className="text-3xl font-bold mb-6">New Arrivals 🔥</h1>
-      
       {loading ? (
         <p className="text-center py-10 text-gray-500">Loading new arrivals...</p>
       ) : (
@@ -79,7 +80,6 @@ export default function NewArrivalsFixed() {
               ))
             )}
           </div>
-
           {hasMore && !loadingMore && (
             <div className="flex justify-center mt-8">
               <button onClick={handleLoadMore} className="px-6 py-3 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition">Load More</button>
@@ -95,3 +95,5 @@ export default function NewArrivalsFixed() {
     </div>
   );
 }
+EOF
+
