@@ -36,8 +36,13 @@ export default function ProductDetails() {
       setLoading(true);
       const allRes = await axiosClient.get('/api/products');
       setAllProducts(allRes.data);
+
       const singleRes = await axiosClient.get(`/api/products/${id}`);
-      setProduct(singleRes.data || null);
+      if (!singleRes.data || Object.keys(singleRes.data).length === 0) {
+        setProduct(null);
+      } else {
+        setProduct(singleRes.data);
+      }
     } catch (error) {
       console.error('❌ Error fetching product:', error);
       setProduct(null);
@@ -66,6 +71,8 @@ export default function ProductDetails() {
   };
 
   if (loading) return <div className="text-center py-20 text-lg text-gray-500">Loading product...</div>;
+  
+  // 🟢 FIX: Agar product null hai, toh niche ka code run hi nahi hoga
   if (!product) return <div className="text-center py-20 text-xl text-gray-600">Product not found!</div>;
 
   const relatedProducts = allProducts
@@ -79,22 +86,13 @@ export default function ProductDetails() {
     showToast(`${product.title} (Size: ${selectedSize}) added to cart!`, 'success');
   };
 
-  // 🟢 FIXED: Added nativeEvent.stopImmediatePropagation()
   const handleWishlistToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation(); 
-
-    if (!user) {
-      showToast("Please login to add to wishlist", "error");
-      return;
-    }
-    
-    if (isInWishlist(product._id)) {
-      removeFromWishlist(product._id);
-    } else {
-      addToWishlist(product._id);
-    }
+    if (!user) { showToast("Please login to add to wishlist", "error"); return; }
+    if (isInWishlist(product._id)) removeFromWishlist(product._id);
+    else addToWishlist(product._id);
   };
 
   const handleReviewSubmit = async (e) => {
@@ -110,12 +108,13 @@ export default function ProductDetails() {
   };
 
   const renderStars = (rating) => Array.from({ length: 5 }, (_, i) => <span key={i} className={i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"}>★</span>);
+
+  // 🟢 FIX: product null nahi hai, toh ab images safely access kar sakte hain
   const images = product.images?.length > 0 ? product.images : [product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'];
 
   return (
     <div className="bg-white min-h-screen pb-20">
-      
-      {/* --- MOBILE SECTION (Myntra Style) --- */}
+      {/* Mobile Section */}
       <div className="md:hidden">
         {/* Carousel */}
         <div className="relative w-full bg-gray-50">
@@ -217,7 +216,7 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      {/* --- DESKTOP SECTION (Myntra Style Restored) --- */}
+      {/* Desktop Section */}
       <div className="hidden md:block max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row gap-12 mb-12">
           <div className="flex-1 relative group">
@@ -228,13 +227,8 @@ export default function ProductDetails() {
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
                 </span>
               </div>
-              
-              {/* 🟢 DESKTOP HEART BUTTON (FIXED: type="button" add kiya) */}
-              <button 
-                type="button" 
-                onClick={handleWishlistToggle} 
-                className="absolute top-4 right-4 p-3 bg-white/80 rounded-full hover:bg-white hover:scale-110 transition duration-200 z-20 shadow-md"
-              >
+              {/* Desktop Heart Button */}
+              <button type="button" onClick={handleWishlistToggle} className="absolute top-4 right-4 p-3 bg-white/80 rounded-full hover:bg-white hover:scale-110 transition duration-200 z-20 shadow-md">
                 <svg className={`w-6 h-6 transition duration-200 ${isInWishlist(product._id) ? 'fill-red-500 text-red-500' : 'text-gray-700 hover:text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
@@ -271,7 +265,6 @@ export default function ProductDetails() {
             <Link to="/" className="block text-gray-500 hover:text-black underline mt-4">Continue Shopping</Link>
           </div>
         </div>
-        
         {/* Desktop Reviews */}
         <section className="border-t border-gray-200 pt-10 max-w-4xl">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
@@ -300,17 +293,15 @@ export default function ProductDetails() {
         </section>
       </div>
 
-      {/* 🟢 LIGHTBOX MODAL (With Heart Button) */}
+      {/* Lightbox Modal */}
       {isLightboxOpen && (
         <div className="fixed inset-0 z-[999] bg-black/95 flex items-center justify-center p-4 cursor-zoom-out" onClick={() => setIsLightboxOpen(false)}>
           <button onClick={() => setIsLightboxOpen(false)} className="absolute top-6 right-6 text-white text-5xl font-light hover:text-gray-300 transition z-10">&times;</button>
-          
           <button onClick={handleWishlistToggle} className="absolute top-6 left-6 p-3 bg-white/10 hover:bg-white/20 rounded-full transition z-10">
             <svg className={`w-7 h-7 ${isInWishlist(product._id) ? 'fill-red-500 text-red-500' : 'fill-none text-white'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </button>
-
           <img src={product.images?.[mainImageIndex] || product.imageUrl} alt={product.title} className="max-w-full max-h-[90vh] object-contain rounded-lg cursor-default shadow-2xl" onClick={(e) => e.stopPropagation()} />
         </div>
       )}
