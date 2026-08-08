@@ -61,11 +61,11 @@ export default function Checkout() {
 
     setLoading(true);
     try {
-      const orderRes = await axiosClient.post('/api/orders/create-razorpay-order', { amount: total });
+      // 🟢 FIX: Frontend se bhi integer bhejo
+      const orderRes = await axiosClient.post('/api/orders/create-razorpay-order', { amount: Math.round(total * 100) });
       const { id: orderId, amount, currency } = orderRes.data;
       if (!orderId) throw new Error('Failed to create Razorpay order');
 
-      // 🟢 FIX: Script already loaded globally in index.html. Just check availability.
       if (!window.Razorpay) {
         showToast('Razorpay SDK is still loading. Please try again in a moment.', 'warning');
         setLoading(false);
