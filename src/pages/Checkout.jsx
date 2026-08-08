@@ -24,8 +24,11 @@ export default function Checkout() {
 
   const [address, setAddress] = useState({ fullName: '', street: '', city: '', pincode: '', phone: '' });
   const [loading, setLoading] = useState(false);
-  // 🟢 NEW: Payment Method State
-  const [paymentMethod, setPaymentMethod] = useState('Razorpay'); // Default is Razorpay
+  const [paymentMethod, setPaymentMethod] = useState('Razorpay');
+
+  // 🟢 NEW: COD Confirmation Modal State
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [placedOrder, setPlacedOrder] = useState(null);
 
   useEffect(() => {
     const fetchDefaultAddress = async () => {
@@ -73,7 +76,6 @@ export default function Checkout() {
 
     setLoading(true);
     try {
-      // Common order data for both COD and Razorpay
       const orderData = {
         user: user?._id || user?.id || 'guest',
         items: cart.map(item => ({
@@ -89,15 +91,15 @@ export default function Checkout() {
         shippingAddress: address,
       };
 
-      // 🟢 CASH ON DELIVERY LOGIC
+      // 🟢 CASH ON DELIVERY LOGIC (With Confirmation Modal!)
       if (paymentMethod === 'Cash on Delivery') {
-        await axiosClient.post('/api/orders', orderData);
-        showToast('Order placed successfully! (Cash on Delivery) 🎉', 'success');
+        const res = await axiosClient.post('/api/orders', orderData);
+        setPlacedOrder(res.data); // Save order data to show in modal
+        setShowConfirmation(true); // Show the success popup
         clearCart?.();
         clearDiscount?.();
-        setTimeout(() => navigate('/dashboard'), 300);
       } 
-      // 🔵 RAZORPAY LOGIC (Existing)
+      // 🔵 RAZORPAY LOGIC
       else {
         const orderRes = await axiosClient.post('/api/orders/create-razorpay-order', { amount: total });
         const { id: orderId, amount, currency } = orderRes.data;
@@ -114,7 +116,6 @@ export default function Checkout() {
           amount, currency, name: 'FORGE', description: 'Order Payment', order_id: orderId,
           handler: async (response) => {
             try {
-              // Save order with Razorpay details
               await axiosClient.post('/api/orders', {
                 ...orderData,
                 razorpayPaymentId: response.razorpay_payment_id,
@@ -125,7 +126,6 @@ export default function Checkout() {
               showToast('Order placed successfully! 🎉', 'success');
               clearCart?.();
               clearDiscount?.();
-
               setTimeout(() => navigate('/dashboard'), 300);
             } catch (saveError) {
               console.error('❌ Order save error:', saveError);
@@ -150,6 +150,36 @@ export default function Checkout() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white min-h-screen">
+      
+      {/* 🟢 CONFIRMATION MODAL (Shows when COD order is placed) */}
+      {showConfirmation && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white max-w-md w-full p-8 rounded-2xl shadow-2xl text-center transform transition-all duration-300 scale-100">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-green-600 text-4xl font-bold">✓</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully! 🎉</h2>
+            <p className="text-gray-600 mb-6">Your order has been received and will be processed and delivered soon.</p>
+            
+            <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left text-sm">
+              <p className="font-semibold text-gray-800">Order #{placedOrder?._id?.slice(-6) || 'N/A'}</p>
+              <p className="text-gray-600 mt-1">Total: ${total.toFixed(2)}</p>
+              <p className="text-gray-600">Payment: Cash on Delivery</p>
+            </div>
+
+            <button 
+              onClick={() => {
+                setShowConfirmation(false);
+                navigate('/dashboard');
+              }}
+              className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row gap-10">
         
         {/* Delivery Address */}
@@ -188,7 +218,6 @@ export default function Checkout() {
             <div className="space-y-4">
               {cart.map((item) => <div key={item.id} className="flex justify-between text-sm"><span>{item.title} x {item.quantity}</span><span>${(item.price * item.quantity).toFixed(2)}</span></div>)}
               
-              {/* 🟢 PAYMENT METHOD SELECTION */}
               <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <h3 className="text-sm font-bold text-gray-900 mb-2">Payment Method</h3>
                 <div className="flex flex-col gap-2">
@@ -223,7 +252,6 @@ export default function Checkout() {
               </div>
               <div className="border-t pt-4 flex justify-between font-bold text-lg"><span>Total</span><span>${total.toFixed(2)}</span></div>
               
-              {/* 🟢 DYNAMIC BUTTON TEXT */}
               <button onClick={handlePayment} disabled={loading} className="w-full mt-5 h-12 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition rounded-lg shadow disabled:opacity-70">
                 {loading ? 'Processing...' : paymentMethod === 'Cash on Delivery' ? `Place Order (COD)` : `Pay $${total.toFixed(2)}`}
               </button>
