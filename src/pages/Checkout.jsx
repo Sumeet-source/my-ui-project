@@ -83,12 +83,22 @@ export default function Checkout() {
         amount, currency, name: 'FORGE', description: 'Order Payment', order_id: orderId,
         handler: async (response) => {
           try {
-            // 🟢 Pay Success: Backend me order save karo
+            // 🟢 FIX: Cart items ko map karke 'productId' add kiya (Backend validation ke liye)
+            const orderItems = cart.map(item => ({
+              productId: item.id,
+              title: item.title,
+              price: item.price,
+              quantity: item.quantity,
+              size: item.size,
+              image: item.image
+            }));
+
             await axiosClient.post('/api/orders', {
               user: user?._id || user?.id || 'guest', 
-              items: cart, 
+              items: orderItems, // 🟢 Yahan 'cart' ki jagah 'orderItems' bhej rahe hain
               totalAmount: total,
-              paymentMethod: 'Razorpay', shippingAddress: address,
+              paymentMethod: 'Razorpay', 
+              shippingAddress: address,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpayOrderId: response.razorpay_order_id,
               razorpaySignature: response.razorpay_signature
@@ -105,7 +115,6 @@ export default function Checkout() {
 
           } catch (saveError) {
             console.error('❌ Order save error:', saveError);
-            // 🟡 Agar order save me error aata hai toh user ko dikhao
             alert('Payment successful, but failed to save order. Please contact support.\nError: ' + (saveError.response?.data?.message || saveError.message));
             showToast('Payment successful, but failed to save order.', 'error');
           }
