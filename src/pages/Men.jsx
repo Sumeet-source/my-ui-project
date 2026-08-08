@@ -6,7 +6,7 @@ import FilterBottomSheet from '../components/FilterBottomSheet';
 export default function Men() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [totalCount, setTotalCount] = useState(0); // 🟢 Backend se exact count lene ke liye
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,10 +23,9 @@ export default function Men() {
     }
 
     try {
-      // 🟢 FIX: Hamesha 'Men' category bhejo, aur user ka selection 'subCategory' ban jayega
       const params = {
-        category: 'Men', 
-        subCategory: filters.subCategory || (filters.category !== 'Men' ? filters.category : ''),
+        category: 'Men',
+        subCategory: filters.subCategory || '',  // 🟢 FIX: only subCategory
         page: page,
         limit: 8
       };
@@ -45,7 +44,7 @@ export default function Men() {
       if (reset) {
         setProducts(newProducts || []);
         setFilteredProducts(newProducts || []);
-        setTotalCount(newTotalCount || 0); // 🟢 Store exact count
+        setTotalCount(newTotalCount || 0);
       } else {
         setProducts(prev => [...prev, ...(newProducts || [])]);
         setFilteredProducts(prev => [...prev, ...(newProducts || [])]);
@@ -76,7 +75,6 @@ export default function Men() {
   };
 
   const applyFilters = (filters) => {
-    // 🟢 FIX: Products ko turant empty mat karo, taaki count 0 na dikhe
     setFilteredProducts([]);
     setHasMore(true);
     fetchMenProducts(1, true, filters);
@@ -143,7 +141,7 @@ export default function Men() {
         onClear={clearFilters} 
         products={filteredProducts} 
         defaultCategory="Men" 
-        totalCount={totalCount} // 🟢 Exact count bhej rahe hain
+        totalCount={totalCount}
       />
     </div>
   );
