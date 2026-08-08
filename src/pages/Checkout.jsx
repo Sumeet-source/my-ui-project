@@ -89,16 +89,15 @@ export default function Checkout() {
         shippingAddress: address,
       };
 
+      // 🟢 CASH ON DELIVERY
       if (paymentMethod === 'Cash on Delivery') {
-        // 🟢 DEBUG: Mobile par ye alert aayega toh code run ho raha hai!
-        alert("✅ COD Logic triggered! Check mobile UI now."); 
-        
         const res = await axiosClient.post('/api/orders', orderData);
         setPlacedOrder(res.data);
         setShowConfirmation(true);
         clearCart?.();
         clearDiscount?.();
       } 
+      // 🔵 RAZORPAY
       else {
         const orderRes = await axiosClient.post('/api/orders/create-razorpay-order', { amount: total });
         const { id: orderId, amount, currency } = orderRes.data;
@@ -115,17 +114,20 @@ export default function Checkout() {
           amount, currency, name: 'FORGE', description: 'Order Payment', order_id: orderId,
           handler: async (response) => {
             try {
-              await axiosClient.post('/api/orders', {
+              // 🟢 ORDER SAVE KARO
+              const savedOrder = await axiosClient.post('/api/orders', {
                 ...orderData,
                 razorpayPaymentId: response.razorpay_payment_id,
                 razorpayOrderId: response.razorpay_order_id,
                 razorpaySignature: response.razorpay_signature
               });
               
-              showToast('Order placed successfully! 🎉', 'success');
+              // 🟢 SAME MODAL OPEN KARO (Jaise COD mein hota hai)
+              setPlacedOrder(savedOrder.data);
+              setShowConfirmation(true);
               clearCart?.();
               clearDiscount?.();
-              setTimeout(() => navigate('/dashboard'), 300);
+
             } catch (saveError) {
               console.error('❌ Order save error:', saveError);
               alert('Payment successful, but failed to save order.\nError: ' + (saveError.response?.data?.message || saveError.message));
@@ -150,7 +152,7 @@ export default function Checkout() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white min-h-screen">
       
-      {/* 🟢 MOBILE-FRIENDLY CONFIRMATION MODAL */}
+      {/* 🟢 CONFIRMATION MODAL (Works for both COD and Razorpay!) */}
       {showConfirmation && (
         <div className="fixed top-0 left-0 right-0 bottom-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl text-center max-h-[85vh] overflow-y-auto transform transition-all duration-300 scale-100">
@@ -163,7 +165,7 @@ export default function Checkout() {
             <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left text-sm">
               <p className="font-semibold text-gray-800">Order #{placedOrder?._id?.slice(-6) || 'N/A'}</p>
               <p className="text-gray-600 mt-1">Total: ${total.toFixed(2)}</p>
-              <p className="text-gray-600">Payment: Cash on Delivery</p>
+              <p className="text-gray-600">Payment: {paymentMethod}</p>
             </div>
 
             <button 
