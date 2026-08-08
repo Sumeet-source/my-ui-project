@@ -49,16 +49,6 @@ export default function Checkout() {
     setAddress(prev => ({ ...prev, [name]: value }));
   };
 
-  const loadRazorpayScript = (src) => {
-    return new Promise((resolve) => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
-
   const handlePayment = async () => {
     if (!address.fullName || !address.street || !address.city || !address.pincode || !address.phone) {
       showToast('Please fill all delivery address fields!', 'error');
@@ -75,8 +65,12 @@ export default function Checkout() {
       const { id: orderId, amount, currency } = orderRes.data;
       if (!orderId) throw new Error('Failed to create Razorpay order');
 
-      const res = await loadRazorpayScript('https://checkout.razorpay.com/v1/checkout.js');
-      if (!res) { showToast('Razorpay SDK failed to load.', 'error'); setLoading(false); return; }
+      // 🟢 FIX: Script already loaded globally in index.html. Just check availability.
+      if (!window.Razorpay) {
+        showToast('Razorpay SDK is still loading. Please try again in a moment.', 'warning');
+        setLoading(false);
+        return;
+      }
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_...',
@@ -113,7 +107,7 @@ export default function Checkout() {
 
           } catch (saveError) {
             console.error('❌ Order save error:', saveError);
-            alert('Payment successful, but failed to save order. Please contact support.\nError: ' + (saveError.response?.data?.message || saveError.message));
+            alert('Payment successful, but failed to save order.\nError: ' + (saveError.response?.data?.message || saveError.message));
             showToast('Payment successful, but failed to save order.', 'error');
           }
         },
@@ -134,8 +128,6 @@ export default function Checkout() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white min-h-screen">
       <div className="flex flex-col lg:flex-row gap-10">
-        
-        {/* 🟢 UPGRADED DELIVERY ADDRESS UI */}
         <div className="flex-1 bg-white p-6 lg:p-8 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-xl font-bold mb-5">Delivery Address</h2>
           <div className="space-y-5">
@@ -164,7 +156,6 @@ export default function Checkout() {
           </div>
         </div>
 
-        {/* Order Summary (Polished UI) */}
         <div className="flex-1 lg:max-w-md bg-white p-6 lg:p-8 rounded-xl shadow-sm border border-gray-100 h-fit">
           <h2 className="text-xl font-bold mb-6">Order Summary</h2>
           {!cart || cart.length === 0 ? (<p className="text-gray-500 py-4">Your cart is empty.</p>) : (
