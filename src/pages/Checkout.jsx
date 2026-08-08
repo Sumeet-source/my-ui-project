@@ -112,7 +112,7 @@ export default function Checkout() {
           amount, currency, name: 'FORGE', description: 'Order Payment', order_id: orderId,
           handler: async (response) => {
             try {
-              // 🟢 DEBUG ALERT: Ye alert aayega toh payment success ke baad code pahunch raha hai!
+              // Debug alert (Mobile par bhi aana chahiye)
               alert("✅ Razorpay handler triggered! Order saving in progress...");
 
               const savedOrder = await axiosClient.post('/api/orders', {
@@ -123,9 +123,13 @@ export default function Checkout() {
               });
               
               setPlacedOrder(savedOrder.data);
-              setShowConfirmation(true);
               clearCart?.();
               clearDiscount?.();
+
+              // 🟢 FIX: 500ms delay taaki mobile par Razorpay ka popup puri tarah band ho jaye
+              setTimeout(() => {
+                setShowConfirmation(true);
+              }, 500);
 
             } catch (saveError) {
               console.error('❌ Order save error:', saveError);
@@ -151,10 +155,10 @@ export default function Checkout() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white min-h-screen">
       
-      {/* 🟢 CONFIRMATION MODAL */}
+      {/* 🟢 MOBILE-OPTIMIZED CONFIRMATION MODAL */}
       {showConfirmation && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl text-center max-h-[85vh] overflow-y-auto transform transition-all duration-300 scale-100">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 touch-none">
+          <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl text-center max-h-[90dvh] overflow-y-auto transform transition-all duration-300 scale-100">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-green-600 text-4xl font-bold">✓</span>
             </div>
