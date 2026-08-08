@@ -14,7 +14,8 @@ export default function Men() {
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const fetchMenProducts = async (page = 1, reset = false) => {
+  // 🟢 UPDATED: Ab filters ko accept karta hai aur backend ko dynamic params bhejta hai
+  const fetchMenProducts = async (page = 1, reset = false, filters = {}) => {
     if (reset) {
       setLoading(true);
       setProducts([]);
@@ -22,13 +23,32 @@ export default function Men() {
     }
 
     try {
-      const res = await axiosClient.get('/api/products', { params: { category: 'Men', page: page, limit: 8 } });
+      // 🟢 FIX: Dynamic params build karo
+      const params = {
+        category: filters.category || 'Men', // Agar filter mein category hai toh wo bhejo, warna default 'Men'
+        page: page,
+        limit: 8
+      };
+
+      // 🟢 Sort logic add kiya
+      if (filters.sort) {
+        if (filters.sort === 'price-low') params.sort = 'price_asc';
+        else if (filters.sort === 'price-high') params.sort = 'price_desc';
+        else if (filters.sort === 'newest') params.sort = 'newest';
+        // 'featured' default hai, kuch bhejne ki zaroorat nahi
+      }
+
+      // 🟢 Price filter add kiya
+      if (filters.price && filters.price < 200) {
+        params.maxPrice = filters.price;
+      }
+
+      const res = await axiosClient.get('/api/products', { params });
       
-      // 🟢 FIX: res.data se products array nikal rahe hain
       const { products: newProducts, totalCount, currentPage: pageReturned, totalPages } = res.data;
 
       if (reset) {
-        setProducts(newProducts || []); // Safety check
+        setProducts(newProducts || []);
         setFilteredProducts(newProducts || []);
       } else {
         setProducts(prev => [...prev, ...(newProducts || [])]);
@@ -58,18 +78,21 @@ export default function Men() {
     fetchMenProducts(currentPage + 1);
   };
 
+  // 🟢 UPDATED: Apply filters ko backend call se connect kar diya
   const applyFilters = (filters) => {
     setProducts([]);
     setFilteredProducts([]);
     setHasMore(true);
-    fetchMenProducts(1, true);
+    // 🟢 User ke filters ko fetch function mein bhejo
+    fetchMenProducts(1, true, filters);
   };
 
+  // 🟢 UPDATED: Clear filters mein empty object bhejo taaki default 'Men' category load ho
   const clearFilters = () => {
     setProducts([]);
     setFilteredProducts([]);
     setHasMore(true);
-    fetchMenProducts(1, true);
+    fetchMenProducts(1, true, {});
   };
 
   return (
