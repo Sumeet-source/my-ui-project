@@ -8,10 +8,8 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [activeTab, setActiveTab] = useState('products');
   
-  // --- Upload State ---
   const [uploading, setUploading] = useState(false);
 
-  // --- State for Adding Product ---
   const [formData, setFormData] = useState({
     title: '', 
     price: '', 
@@ -21,7 +19,6 @@ export default function AdminDashboard() {
     inStock: true
   });
 
-  // --- State for Editing Product ---
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
   const [editFormData, setEditFormData] = useState({
@@ -32,6 +29,17 @@ export default function AdminDashboard() {
     category: 'Men', 
     inStock: true
   });
+
+  // 🟢 Coupon States
+  const [couponFormData, setCouponFormData] = useState({
+    code: '',
+    discountType: 'percentage',
+    discountValue: '',
+    minOrderValue: '',
+    expiresAt: '',
+    usageLimit: 1
+  });
+  const [creatingCoupon, setCreatingCoupon] = useState(false);
 
   // --- Fetch Data ---
   useEffect(() => {
@@ -48,17 +56,22 @@ export default function AdminDashboard() {
   const fetchOrders = async () => {
     try {
       const res = await axiosClient.get('/api/orders/all');
-      setOrders(res.data);
+      let data = res.data;
+      if (Array.isArray(data)) data = data;
+      else if (data && Array.isArray(data.orders)) data = data.orders;
+      else if (data && Array.isArray(data.data)) data = data.data;
+      else data = [];
+      setOrders(data);
     } catch (error) {
       console.error('Failed to fetch orders:', error);
+      showToast('Failed to load orders', 'error');
     }
   };
 
-    const fetchProducts = async () => {
+  const fetchProducts = async () => {
     try {
       const res = await axiosClient.get('/api/products');
       let data = res.data;
-      // 🟢 Safe check: Agar array nahi hai toh empty array set karo
       if (Array.isArray(data)) data = data;
       else if (data && Array.isArray(data.products)) data = data.products;
       else if (data && Array.isArray(data.data)) data = data.data;
@@ -69,20 +82,17 @@ export default function AdminDashboard() {
     }
   };
 
-  // 🟢 NEW: Handle Image Upload
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = async (e, setter, field = 'imageUrl') => {
     const file = e.target.files[0];
     if (!file) return;
-
     setUploading(true);
     const formData = new FormData();
     formData.append('image', file);
-
     try {
       const res = await axiosClient.post('/api/admin/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setFormData(prev => ({ ...prev, imageUrl: res.data.secure_url }));
+      setter(prev => ({ ...prev, [field]: res.data.secure_url }));
       showToast('Image uploaded successfully!', 'success');
     } catch (error) {
       showToast('Failed to upload image', 'error');
@@ -91,15 +101,12 @@ export default function AdminDashboard() {
     }
   };
 
-  // 🟢 NEW: Handle Edit Image Upload
   const handleEditImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setUploading(true);
     const formData = new FormData();
     formData.append('image', file);
-
     try {
       const res = await axiosClient.post('/api/admin/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -113,19 +120,32 @@ export default function AdminDashboard() {
     }
   };
 
-  // --- Handlers for Adding Product ---
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
+    if (uploading) {
+      showToast('Please wait, image is still uploading!', 'warning');
+      return;
+    }
+    if (!formData.imageUrl) {
+      showToast('Please select and upload an image first!', 'warning');
+      return;
+    }
     try {
-      await axiosClient.post('/api/products', formData);
+      const dataToSend = {
+        title: formData.title,
+        price: formData.price,
+        description: formData.description,
+        category: formData.category,
+        inStock: formData.inStock,
+        imageUrl: formData.imageUrl,
+        images: [formData.imageUrl]
+      };
+      await axiosClient.post('/api/products', dataToSend);
       showToast('Product added successfully!', 'success');
       fetchProducts();
       setFormData({ title: '', price: '', description: '', imageUrl: '', category: 'Men', inStock: true });
@@ -134,7 +154,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // --- Handlers for Editing Product ---
   const handleEditClick = (product) => {
     setEditingProductId(product._id);
     setEditFormData({
@@ -150,16 +169,26 @@ export default function AdminDashboard() {
 
   const handleEditChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setEditFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    setEditFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    if (uploading) {
+      showToast('Please wait, image is still uploading!', 'warning');
+      return;
+    }
     try {
-      await axiosClient.put(`/api/products/${editingProductId}`, editFormData);
+      const dataToSend = {
+        title: editFormData.title,
+        price: editFormData.price,
+        description: editFormData.description,
+        category: editFormData.category,
+        inStock: editFormData.inStock,
+        imageUrl: editFormData.imageUrl,
+        images: editFormData.imageUrl ? [editFormData.imageUrl] : []
+      };
+      await axiosClient.put(`/api/products/${editingProductId}`, dataToSend);
       showToast('Product updated successfully!', 'success');
       setIsEditModalOpen(false);
       setEditingProductId(null);
@@ -169,7 +198,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // --- Handler for Deleting Product ---
   const handleDelete = async (id) => {
     if(!confirm('Are you sure you want to delete this product?')) return;
     try {
@@ -181,27 +209,53 @@ export default function AdminDashboard() {
     }
   };
 
+  // 🟢 Order Status Handler
+  const handleStatusUpdate = async (orderId, newStatus) => {
+    try {
+      await axiosClient.put(`/api/orders/${orderId}/status`, { status: newStatus });
+      showToast('Order status updated successfully!', 'success');
+      fetchOrders();
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      showToast('Failed to update order status', 'error');
+    }
+  };
+
+  // 🟢 Coupon Handlers
+  const handleCouponChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setCouponFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handleCreateCoupon = async (e) => {
+    e.preventDefault();
+    if (!couponFormData.code || !couponFormData.discountValue || !couponFormData.expiresAt) {
+      showToast('Please fill in Code, Value, and Expiry Date', 'warning');
+      return;
+    }
+    setCreatingCoupon(true);
+    try {
+      await axiosClient.post('/api/coupons/create', couponFormData);
+      showToast('Coupon created successfully!', 'success');
+      setCouponFormData({ code: '', discountType: 'percentage', discountValue: '', minOrderValue: '', expiresAt: '', usageLimit: 1 });
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Failed to create coupon', 'error');
+    } finally {
+      setCreatingCoupon(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
 
-        <div className="flex border-b border-gray-200 mb-6">
-          <button 
-            onClick={() => setActiveTab('products')}
-            className={`py-2 px-4 border-b-2 font-semibold transition ${activeTab === 'products' ? 'border-black text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-          >
-            Manage Products
-          </button>
-          <button 
-            onClick={() => setActiveTab('orders')}
-            className={`py-2 px-4 border-b-2 font-semibold transition ${activeTab === 'orders' ? 'border-black text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-          >
-            Order History ({orders.length})
-          </button>
+        <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
+          <button onClick={() => setActiveTab('products')} className={`py-2 px-4 border-b-2 font-semibold transition ${activeTab === 'products' ? 'border-black text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Manage Products</button>
+          <button onClick={() => setActiveTab('orders')} className={`py-2 px-4 border-b-2 font-semibold transition ${activeTab === 'orders' ? 'border-black text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Order History ({orders.length})</button>
+          <button onClick={() => setActiveTab('coupons')} className={`py-2 px-4 border-b-2 font-semibold transition ${activeTab === 'coupons' ? 'border-black text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Manage Coupons</button>
         </div>
 
-        {/* Add New Product Form */}
         {activeTab === 'products' && (
           <>
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-8">
@@ -218,19 +272,11 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-900">Product Image</label>
-                    {/* 🟢 File Upload Input */}
                     <div className="flex items-center gap-2 mt-1">
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleImageUpload}
-                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-black file:text-white hover:file:bg-gray-800"
-                      />
+                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setFormData)} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-black file:text-white hover:file:bg-gray-800" />
                       {uploading && <span className="text-sm text-gray-500 animate-pulse">Uploading...</span>}
                     </div>
-                    {formData.imageUrl && (
-                      <p className="text-xs text-green-600 mt-1">Image uploaded successfully!</p>
-                    )}
+                    {formData.imageUrl && <p className="text-xs text-green-600 mt-1">Image uploaded successfully!</p>}
                   </div>
                 </div>
                 <div>
@@ -241,10 +287,7 @@ export default function AdminDashboard() {
                   <div>
                     <label className="block text-sm font-semibold text-gray-900">Category</label>
                     <select name="category" value={formData.category} onChange={handleChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
-                      <option value="Men">Men</option>
-                      <option value="Women">Women</option>
-                      <option value="Shoes">Shoes</option>
-                      <option value="Outlet">Outlet</option>
+                      <option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Outlet">Outlet</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-2 mt-6">
@@ -252,11 +295,12 @@ export default function AdminDashboard() {
                     <label className="text-sm font-medium">In Stock</label>
                   </div>
                 </div>
-                <button type="submit" className="w-full h-10 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition">Add Product</button>
+                <button type="submit" disabled={uploading} className={`w-full h-10 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  {uploading ? 'Uploading Image...' : 'Add Product'}
+                </button>
               </form>
             </div>
 
-            {/* Manage Existing Products */}
             <div>
               <h2 className="text-xl font-semibold mb-4">Manage Existing Products</h2>
               {products.length === 0 ? (
@@ -265,12 +309,7 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {products.map((product) => (
                     <div key={product._id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex gap-4">
-                      <img 
-                        src={product.images?.[0] || product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
-                        alt={product.title} 
-                        className="w-24 h-24 object-cover rounded bg-gray-100"
-                        onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }}
-                      />
+                      <img src={product.images?.[0] || product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} alt={product.title} className="w-24 h-24 object-cover rounded bg-gray-100" onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }} />
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
                           <h3 className="font-medium text-gray-900">{product.title}</h3>
@@ -280,18 +319,8 @@ export default function AdminDashboard() {
                         <div className="flex items-center justify-between gap-3 mt-4">
                           <span className="text-xs text-gray-500">{product.category}</span>
                           <div className="flex gap-2">
-                            <button
-                              onClick={() => handleEditClick(product)}
-                              className="px-3 py-1 text-sm font-semibold text-white bg-black rounded hover:bg-gray-800 transition"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDelete(product._id)}
-                              className="px-3 py-1 text-sm font-semibold text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition"
-                            >
-                              Delete
-                            </button>
+                            <button onClick={() => handleEditClick(product)} className="px-3 py-1 text-sm font-semibold text-white bg-black rounded hover:bg-gray-800 transition">Edit</button>
+                            <button onClick={() => handleDelete(product._id)} className="px-3 py-1 text-sm font-semibold text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition">Delete</button>
                           </div>
                         </div>
                       </div>
@@ -303,6 +332,7 @@ export default function AdminDashboard() {
           </>
         )}
 
+        {/* 🟢 ORDERS TAB WITH STATUS DROPDOWN */}
         {activeTab === 'orders' && (
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold mb-4">Order History</h2>
@@ -311,16 +341,127 @@ export default function AdminDashboard() {
             ) : (
               <div className="space-y-4">
                 {orders.map((order) => (
-                  <div key={order._id || order.id} className="p-4 border border-gray-200 rounded">
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                      <span>Order #{order._id || order.id}</span>
-                      <span>{order.status ?? 'Pending'}</span>
+                  <div key={order._id || order.id} className="p-4 border border-gray-200 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">Order #{order._id || order.id}</p>
+                      <p className="text-sm text-gray-600 mt-1">Total: ${order.totalAmount ?? order.total ?? order.amount ?? '0.00'}</p>
+                      <p className="text-xs text-gray-500">Current: {order.status ?? 'Pending'}</p>
                     </div>
-                    <p className="mt-2 text-sm text-gray-700">Total: ${order.total ?? order.amount ?? '0.00'}</p>
+                    
+                    {/* 🟢 STATUS UPDATE DROPDOWN */}
+                    <div className="flex items-center gap-2">
+                      <select 
+                        value={order.status || 'Pending'} 
+                        onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:border-black"
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* 🟢 COUPON TAB */}
+        {activeTab === 'coupons' && (
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <h2 className="text-xl font-semibold mb-4">Manage Coupons</h2>
+            <form onSubmit={handleCreateCoupon} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Coupon Code</label>
+                  <input type="text" name="code" value={couponFormData.code} onChange={handleCouponChange} placeholder="e.g. TEST20" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black uppercase" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Discount Type</label>
+                  <select name="discountType" value={couponFormData.discountType} onChange={handleCouponChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="flat">Flat ($)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Discount Value</label>
+                  <input type="number" name="discountValue" value={couponFormData.discountValue} onChange={handleCouponChange} placeholder={couponFormData.discountType === 'percentage' ? 'e.g. 20' : 'e.g. 50'} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Min Order Value ($)</label>
+                  <input type="number" name="minOrderValue" value={couponFormData.minOrderValue} onChange={handleCouponChange} placeholder="e.g. 100" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Expiry Date</label>
+                  <input type="date" name="expiresAt" value={couponFormData.expiresAt} onChange={handleCouponChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Usage Limit</label>
+                  <input type="number" name="usageLimit" value={couponFormData.usageLimit} onChange={handleCouponChange} placeholder="e.g. 10" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" />
+                </div>
+              </div>
+
+              <button type="submit" disabled={creatingCoupon} className={`w-full h-10 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition ${creatingCoupon ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                {creatingCoupon ? 'Creating Coupon...' : 'Create Coupon'}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {isEditModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
+              <h2 className="text-xl font-bold mb-4">Edit Product</h2>
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold">Title</label>
+                  <input type="text" name="title" value={editFormData.title} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold">Price ($)</label>
+                  <input type="number" name="price" value={editFormData.price} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold">Image</label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <input type="file" accept="image/*" onChange={(e) => handleEditImageUpload} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-black file:text-white hover:file:bg-gray-800" />
+                    {uploading && <span className="text-sm text-gray-500 animate-pulse">Uploading...</span>}
+                  </div>
+                  {editFormData.imageUrl && <p className="text-xs text-green-600 mt-1">Image uploaded successfully!</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold">Description</label>
+                  <textarea name="description" value={editFormData.description} onChange={handleEditChange} className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20" />
+                </div>
+                <div className="flex items-center gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold">Category</label>
+                    <select name="category" value={editFormData.category} onChange={handleEditChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
+                      <option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Outlet">Outlet</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-2 mt-6">
+                    <input type="checkbox" name="inStock" checked={editFormData.inStock} onChange={handleEditChange} className="h-5 w-5 accent-black" />
+                    <label className="text-sm font-medium">In Stock</label>
+                  </div>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button type="submit" disabled={uploading} className={`flex-1 h-10 bg-black text-white font-semibold rounded hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    {uploading ? 'Uploading...' : 'Update Product'}
+                  </button>
+                  <button type="button" onClick={() => { setIsEditModalOpen(false); setEditingProductId(null); }} className="flex-1 h-10 bg-gray-200 text-gray-800 font-semibold rounded hover:bg-gray-300 transition">Cancel</button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>
