@@ -67,14 +67,19 @@ export default function FilterBottomSheet({
     onClear();
   };
 
-  const handleApply = () => {
+    const handleApply = () => {
     let finalFilters = { ...localFilters };
-    // 🟢 SMART LOGIC: Agar page category-specific hai, toh 'category' ko 'subCategory' map kar do
     if (defaultCategory) {
+      //  FIX: Pehle Sub-Category check karo, agar wo nahi hai toh Main-Category ko sub-category banao
+      let actualSubCategory = localFilters.subCategory;
+      if (!actualSubCategory && localFilters.category !== defaultCategory) {
+        actualSubCategory = localFilters.category;
+      }
+      
       finalFilters = {
         ...localFilters,
-        category: defaultCategory, 
-        subCategory: localFilters.category !== defaultCategory ? localFilters.category : localFilters.subCategory
+        category: defaultCategory, // Hamesha 'Men' bhejo
+        subCategory: actualSubCategory // Sahi sub-category bhejo (jaise 'Shorts')
       };
     }
     onApply(finalFilters);
