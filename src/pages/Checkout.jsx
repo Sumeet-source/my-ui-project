@@ -89,7 +89,6 @@ export default function Checkout() {
         shippingAddress: address,
       };
 
-      // 🟢 CASH ON DELIVERY
       if (paymentMethod === 'Cash on Delivery') {
         const res = await axiosClient.post('/api/orders', orderData);
         setPlacedOrder(res.data);
@@ -97,7 +96,6 @@ export default function Checkout() {
         clearCart?.();
         clearDiscount?.();
       } 
-      // 🔵 RAZORPAY
       else {
         const orderRes = await axiosClient.post('/api/orders/create-razorpay-order', { amount: total });
         const { id: orderId, amount, currency } = orderRes.data;
@@ -114,7 +112,9 @@ export default function Checkout() {
           amount, currency, name: 'FORGE', description: 'Order Payment', order_id: orderId,
           handler: async (response) => {
             try {
-              // 🟢 ORDER SAVE KARO
+              // 🟢 DEBUG ALERT: Ye alert aayega toh payment success ke baad code pahunch raha hai!
+              alert("✅ Razorpay handler triggered! Order saving in progress...");
+
               const savedOrder = await axiosClient.post('/api/orders', {
                 ...orderData,
                 razorpayPaymentId: response.razorpay_payment_id,
@@ -122,7 +122,6 @@ export default function Checkout() {
                 razorpaySignature: response.razorpay_signature
               });
               
-              // 🟢 SAME MODAL OPEN KARO (Jaise COD mein hota hai)
               setPlacedOrder(savedOrder.data);
               setShowConfirmation(true);
               clearCart?.();
@@ -152,7 +151,7 @@ export default function Checkout() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white min-h-screen">
       
-      {/* 🟢 CONFIRMATION MODAL (Works for both COD and Razorpay!) */}
+      {/* 🟢 CONFIRMATION MODAL */}
       {showConfirmation && (
         <div className="fixed top-0 left-0 right-0 bottom-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl text-center max-h-[85vh] overflow-y-auto transform transition-all duration-300 scale-100">
