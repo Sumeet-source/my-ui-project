@@ -8,12 +8,21 @@ import { useAuth } from '../context/AuthContext';
 export default function Checkout() {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { cartItems, clearCart } = useCart() || { cartItems: [], clearCart: () => {} };
   const { user } = useAuth();
 
-  const subtotal = (cartItems || []).reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  // 🟢 FIX: Aapke context se 'cart' uthaya, saath me discount bhi utha liya
+  const { cart, clearCart, getTotalPrice, discount, clearDiscount } = useCart() || { 
+    cart: [], 
+    clearCart: () => {}, 
+    getTotalPrice: () => 0, 
+    discount: { amount: 0, code: '' },
+    clearDiscount: () => {}
+  };
+
+  // 🟢 FIX: Total price context ke function se nikaal rahe hain
+  const subtotal = getTotalPrice(); 
   const deliveryFee = 0;
-  const total = subtotal + deliveryFee;
+  const total = Math.max(0, subtotal - (discount?.amount || 0));
 
   const [address, setAddress] = useState({ fullName: '', street: '', city: '', pincode: '', phone: '' });
   const [loading, setLoading] = useState(false);
@@ -57,7 +66,7 @@ export default function Checkout() {
       showToast('Please fill all delivery address fields!', 'error');
       return;
     }
-    if (!cartItems || cartItems.length === 0) {
+    if (!cart || cart.length === 0) {
       showToast('Your cart is empty!', 'warning');
       return;
     }
@@ -77,7 +86,9 @@ export default function Checkout() {
         handler: async (response) => {
           try {
             await axiosClient.post('/api/orders', {
-              user: user?._id || user?.id || 'guest', items: cartItems, totalAmount: total,
+              user: user?._id || user?.id || 'guest', 
+              items: cart, // 🟢 'cartItems' ki jagah 'cart'
+              totalAmount: total,
               paymentMethod: 'Razorpay', shippingAddress: address,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpayOrderId: response.razorpay_order_id,
@@ -85,6 +96,7 @@ export default function Checkout() {
             });
             showToast('Order placed successfully! 🎉', 'success');
             clearCart?.();
+            clearDiscount?.();
             navigate('/dashboard');
           } catch (saveError) {
             console.error('Order save error:', saveError);
@@ -122,9 +134,9 @@ export default function Checkout() {
         </div>
         <div className="flex-1 bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-fit">
           <h2 className="text-xl font-bold mb-6">Order Summary</h2>
-          {!cartItems || cartItems.length === 0 ? (<p className="text-gray-500 py-4">Your cart is empty.</p>) : (
+          {!cart || cart.length === 0 ? (<p className="text-gray-500 py-4">Your cart is empty.</p>) : (
             <div className="space-y-4">
-              {cartItems.map((item) => <div key={item.id} className="flex justify-between text-sm"><span>{item.title} x {item.quantity}</span><span>${(item.price * item.quantity).toFixed(2)}</span></div>)}
+              {cart.map((item) => <div key={item.id} className="flex justify-between text-sm"><span>{item.title} x {item.quantity}</span><span>${(item.price * item.quantity).toFixed(2)}</span></div>)}
               <div className="border-t pt-4 space-y-2 text-sm">
                 <div className="flex justify-between"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
                 <div className="flex justify-between"><span>Delivery</span><span className="text-green-600 font-medium">FREE</span></div>
