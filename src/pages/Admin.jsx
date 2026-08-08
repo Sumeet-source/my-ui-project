@@ -30,7 +30,6 @@ export default function AdminDashboard() {
     inStock: true
   });
 
-  // 🟢 Coupon States
   const [couponFormData, setCouponFormData] = useState({
     code: '',
     discountType: 'percentage',
@@ -40,6 +39,15 @@ export default function AdminDashboard() {
     usageLimit: 1
   });
   const [creatingCoupon, setCreatingCoupon] = useState(false);
+
+  // 🟢 BULLETPROOF TOAST (Guaranteed to show on Desktop & Mobile)
+  const [customToast, setCustomToast] = useState({ show: false, message: '', type: 'success' });
+  const triggerCustomToast = (message, type = 'success') => {
+    setCustomToast({ show: true, message, type });
+    setTimeout(() => {
+      setCustomToast({ show: false, message: '', type: 'success' });
+    }, 3000);
+  };
 
   // --- Fetch Data ---
   useEffect(() => {
@@ -209,7 +217,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // 🟢 Order Status Handler
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
       await axiosClient.put(`/api/orders/${orderId}/status`, { status: newStatus });
@@ -221,7 +228,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // 🟢 Coupon Handlers
   const handleCouponChange = (e) => {
     const { name, value, type, checked } = e.target;
     setCouponFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
@@ -230,16 +236,20 @@ export default function AdminDashboard() {
   const handleCreateCoupon = async (e) => {
     e.preventDefault();
     if (!couponFormData.code || !couponFormData.discountValue || !couponFormData.expiresAt) {
-      showToast('Please fill in Code, Value, and Expiry Date', 'warning');
+      triggerCustomToast('Please fill in Code, Value, and Expiry Date', 'warning');
       return;
     }
     setCreatingCoupon(true);
     try {
       await axiosClient.post('/api/coupons/create', couponFormData);
+      
+      // 🟢 DONO TOAST TRIGGER KAR RAHE HAIN (Ek guaranteed dikhega)
+      triggerCustomToast('Coupon created successfully!', 'success');
       showToast('Coupon created successfully!', 'success');
+
       setCouponFormData({ code: '', discountType: 'percentage', discountValue: '', minOrderValue: '', expiresAt: '', usageLimit: 1 });
     } catch (error) {
-      showToast(error.response?.data?.message || 'Failed to create coupon', 'error');
+      triggerCustomToast(error.response?.data?.message || 'Failed to create coupon', 'error');
     } finally {
       setCreatingCoupon(false);
     }
@@ -248,6 +258,16 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
+        
+        {/* 🟢 BULLETPROOF TOAST RENDER (Top Fixed) */}
+        {customToast.show && (
+          <div className={`fixed top-4 left-0 right-0 mx-auto w-max z-[99999] px-6 py-3 rounded-xl shadow-2xl text-white font-bold text-center transition-all duration-300 border border-white/20 backdrop-blur-sm
+            ${customToast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
+          >
+            {customToast.message}
+          </div>
+        )}
+
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
 
         <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
@@ -332,7 +352,6 @@ export default function AdminDashboard() {
           </>
         )}
 
-        {/* 🟢 ORDERS TAB WITH STATUS DROPDOWN */}
         {activeTab === 'orders' && (
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold mb-4">Order History</h2>
@@ -348,7 +367,6 @@ export default function AdminDashboard() {
                       <p className="text-xs text-gray-500">Current: {order.status ?? 'Pending'}</p>
                     </div>
                     
-                    {/* 🟢 STATUS UPDATE DROPDOWN */}
                     <div className="flex items-center gap-2">
                       <select 
                         value={order.status || 'Pending'} 
@@ -369,7 +387,6 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* 🟢 COUPON TAB */}
         {activeTab === 'coupons' && (
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold mb-4">Manage Coupons</h2>
