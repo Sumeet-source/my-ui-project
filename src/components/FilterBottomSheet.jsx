@@ -1,10 +1,24 @@
 import { useState } from 'react';
 
-export default function FilterBottomSheet({ isOpen, onClose, onApply, onClear, products, defaultCategory = '' }) {
+// 🟢 CATEGORY HIERARCHY DATA
+const CATEGORIES = {
+  Clothing: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
+  Shoes: ['Sneakers', 'Running Shoes', 'Casual Shoes', 'Formal Shoes', 'Loafers', 'Boots', 'Sandals'],
+  Accessories: ['Watches', 'Sunglasses', 'Belts', 'Wallets', 'Caps & Hats', 'Backpacks', 'Socks', 'Ties', 'Cufflinks']
+};
+
+export default function FilterBottomSheet({ 
+  isOpen, 
+  onClose, 
+  onApply, 
+  onClear, 
+  products, 
+  defaultCategory = '' 
+}) {
   const [localFilters, setLocalFilters] = useState({
     sort: 'featured',
-    gender: '',
-    category: '',
+    category: defaultCategory,
+    subCategory: '',
     price: 200,
   });
 
@@ -13,14 +27,11 @@ export default function FilterBottomSheet({ isOpen, onClose, onApply, onClear, p
     if (localFilters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (localFilters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     
-    if (localFilters.gender) {
-      result = result.filter(p => p.title.toLowerCase().includes(localFilters.gender.toLowerCase()));
-    }
-    // Category filter logic - matches Men.jsx logic
     if (localFilters.category) {
       result = result.filter(p => p.category.toLowerCase() === localFilters.category.toLowerCase());
-    } else if (defaultCategory) {
-      result = result.filter(p => p.category.toLowerCase() === defaultCategory.toLowerCase());
+    }
+    if (localFilters.subCategory) {
+      result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
     }
     if (localFilters.price) {
       result = result.filter(p => p.price <= parseInt(localFilters.price));
@@ -32,11 +43,16 @@ export default function FilterBottomSheet({ isOpen, onClose, onApply, onClear, p
   const activeFilterCount = Object.values(localFilters).filter(v => v !== '' && v !== 'featured' && v !== 200).length;
 
   const handleChange = (key, value) => {
-    setLocalFilters(prev => ({ ...prev, [key]: value }));
+    // 🟢 FIX: Agar user main category change kare, toh subCategory clear ho jaye
+    if (key === 'category') {
+      setLocalFilters(prev => ({ ...prev, category: value, subCategory: '' }));
+    } else {
+      setLocalFilters(prev => ({ ...prev, [key]: value }));
+    }
   };
 
   const handleClearAll = () => {
-    setLocalFilters({ sort: 'featured', gender: '', category: '', price: 200 });
+    setLocalFilters({ sort: 'featured', category: defaultCategory, subCategory: '', price: 200 });
     onClear();
   };
 
@@ -44,8 +60,6 @@ export default function FilterBottomSheet({ isOpen, onClose, onApply, onClear, p
     onApply(localFilters);
     onClose();
   };
-
-  const categories = ['Clothing', 'Shoes', 'Accessories'];
 
   if (!isOpen) return null;
 
@@ -64,6 +78,7 @@ export default function FilterBottomSheet({ isOpen, onClose, onApply, onClear, p
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 pb-24">
+          {/* SORT BY */}
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Sort By</p>
             <select 
@@ -78,50 +93,55 @@ export default function FilterBottomSheet({ isOpen, onClose, onApply, onClear, p
             </select>
           </div>
 
-          {/* 🟢 FIX: Gender filter sirf tab dikhega jab user category page par nahi ho (jaise Home/Search) */}
-          {!defaultCategory && (
-            <div className="space-y-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Gender</p>
-              <div className="flex flex-wrap gap-3">
-                {['Men', 'Women', 'Unisex'].map((g) => (
-                  <label key={g} className="flex items-center gap-2 text-sm cursor-pointer">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value={g}
-                      checked={localFilters.gender === g}
-                      onChange={(e) => handleChange('gender', e.target.value)}
-                      className="w-4 h-4 accent-black focus:ring-black"
-                    />
-                    {g}
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-
+          {/* 🟢 NEW HIERARCHY CATEGORY SELECTION */}
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Category</p>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((c) => {
-                const isSelected = localFilters.category === c;
+            <div className="flex flex-wrap gap-2 mb-2">
+              {Object.keys(CATEGORIES).map((mainCat) => {
+                const isSelected = localFilters.category === mainCat;
                 return (
                   <button
-                    key={c}
-                    onClick={() => handleChange('category', isSelected ? '' : c)}
+                    key={mainCat}
+                    onClick={() => handleChange('category', isSelected ? '' : mainCat)}
                     className={`px-4 py-1.5 rounded-full text-sm font-medium transition border ${
                       isSelected 
                         ? 'bg-black text-white border-black' 
                         : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
                     }`}
                   >
-                    {isSelected && '✓ '}{c}
+                    {isSelected && '✓ '}{mainCat}
                   </button>
                 );
               })}
             </div>
+
+            {/* 🟢 SUB-CATEGORY ACCORDION (Dikhega sirf jab main category select ho) */}
+            {localFilters.category && CATEGORIES[localFilters.category] && (
+              <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-xs font-medium text-gray-600 mb-2">Select Sub-Category (Optional)</p>
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORIES[localFilters.category].map((sub) => {
+                    const isSelected = localFilters.subCategory === sub;
+                    return (
+                      <button
+                        key={sub}
+                        onClick={() => handleChange('subCategory', isSelected ? '' : sub)}
+                        className={`px-3 py-1 rounded-full text-xs font-medium transition border ${
+                          isSelected 
+                            ? 'bg-black text-white border-black' 
+                            : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+                        }`}
+                      >
+                        {isSelected && '✓ '}{sub}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
+          {/* PRICE */}
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Price</p>
             <div className="space-y-4">

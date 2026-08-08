@@ -78,16 +78,14 @@ export default function Men() {
     fetchMenProducts(currentPage + 1);
   };
 
-  // 🟢 UPDATED: Apply filters ko backend call se connect kar diya
-  const applyFilters = (filters) => {
+  // UPDATED: Apply filters ko backend call se connect kar diya
+   const applyFilters = (filters) => {
     setProducts([]);
     setFilteredProducts([]);
     setHasMore(true);
-    // 🟢 User ke filters ko fetch function mein bhejo
-    fetchMenProducts(1, true, filters);
+    fetchMenProducts(1, true, filters); // Ab filters object mein subCategory bhi aa jayega
   };
-
-  // 🟢 UPDATED: Clear filters mein empty object bhejo taaki default 'Men' category load ho
+  // UPDATED: Clear filters mein empty object bhejo taaki default 'Men' category load ho
   const clearFilters = () => {
     setProducts([]);
     setFilteredProducts([]);
