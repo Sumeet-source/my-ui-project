@@ -54,10 +54,16 @@ export default function AdminDashboard() {
     }
   };
 
-  const fetchProducts = async () => {
+    const fetchProducts = async () => {
     try {
       const res = await axiosClient.get('/api/products');
-      setProducts(res.data);
+      let data = res.data;
+      // 🟢 Safe check: Agar array nahi hai toh empty array set karo
+      if (Array.isArray(data)) data = data;
+      else if (data && Array.isArray(data.products)) data = data.products;
+      else if (data && Array.isArray(data.data)) data = data.data;
+      else data = [];
+      setProducts(data);
     } catch (error) {
       showToast('Failed to load products', 'error');
     }
