@@ -78,24 +78,27 @@ export default function FilterBottomSheet({ isOpen, onClose, onApply, onClear, p
             </select>
           </div>
 
-          <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Gender</p>
-            <div className="flex flex-wrap gap-3">
-              {['Men', 'Women', 'Unisex'].map((g) => (
-                <label key={g} className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value={g}
-                    checked={localFilters.gender === g}
-                    onChange={(e) => handleChange('gender', e.target.value)}
-                    className="w-4 h-4 accent-black focus:ring-black"
-                  />
-                  {g}
-                </label>
-              ))}
+          {/* 🟢 FIX: Gender filter sirf tab dikhega jab user category page par nahi ho (jaise Home/Search) */}
+          {!defaultCategory && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Gender</p>
+              <div className="flex flex-wrap gap-3">
+                {['Men', 'Women', 'Unisex'].map((g) => (
+                  <label key={g} className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input
+                      type="radio"
+                      name="gender"
+                      value={g}
+                      checked={localFilters.gender === g}
+                      onChange={(e) => handleChange('gender', e.target.value)}
+                      className="w-4 h-4 accent-black focus:ring-black"
+                    />
+                    {g}
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Category</p>
