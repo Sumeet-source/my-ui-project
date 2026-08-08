@@ -112,8 +112,7 @@ export default function Checkout() {
           amount, currency, name: 'FORGE', description: 'Order Payment', order_id: orderId,
           handler: async (response) => {
             try {
-              // Debug alert (Mobile par bhi aana chahiye)
-              alert("✅ Razorpay handler triggered! Order saving in progress...");
+              // 🟢 ALERT HATA DIYA HAI! (Mobile par block nahi karega)
 
               const savedOrder = await axiosClient.post('/api/orders', {
                 ...orderData,
@@ -155,7 +154,7 @@ export default function Checkout() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white min-h-screen">
       
-      {/* 🟢 MOBILE-OPTIMIZED CONFIRMATION MODAL */}
+      {/* 🟢 CONFIRMATION MODAL */}
       {showConfirmation && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 touch-none">
           <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl text-center max-h-[90dvh] overflow-y-auto transform transition-all duration-300 scale-100">
@@ -167,7 +166,8 @@ export default function Checkout() {
             
             <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left text-sm">
               <p className="font-semibold text-gray-800">Order #{placedOrder?._id?.slice(-6) || 'N/A'}</p>
-              <p className="text-gray-600 mt-1">Total: ${total.toFixed(2)}</p>
+              {/* 🟢 FIX: Total ab placedOrder se aa raha hai, ₹0 nahi dikhega! */}
+              <p className="text-gray-600 mt-1">Total: ${(placedOrder?.totalAmount || total).toFixed(2)}</p>
               <p className="text-gray-600">Payment: {paymentMethod}</p>
             </div>
 
