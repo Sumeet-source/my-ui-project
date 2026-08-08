@@ -25,8 +25,6 @@ export default function Checkout() {
   const [address, setAddress] = useState({ fullName: '', street: '', city: '', pincode: '', phone: '' });
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('Razorpay');
-
-  // 🟢 NEW: COD Confirmation Modal State
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
 
@@ -91,15 +89,16 @@ export default function Checkout() {
         shippingAddress: address,
       };
 
-      // 🟢 CASH ON DELIVERY LOGIC (With Confirmation Modal!)
       if (paymentMethod === 'Cash on Delivery') {
+        // 🟢 DEBUG: Mobile par ye alert aayega toh code run ho raha hai!
+        alert("✅ COD Logic triggered! Check mobile UI now."); 
+        
         const res = await axiosClient.post('/api/orders', orderData);
-        setPlacedOrder(res.data); // Save order data to show in modal
-        setShowConfirmation(true); // Show the success popup
+        setPlacedOrder(res.data);
+        setShowConfirmation(true);
         clearCart?.();
         clearDiscount?.();
       } 
-      // 🔵 RAZORPAY LOGIC
       else {
         const orderRes = await axiosClient.post('/api/orders/create-razorpay-order', { amount: total });
         const { id: orderId, amount, currency } = orderRes.data;
@@ -151,10 +150,10 @@ export default function Checkout() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white min-h-screen">
       
-      {/* 🟢 CONFIRMATION MODAL (Shows when COD order is placed) */}
+      {/* 🟢 MOBILE-FRIENDLY CONFIRMATION MODAL */}
       {showConfirmation && (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white max-w-md w-full p-8 rounded-2xl shadow-2xl text-center transform transition-all duration-300 scale-100">
+        <div className="fixed top-0 left-0 right-0 bottom-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl text-center max-h-[85vh] overflow-y-auto transform transition-all duration-300 scale-100">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-green-600 text-4xl font-bold">✓</span>
             </div>
@@ -181,77 +180,36 @@ export default function Checkout() {
       )}
 
       <div className="flex flex-col lg:flex-row gap-10">
-        
-        {/* Delivery Address */}
         <div className="flex-1 bg-white p-6 lg:p-8 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-xl font-bold mb-5">Delivery Address</h2>
           <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1.5">Full Name</label>
-              <input type="text" name="fullName" value={address.fullName} onChange={handleChange} placeholder="John Doe" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1.5">Address</label>
-              <input type="text" name="street" value={address.street} onChange={handleChange} placeholder="123 Main St" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
-            </div>
+            <div><label className="block text-sm font-medium text-gray-800 mb-1.5">Full Name</label><input type="text" name="fullName" value={address.fullName} onChange={handleChange} placeholder="John Doe" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" /></div>
+            <div><label className="block text-sm font-medium text-gray-800 mb-1.5">Address</label><input type="text" name="street" value={address.street} onChange={handleChange} placeholder="123 Main St" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-800 mb-1.5">City</label>
-                <input type="text" name="city" value={address.city} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-800 mb-1.5">Pincode</label>
-                <input type="text" name="pincode" value={address.pincode} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
-              </div>
+              <div><label className="block text-sm font-medium text-gray-800 mb-1.5">City</label><input type="text" name="city" value={address.city} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" /></div>
+              <div><label className="block text-sm font-medium text-gray-800 mb-1.5">Pincode</label><input type="text" name="pincode" value={address.pincode} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" /></div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1.5">Phone Number</label>
-              <input type="text" name="phone" value={address.phone} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
-            </div>
+            <div><label className="block text-sm font-medium text-gray-800 mb-1.5">Phone Number</label><input type="text" name="phone" value={address.phone} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" /></div>
           </div>
         </div>
 
-        {/* Order Summary */}
         <div className="flex-1 lg:max-w-md bg-white p-6 lg:p-8 rounded-xl shadow-sm border border-gray-100 h-fit">
           <h2 className="text-xl font-bold mb-6">Order Summary</h2>
           {!cart || cart.length === 0 ? (<p className="text-gray-500 py-4">Your cart is empty.</p>) : (
             <div className="space-y-4">
               {cart.map((item) => <div key={item.id} className="flex justify-between text-sm"><span>{item.title} x {item.quantity}</span><span>${(item.price * item.quantity).toFixed(2)}</span></div>)}
-              
               <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <h3 className="text-sm font-bold text-gray-900 mb-2">Payment Method</h3>
                 <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input 
-                      type="radio" 
-                      name="paymentMethod" 
-                      value="Razorpay" 
-                      checked={paymentMethod === 'Razorpay'} 
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4 accent-black"
-                    />
-                    <span className="text-sm text-gray-700">Razorpay (Card / UPI / Netbanking)</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input 
-                      type="radio" 
-                      name="paymentMethod" 
-                      value="Cash on Delivery" 
-                      checked={paymentMethod === 'Cash on Delivery'} 
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4 accent-black"
-                    />
-                    <span className="text-sm text-gray-700">Cash on Delivery</span>
-                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="paymentMethod" value="Razorpay" checked={paymentMethod === 'Razorpay'} onChange={(e) => setPaymentMethod(e.target.value)} className="w-4 h-4 accent-black" /><span className="text-sm text-gray-700">Razorpay (Card / UPI / Netbanking)</span></label>
+                  <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="paymentMethod" value="Cash on Delivery" checked={paymentMethod === 'Cash on Delivery'} onChange={(e) => setPaymentMethod(e.target.value)} className="w-4 h-4 accent-black" /><span className="text-sm text-gray-700">Cash on Delivery</span></label>
                 </div>
               </div>
-
               <div className="border-t pt-4 space-y-2 text-sm">
                 <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
                 <div className="flex justify-between text-gray-600"><span>Delivery</span><span className="text-green-600 font-medium">FREE</span></div>
               </div>
               <div className="border-t pt-4 flex justify-between font-bold text-lg"><span>Total</span><span>${total.toFixed(2)}</span></div>
-              
               <button onClick={handlePayment} disabled={loading} className="w-full mt-5 h-12 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition rounded-lg shadow disabled:opacity-70">
                 {loading ? 'Processing...' : paymentMethod === 'Cash on Delivery' ? `Place Order (COD)` : `Pay $${total.toFixed(2)}`}
               </button>
