@@ -2,6 +2,13 @@ import { useState, useEffect } from 'react';
 import { useToast } from '../context/ToastContext';
 import axiosClient from '../api/axiosClient';
 
+// 🟢 NEW: Category → Sub-Category Mapping (Backend aur Frontend dono isi ko use karenge)
+const SUB_CATEGORY_MAP = {
+  Clothing: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
+  Shoes: ['Sneakers', 'Running Shoes', 'Casual Shoes', 'Formal Shoes', 'Loafers', 'Boots', 'Sandals'],
+  Accessories: ['Watches', 'Sunglasses', 'Belts', 'Wallets', 'Caps & Hats', 'Backpacks', 'Socks', 'Ties', 'Cufflinks'],
+};
+
 export default function AdminDashboard() {
   const { showToast } = useToast();
   const [products, setProducts] = useState([]);
@@ -10,12 +17,14 @@ export default function AdminDashboard() {
   
   const [uploading, setUploading] = useState(false);
 
+  // 🟢 Fixed: subCategory add kar diya hai
   const [formData, setFormData] = useState({
     title: '', 
     price: '', 
     description: '', 
     imageUrl: '', 
     category: 'Men', 
+    subCategory: '', 
     inStock: true
   });
 
@@ -27,6 +36,7 @@ export default function AdminDashboard() {
     description: '', 
     imageUrl: '', 
     category: 'Men', 
+    subCategory: '', 
     inStock: true
   });
 
@@ -40,7 +50,7 @@ export default function AdminDashboard() {
   });
   const [creatingCoupon, setCreatingCoupon] = useState(false);
 
-  // 🟢 BULLETPROOF TOAST (Guaranteed to show on Desktop & Mobile)
+  // 🟢 BULLETPROOF TOAST
   const [customToast, setCustomToast] = useState({ show: false, message: '', type: 'success' });
   const triggerCustomToast = (message, type = 'success') => {
     setCustomToast({ show: true, message, type });
@@ -128,9 +138,14 @@ export default function AdminDashboard() {
     }
   };
 
+  // 🟢 UPDATED: Category change hone par subCategory reset ho jayega
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+      ...(name === 'category' && { subCategory: '' }) // Reset subCategory when category changes
+    }));
   };
 
   const handleAddProduct = async (e) => {
@@ -144,11 +159,13 @@ export default function AdminDashboard() {
       return;
     }
     try {
+      // 🟢 FIX: dataToSend mein subCategory add kar diya
       const dataToSend = {
         title: formData.title,
         price: formData.price,
         description: formData.description,
         category: formData.category,
+        subCategory: formData.subCategory,
         inStock: formData.inStock,
         imageUrl: formData.imageUrl,
         images: [formData.imageUrl]
@@ -156,7 +173,7 @@ export default function AdminDashboard() {
       await axiosClient.post('/api/products', dataToSend);
       showToast('Product added successfully!', 'success');
       fetchProducts();
-      setFormData({ title: '', price: '', description: '', imageUrl: '', category: 'Men', inStock: true });
+      setFormData({ title: '', price: '', description: '', imageUrl: '', category: 'Men', subCategory: '', inStock: true });
     } catch (error) {
       showToast('Failed to add product', 'error');
     }
@@ -170,14 +187,20 @@ export default function AdminDashboard() {
       description: product.description || '',
       imageUrl: product.imageUrl || '',
       category: product.category,
+      subCategory: product.subCategory || '',
       inStock: product.inStock
     });
     setIsEditModalOpen(true);
   };
 
+  // 🟢 UPDATED: Edit mein bhi Category change par subCategory reset hoga
   const handleEditChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setEditFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+      ...(name === 'category' && { subCategory: '' })
+    }));
   };
 
   const handleEditSubmit = async (e) => {
@@ -187,11 +210,13 @@ export default function AdminDashboard() {
       return;
     }
     try {
+      // 🟢 FIX: Edit dataToSend mein bhi subCategory add kar diya
       const dataToSend = {
         title: editFormData.title,
         price: editFormData.price,
         description: editFormData.description,
         category: editFormData.category,
+        subCategory: editFormData.subCategory,
         inStock: editFormData.inStock,
         imageUrl: editFormData.imageUrl,
         images: editFormData.imageUrl ? [editFormData.imageUrl] : []
@@ -242,11 +267,8 @@ export default function AdminDashboard() {
     setCreatingCoupon(true);
     try {
       await axiosClient.post('/api/coupons/create', couponFormData);
-      
-      // 🟢 DONO TOAST TRIGGER KAR RAHE HAIN (Ek guaranteed dikhega)
       triggerCustomToast('Coupon created successfully!', 'success');
       showToast('Coupon created successfully!', 'success');
-
       setCouponFormData({ code: '', discountType: 'percentage', discountValue: '', minOrderValue: '', expiresAt: '', usageLimit: 1 });
     } catch (error) {
       triggerCustomToast(error.response?.data?.message || 'Failed to create coupon', 'error');
@@ -259,11 +281,8 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         
-        {/* 🟢 BULLETPROOF TOAST RENDER (Top Fixed) */}
         {customToast.show && (
-          <div className={`fixed top-4 left-0 right-0 mx-auto w-max z-[99999] px-6 py-3 rounded-xl shadow-2xl text-white font-bold text-center transition-all duration-300 border border-white/20 backdrop-blur-sm
-            ${customToast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
-          >
+          <div className={`fixed top-4 left-0 right-0 mx-auto w-max z-[99999] px-6 py-3 rounded-xl shadow-2xl text-white font-bold text-center transition-all duration-300 border border-white/20 backdrop-blur-sm ${customToast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
             {customToast.message}
           </div>
         )}
@@ -307,7 +326,7 @@ export default function AdminDashboard() {
                   <div>
                     <label className="block text-sm font-semibold text-gray-900">Category</label>
                     <select name="category" value={formData.category} onChange={handleChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
-                      <option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Outlet">Outlet</option>
+                      <option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Accessories">Accessories</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-2 mt-6">
@@ -315,6 +334,25 @@ export default function AdminDashboard() {
                     <label className="text-sm font-medium">In Stock</label>
                   </div>
                 </div>
+
+                {/* 🟢 NEW: Sub-Category Dropdown */}
+                {formData.category && SUB_CATEGORY_MAP[formData.category] && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900">Sub-Category</label>
+                    <select
+                      name="subCategory"
+                      value={formData.subCategory}
+                      onChange={handleChange}
+                      className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"
+                    >
+                      <option value="">Select Sub-Category</option>
+                      {SUB_CATEGORY_MAP[formData.category].map((sub) => (
+                        <option key={sub} value={sub}>{sub}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
                 <button type="submit" disabled={uploading} className={`w-full h-10 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                   {uploading ? 'Uploading Image...' : 'Add Product'}
                 </button>
@@ -366,18 +404,9 @@ export default function AdminDashboard() {
                       <p className="text-sm text-gray-600 mt-1">Total: ${order.totalAmount ?? order.total ?? order.amount ?? '0.00'}</p>
                       <p className="text-xs text-gray-500">Current: {order.status ?? 'Pending'}</p>
                     </div>
-                    
                     <div className="flex items-center gap-2">
-                      <select 
-                        value={order.status || 'Pending'} 
-                        onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:border-black"
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
+                      <select value={order.status || 'Pending'} onChange={(e) => handleStatusUpdate(order._id, e.target.value)} className="px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:border-black">
+                        <option value="Pending">Pending</option><option value="Processing">Processing</option><option value="Shipped">Shipped</option><option value="Delivered">Delivered</option><option value="Cancelled">Cancelled</option>
                       </select>
                     </div>
                   </div>
@@ -392,41 +421,17 @@ export default function AdminDashboard() {
             <h2 className="text-xl font-semibold mb-4">Manage Coupons</h2>
             <form onSubmit={handleCreateCoupon} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">Coupon Code</label>
-                  <input type="text" name="code" value={couponFormData.code} onChange={handleCouponChange} placeholder="e.g. TEST20" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black uppercase" required />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">Discount Type</label>
-                  <select name="discountType" value={couponFormData.discountType} onChange={handleCouponChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
-                    <option value="percentage">Percentage (%)</option>
-                    <option value="flat">Flat ($)</option>
-                  </select>
-                </div>
+                <div><label className="block text-sm font-semibold text-gray-900">Coupon Code</label><input type="text" name="code" value={couponFormData.code} onChange={handleCouponChange} placeholder="e.g. TEST20" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black uppercase" required /></div>
+                <div><label className="block text-sm font-semibold text-gray-900">Discount Type</label><select name="discountType" value={couponFormData.discountType} onChange={handleCouponChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="percentage">Percentage (%)</option><option value="flat">Flat ($)</option></select></div>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">Discount Value</label>
-                  <input type="number" name="discountValue" value={couponFormData.discountValue} onChange={handleCouponChange} placeholder={couponFormData.discountType === 'percentage' ? 'e.g. 20' : 'e.g. 50'} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">Min Order Value ($)</label>
-                  <input type="number" name="minOrderValue" value={couponFormData.minOrderValue} onChange={handleCouponChange} placeholder="e.g. 100" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" />
-                </div>
+                <div><label className="block text-sm font-semibold text-gray-900">Discount Value</label><input type="number" name="discountValue" value={couponFormData.discountValue} onChange={handleCouponChange} placeholder={couponFormData.discountType === 'percentage' ? 'e.g. 20' : 'e.g. 50'} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
+                <div><label className="block text-sm font-semibold text-gray-900">Min Order Value ($)</label><input type="number" name="minOrderValue" value={couponFormData.minOrderValue} onChange={handleCouponChange} placeholder="e.g. 100" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" /></div>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">Expiry Date</label>
-                  <input type="date" name="expiresAt" value={couponFormData.expiresAt} onChange={handleCouponChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">Usage Limit</label>
-                  <input type="number" name="usageLimit" value={couponFormData.usageLimit} onChange={handleCouponChange} placeholder="e.g. 10" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" />
-                </div>
+                <div><label className="block text-sm font-semibold text-gray-900">Expiry Date</label><input type="date" name="expiresAt" value={couponFormData.expiresAt} onChange={handleCouponChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
+                <div><label className="block text-sm font-semibold text-gray-900">Usage Limit</label><input type="number" name="usageLimit" value={couponFormData.usageLimit} onChange={handleCouponChange} placeholder="e.g. 10" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" /></div>
               </div>
-
               <button type="submit" disabled={creatingCoupon} className={`w-full h-10 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition ${creatingCoupon ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 {creatingCoupon ? 'Creating Coupon...' : 'Create Coupon'}
               </button>
@@ -439,42 +444,35 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
               <h2 className="text-xl font-bold mb-4">Edit Product</h2>
               <form onSubmit={handleEditSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold">Title</label>
-                  <input type="text" name="title" value={editFormData.title} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold">Price ($)</label>
-                  <input type="number" name="price" value={editFormData.price} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold">Image</label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <input type="file" accept="image/*" onChange={(e) => handleEditImageUpload} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-black file:text-white hover:file:bg-gray-800" />
-                    {uploading && <span className="text-sm text-gray-500 animate-pulse">Uploading...</span>}
-                  </div>
-                  {editFormData.imageUrl && <p className="text-xs text-green-600 mt-1">Image uploaded successfully!</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold">Description</label>
-                  <textarea name="description" value={editFormData.description} onChange={handleEditChange} className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20" />
-                </div>
+                <div><label className="block text-sm font-semibold">Title</label><input type="text" name="title" value={editFormData.title} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
+                <div><label className="block text-sm font-semibold">Price ($)</label><input type="number" name="price" value={editFormData.price} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
+                <div><label className="block text-sm font-semibold">Image</label><div className="flex items-center gap-2 mt-1"><input type="file" accept="image/*" onChange={(e) => handleEditImageUpload} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-black file:text-white hover:file:bg-gray-800" />{uploading && <span className="text-sm text-gray-500 animate-pulse">Uploading...</span>}</div>{editFormData.imageUrl && <p className="text-xs text-green-600 mt-1">Image uploaded successfully!</p>}</div>
+                <div><label className="block text-sm font-semibold">Description</label><textarea name="description" value={editFormData.description} onChange={handleEditChange} className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20" /></div>
                 <div className="flex items-center gap-6">
+                  <div><label className="block text-sm font-semibold">Category</label><select name="category" value={editFormData.category} onChange={handleEditChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Accessories">Accessories</option></select></div>
+                  <div className="flex items-center gap-2 mt-6"><input type="checkbox" name="inStock" checked={editFormData.inStock} onChange={handleEditChange} className="h-5 w-5 accent-black" /><label className="text-sm font-medium">In Stock</label></div>
+                </div>
+
+                {/* 🟢 NEW: Edit Modal me bhi Sub-Category Dropdown */}
+                {editFormData.category && SUB_CATEGORY_MAP[editFormData.category] && (
                   <div>
-                    <label className="block text-sm font-semibold">Category</label>
-                    <select name="category" value={editFormData.category} onChange={handleEditChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
-                      <option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Outlet">Outlet</option>
+                    <label className="block text-sm font-semibold text-gray-900">Sub-Category</label>
+                    <select
+                      name="subCategory"
+                      value={editFormData.subCategory}
+                      onChange={handleEditChange}
+                      className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"
+                    >
+                      <option value="">Select Sub-Category</option>
+                      {SUB_CATEGORY_MAP[editFormData.category].map((sub) => (
+                        <option key={sub} value={sub}>{sub}</option>
+                      ))}
                     </select>
                   </div>
-                  <div className="flex items-center gap-2 mt-6">
-                    <input type="checkbox" name="inStock" checked={editFormData.inStock} onChange={handleEditChange} className="h-5 w-5 accent-black" />
-                    <label className="text-sm font-medium">In Stock</label>
-                  </div>
-                </div>
+                )}
+
                 <div className="flex gap-3 pt-2">
-                  <button type="submit" disabled={uploading} className={`flex-1 h-10 bg-black text-white font-semibold rounded hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                    {uploading ? 'Uploading...' : 'Update Product'}
-                  </button>
+                  <button type="submit" disabled={uploading} className={`flex-1 h-10 bg-black text-white font-semibold rounded hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>{uploading ? 'Uploading...' : 'Update Product'}</button>
                   <button type="button" onClick={() => { setIsEditModalOpen(false); setEditingProductId(null); }} className="flex-1 h-10 bg-gray-200 text-gray-800 font-semibold rounded hover:bg-gray-300 transition">Cancel</button>
                 </div>
               </form>
