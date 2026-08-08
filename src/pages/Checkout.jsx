@@ -10,7 +10,6 @@ export default function Checkout() {
   const { showToast } = useToast();
   const { user } = useAuth();
 
-  // 🟢 FIX: Aapke context se 'cart' uthaya, saath me discount bhi utha liya
   const { cart, clearCart, getTotalPrice, discount, clearDiscount } = useCart() || { 
     cart: [], 
     clearCart: () => {}, 
@@ -19,7 +18,6 @@ export default function Checkout() {
     clearDiscount: () => {}
   };
 
-  // 🟢 FIX: Total price context ke function se nikaal rahe hain
   const subtotal = getTotalPrice(); 
   const deliveryFee = 0;
   const total = Math.max(0, subtotal - (discount?.amount || 0));
@@ -85,21 +83,30 @@ export default function Checkout() {
         amount, currency, name: 'FORGE', description: 'Order Payment', order_id: orderId,
         handler: async (response) => {
           try {
+            // 🟢 Pay Success: Backend me order save karo
             await axiosClient.post('/api/orders', {
               user: user?._id || user?.id || 'guest', 
-              items: cart, // 🟢 'cartItems' ki jagah 'cart'
+              items: cart, 
               totalAmount: total,
               paymentMethod: 'Razorpay', shippingAddress: address,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpayOrderId: response.razorpay_order_id,
               razorpaySignature: response.razorpay_signature
             });
+            
             showToast('Order placed successfully! 🎉', 'success');
             clearCart?.();
             clearDiscount?.();
-            navigate('/dashboard');
+
+            // 🔥 FIX: Razorpay popup band hone ke baad redirect
+            setTimeout(() => {
+              navigate('/dashboard'); 
+            }, 300);
+
           } catch (saveError) {
-            console.error('Order save error:', saveError);
+            console.error('❌ Order save error:', saveError);
+            // 🟡 Agar order save me error aata hai toh user ko dikhao
+            alert('Payment successful, but failed to save order. Please contact support.\nError: ' + (saveError.response?.data?.message || saveError.message));
             showToast('Payment successful, but failed to save order.', 'error');
           }
         },
