@@ -21,9 +21,21 @@ export default function Search() {
 
       setLoading(true);
       try {
-        // 🟢 FIX: '/api/products/search' ki jagah '/api/products' call karo aur 'q' param bhejo
         const res = await axiosClient.get('/api/products', { params: { q: query } });
-        setProducts(res.data);
+        
+        // 🟢 FIX: Agar res.data Object hai toh usme se array nikaalo, warna crash ho jayega!
+        let data = res.data;
+        if (Array.isArray(data)) {
+          data = data;
+        } else if (data && Array.isArray(data.products)) {
+          data = data.products;
+        } else if (data && Array.isArray(data.data)) {
+          data = data.data;
+        } else {
+          data = [];
+        }
+
+        setProducts(data);
       } catch (error) {
         console.error('Search error:', error);
         setProducts([]);
@@ -38,14 +50,12 @@ export default function Search() {
   return (
     <div className="bg-white min-h-screen overflow-x-hidden">
       
-      {/* --- MOBILE TOP BAR --- */}
       <div className="md:hidden flex justify-center items-center border-b border-gray-200 py-3 px-4 bg-white">
         <button className="text-sm font-medium text-black flex items-center gap-1">
           Filters/ Sort <ChevronDown className="w-4 h-4" />
         </button>
       </div>
 
-      {/* --- SEARCH RESULT HEADER --- */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-2">
           <h1 className="text-xl font-bold text-gray-900">Search Results</h1>
@@ -53,7 +63,6 @@ export default function Search() {
           <p className="text-sm text-gray-500 mt-2">{loading ? 'Searching...' : `${products.length} items`}</p>
         </div>
 
-        {/* --- PRODUCT GRID --- */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 lg:gap-x-8 lg:gap-y-12 mt-4">
           {loading ? (
             <div className="col-span-2 lg:col-span-3 text-center py-20">
