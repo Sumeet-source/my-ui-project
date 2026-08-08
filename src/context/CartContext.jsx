@@ -1,83 +1,160 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axiosClient from '../api/axiosClient';
+import { useToast } from '../context/ToastContext';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
-const CartContext = createContext();
+export default function Checkout() {
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+  const { user } = useAuth();
 
-export function CartProvider({ children }) {
-  const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem('shopping_cart');
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
+  // 🟢 FIX: Aapke Context ke hisaab se 'cart' use kiya aur 'getTotalPrice' use kiya
+  const { cart, clearCart, getTotalPrice, discount, clearDiscount } = useCart() || { 
+    cart: [], 
+    clearCart: () => {}, 
+    getTotalPrice: () => 0, 
+    discount: { amount: 0, code: '' },
+    clearDiscount: () => {}
+  };
 
-  // 🟢 New state for coupon
-  const [discount, setDiscount] = useState({ amount: 0, code: '' });
+  const subtotal = getTotalPrice(); // Cart ka total nikaalne ka sahi tareeqa
+  const deliveryFee = 0;
+  const total = Math.max(0, subtotal - (discount?.amount || 0));
+
+  const [address, setAddress] = useState({ fullName: '', street: '', city: '', pincode: '', phone: '' });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('shopping_cart', JSON.stringify(cart));
-  }, [cart]);
+    const fetchDefaultAddress = async () => {
+      try {
+        const res = await axiosClient.get('/api/addresses');
+        if (res.data && Array.isArray(res.data)) {
+          const defaultAddr = res.data.find(addr => addr.isDefault === true);
+          if (defaultAddr) {
+            setAddress({
+              fullName: defaultAddr.fullName || '', street: defaultAddr.street || '',
+              city: defaultAddr.city || '', pincode: defaultAddr.pincode || '',
+              phone: defaultAddr.phone || ''
+            });
+          }
+        }
+      } catch (error) { console.log('Address API error'); }
+    };
+    if (user) fetchDefaultAddress();
+  }, [user]);
 
-  const addToCart = (item) => {
-    setCart((prev) => {
-      const existingItem = prev.find((i) => i.id === item.id && i.size === item.size);
-      if (existingItem) {
-        return prev.map((i) =>
-          i.id === item.id && i.size === item.size
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
-        );
-      }
-      return [...prev, { ...item, quantity: 1 }];
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setAddress(prev => ({ ...prev, [name]: value }));
+  };
+
+  const loadRazorpayScript = (src) => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
     });
   };
 
-  const removeFromCart = (id, size) => {
-    setCart((prev) => prev.filter((item) => !(item.id === id && item.size === size)));
-  };
+  const handlePayment = async () => {
+    if (!address.fullName || !address.street || !address.city || !address.pincode || !address.phone) {
+      showToast('Please fill all delivery address fields!', 'error');
+      return;
+    }
+    if (!cart || cart.length === 0) {
+      showToast('Your cart is empty!', 'warning');
+      return;
+    }
 
-  const updateQuantity = (id, size, delta) => {
-    setCart((prev) =>
-      prev.map((item) =>
-        item.id === id && item.size === size
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
-    );
-  };
+    setLoading(true);
+    try {
+      const orderRes = await axiosClient.post('/api/orders/create-razorpay-order', { amount: total });
+      const { id: orderId, amount, currency } = orderRes.data;
+      if (!orderId) throw new Error('Failed to create Razorpay order');
 
-  const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
+      const res = await loadRazorpayScript('https://checkout.razorpay.com/v1/checkout.js');
+      if (!res) { showToast('Razorpay SDK failed to load.', 'error'); setLoading(false); return; }
 
-  const clearCart = () => {
-    setCart([]);
-    setDiscount({ amount: 0, code: '' }); // Clear discount too
-  };
-
-  // 🟢 Coupon set karne ka function
-  const applyDiscount = (amount, code) => {
-    setDiscount({ amount, code });
-  };
-
-  const clearDiscount = () => {
-    setDiscount({ amount: 0, code: '' });
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_...',
+        amount, currency, name: 'FORGE', description: 'Order Payment', order_id: orderId,
+        handler: async (response) => {
+          try {
+            await axiosClient.post('/api/orders', {
+              user: user?._id || user?.id || 'guest', items: cart, totalAmount: total,
+              paymentMethod: 'Razorpay', shippingAddress: address,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpaySignature: response.razorpay_signature
+            });
+            showToast('Order placed successfully! 🎉', 'success');
+            clearCart();
+            clearDiscount();
+            navigate('/dashboard');
+          } catch (saveError) {
+            console.error('Order save error:', saveError);
+            showToast('Payment successful, but failed to save order.', 'error');
+          }
+        },
+        prefill: { name: address.fullName, email: user?.email || '', contact: address.phone },
+        theme: { color: '#000000' },
+        modal: { ondismiss: () => { setLoading(false); showToast('Payment cancelled', 'info'); } }
+      };
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      console.error('Payment error:', error);
+      showToast(error.response?.data?.message || 'Failed to initiate payment', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <CartContext.Provider value={{ 
-      cart, 
-      addToCart, 
-      removeFromCart, 
-      updateQuantity, 
-      getTotalPrice, 
-      clearCart, 
-      discount, 
-      applyDiscount,
-      clearDiscount 
-    }}>
-      {children}
-    </CartContext.Provider>
-  );
-}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white min-h-screen">
+      <div className="flex flex-col lg:flex-row gap-10">
+        <div className="flex-1 bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
+          <h2 className="text-xl font-bold mb-4">Delivery Address</h2>
+          <div className="space-y-4">
+            <div><label className="block text-sm font-semibold text-gray-700">Full Name</label><input type="text" name="fullName" value={address.fullName} onChange={handleChange} /></div>
+            <div><label className="block text-sm font-semibold text-gray-700">Address</label><input type="text" name="street" value={address.street} onChange={handleChange} /></div>
+            <div className="grid grid-cols-2 gap-4">
+              <div><label className="block text-sm font-semibold text-gray-700">City</label><input type="text" name="city" value={address.city} onChange={handleChange} /></div>
+              <div><label className="block text-sm font-semibold text-gray-700">Pincode</label><input type="text" name="pincode" value={address.pincode} onChange={handleChange} /></div>
+            </div>
+            <div><label className="block text-sm font-semibold text-gray-700">Phone Number</label><input type="text" name="phone" value={address.phone} onChange={handleChange} /></div>
+          </div>
+        </div>
+        <div className="flex-1 bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-fit">
+          <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+          {!cart || cart.length === 0 ? (<p className="text-gray-500 py-4">Your cart is empty.</p>) : (
+            <div className="space-y-4">
+              {cart.map((item) => <div key={item.id} className="flex justify-between text-sm"><span>{item.title} x {item.quantity}</span><span>${(item.price * item.quantity).toFixed(2)}</span></div>)}
+              
+              {/* 🟢 Coupon Discount Display (Agar coupon apply hoga toh dikhega) */}
+              {discount.code && (
+                <div className="flex justify-between text-green-600 text-sm">
+                  <span>Discount ({discount.code})</span>
+                  <span>-${discount.amount.toFixed(2)}</span>
+                </div>
+              )}
 
-export function useCart() {
-  return useContext(CartContext);
+              <div className="border-t pt-4 space-y-2 text-sm">
+                <div className="flex justify-between"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>Delivery</span><span className="text-green-600 font-medium">FREE</span></div>
+              </div>
+              <div className="border-t pt-4 flex justify-between font-bold text-lg"><span>Total</span><span>${total.toFixed(2)}</span></div>
+              <button onClick={handlePayment} disabled={loading} className="w-full mt-4 h-12 bg-black text-white font-semibold rounded disabled:opacity-70">
+                {loading ? 'Processing...' : `Pay $${total.toFixed(2)}`}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
