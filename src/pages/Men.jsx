@@ -23,12 +23,19 @@ export default function Men() {
     }
 
     try {
-      const params = {
-        category: 'Men',
-        subCategory: filters.subCategory || '',  // 🟢 FIX: only subCategory
+      // 🟢 SMART LOGIC: Agar user Shoes/Accessories select kare, toh category change ho jayegi!
+      let params = {
         page: page,
         limit: 8
       };
+
+      if (filters.category === 'Shoes' || filters.category === 'Accessories') {
+        params.category = filters.category; // Fetch directly from Shoes or Accessories DB
+        if (filters.subCategory) params.subCategory = filters.subCategory;
+      } else {
+        params.category = 'Men'; // Default to Men (for Clothing)
+        if (filters.subCategory) params.subCategory = filters.subCategory;
+      }
 
       if (filters.sort) {
         if (filters.sort === 'price-low') params.sort = 'price_asc';

@@ -6,6 +6,7 @@ import FilterBottomSheet from '../components/FilterBottomSheet';
 export default function Women() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -14,7 +15,7 @@ export default function Women() {
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const fetchWomenProducts = async (page = 1, reset = false) => {
+  const fetchWomenProducts = async (page = 1, reset = false, filters = {}) => {
     if (reset) {
       setLoading(true);
       setProducts([]);
@@ -22,30 +23,44 @@ export default function Women() {
     }
 
     try {
-      const res = await axiosClient.get('/api/products', { params: { category: 'Women', page: page, limit: 8 } });
+      let params = { page: page, limit: 8 };
+
+      if (filters.category === 'Shoes' || filters.category === 'Accessories') {
+        params.category = filters.category;
+        if (filters.subCategory) params.subCategory = filters.subCategory;
+      } else {
+        params.category = 'Women';
+        if (filters.subCategory) params.subCategory = filters.subCategory;
+      }
+
+      if (filters.sort) {
+        if (filters.sort === 'price-low') params.sort = 'price_asc';
+        else if (filters.sort === 'price-high') params.sort = 'price_desc';
+        else if (filters.sort === 'newest') params.sort = 'newest';
+      }
+      if (filters.price && filters.price < 200) params.maxPrice = filters.price;
+
+      const res = await axiosClient.get('/api/products', { params });
       
-      const { products: newProducts, totalCount, currentPage: pageReturned, totalPages } = res.data;
+      const { products: newProducts, totalCount: newTotalCount, currentPage: pageReturned, totalPages } = res.data;
 
       if (reset) {
-        setProducts(newProducts);
-        setFilteredProducts(newProducts);
+        setProducts(newProducts || []);
+        setFilteredProducts(newProducts || []);
+        setTotalCount(newTotalCount || 0);
       } else {
-        setProducts(prev => [...prev, ...newProducts]);
-        setFilteredProducts(prev => [...prev, ...newProducts]);
+        setProducts(prev => [...prev, ...(newProducts || [])]);
+        setFilteredProducts(prev => [...prev, ...(newProducts || [])]);
       }
       
-      setCurrentPage(pageReturned);
-      
-      if (pageReturned >= totalPages) {
-        setHasMore(false);
-      } else {
-        setHasMore(true);
-      }
+      setCurrentPage(pageReturned || 1);
+      setHasMore(pageReturned < totalPages);
     } catch (error) {
       console.error('Error fetching women products:', error);
       if (reset) {
         setProducts([]);
         setFilteredProducts([]);
+        setTotalCount(0);
       }
     } finally {
       setLoading(false);
@@ -63,17 +78,15 @@ export default function Women() {
   };
 
   const applyFilters = (filters) => {
-    setProducts([]);
     setFilteredProducts([]);
     setHasMore(true);
-    fetchWomenProducts(1, true);
+    fetchWomenProducts(1, true, filters);
   };
 
   const clearFilters = () => {
-    setProducts([]);
     setFilteredProducts([]);
     setHasMore(true);
-    fetchWomenProducts(1, true);
+    fetchWomenProducts(1, true, {});
   };
 
   return (
@@ -126,11 +139,12 @@ export default function Women() {
 
       <FilterBottomSheet 
         isOpen={isFilterOpen} 
-        onClose={() => setIsFilterOpen(false)}
-        onApply={applyFilters}
-        onClear={clearFilters}
-        products={products}
-        defaultCategory="Women"
+        onClose={() => setIsFilterOpen(false)} 
+        onApply={applyFilters} 
+        onClear={clearFilters} 
+        products={filteredProducts} 
+        defaultCategory="Women" 
+        totalCount={totalCount}
       />
     </div>
   );
