@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-// 🟢 CATEGORY HIERARCHY DATA
 const CATEGORIES = {
   Clothing: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
   Shoes: ['Sneakers', 'Running Shoes', 'Casual Shoes', 'Formal Shoes', 'Loafers', 'Boots', 'Sandals'],
@@ -13,7 +12,8 @@ export default function FilterBottomSheet({
   onApply, 
   onClear, 
   products, 
-  defaultCategory = '' 
+  defaultCategory = '',
+  totalCount = 0 
 }) {
   const [localFilters, setLocalFilters] = useState({
     sort: 'featured',
@@ -22,16 +22,28 @@ export default function FilterBottomSheet({
     price: 200,
   });
 
+  // 🟢 FIX: Frontend par count calculate karo (Taaki button par exact count dikhe)
   const getFilteredCount = () => {
     let result = [...products];
+    
     if (localFilters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (localFilters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     
-    if (localFilters.category) {
-      result = result.filter(p => p.category.toLowerCase() === localFilters.category.toLowerCase());
-    }
-    if (localFilters.subCategory) {
-      result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
+    if (defaultCategory) {
+      // Agar user 'Men' page par hai, toh 'Clothing' ko subCategory ki tarah filter karo
+      if (localFilters.category && localFilters.category !== defaultCategory) {
+        result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.category.toLowerCase());
+      }
+      if (localFilters.subCategory) {
+        result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
+      }
+    } else {
+      if (localFilters.category) {
+        result = result.filter(p => p.category.toLowerCase() === localFilters.category.toLowerCase());
+      }
+      if (localFilters.subCategory) {
+        result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
+      }
     }
     if (localFilters.price) {
       result = result.filter(p => p.price <= parseInt(localFilters.price));
@@ -43,7 +55,6 @@ export default function FilterBottomSheet({
   const activeFilterCount = Object.values(localFilters).filter(v => v !== '' && v !== 'featured' && v !== 200).length;
 
   const handleChange = (key, value) => {
-    // 🟢 FIX: Agar user main category change kare, toh subCategory clear ho jaye
     if (key === 'category') {
       setLocalFilters(prev => ({ ...prev, category: value, subCategory: '' }));
     } else {
@@ -57,7 +68,16 @@ export default function FilterBottomSheet({
   };
 
   const handleApply = () => {
-    onApply(localFilters);
+    let finalFilters = { ...localFilters };
+    // 🟢 SMART LOGIC: Agar page category-specific hai, toh 'category' ko 'subCategory' map kar do
+    if (defaultCategory) {
+      finalFilters = {
+        ...localFilters,
+        category: defaultCategory, 
+        subCategory: localFilters.category !== defaultCategory ? localFilters.category : localFilters.subCategory
+      };
+    }
+    onApply(finalFilters);
     onClose();
   };
 
@@ -78,7 +98,6 @@ export default function FilterBottomSheet({
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 pb-24">
-          {/* SORT BY */}
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Sort By</p>
             <select 
@@ -93,7 +112,6 @@ export default function FilterBottomSheet({
             </select>
           </div>
 
-          {/* 🟢 NEW HIERARCHY CATEGORY SELECTION */}
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Category</p>
             <div className="flex flex-wrap gap-2 mb-2">
@@ -115,7 +133,7 @@ export default function FilterBottomSheet({
               })}
             </div>
 
-            {/* 🟢 SUB-CATEGORY ACCORDION (Dikhega sirf jab main category select ho) */}
+            {/* Sub-Category Accordion */}
             {localFilters.category && CATEGORIES[localFilters.category] && (
               <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-xs font-medium text-gray-600 mb-2">Select Sub-Category (Optional)</p>
@@ -141,7 +159,6 @@ export default function FilterBottomSheet({
             )}
           </div>
 
-          {/* PRICE */}
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Price</p>
             <div className="space-y-4">

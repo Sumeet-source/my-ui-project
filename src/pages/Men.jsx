@@ -6,6 +6,7 @@ import FilterBottomSheet from '../components/FilterBottomSheet';
 export default function Men() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [totalCount, setTotalCount] = useState(0); // 🟢 Backend se exact count lene ke liye
   const [loading, setLoading] = useState(true);
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -14,7 +15,6 @@ export default function Men() {
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // 🟢 UPDATED: Ab filters ko accept karta hai aur backend ko dynamic params bhejta hai
   const fetchMenProducts = async (page = 1, reset = false, filters = {}) => {
     if (reset) {
       setLoading(true);
@@ -23,33 +23,29 @@ export default function Men() {
     }
 
     try {
-      // 🟢 FIX: Dynamic params build karo
+      // 🟢 FIX: Hamesha 'Men' category bhejo, aur user ka selection 'subCategory' ban jayega
       const params = {
-        category: filters.category || 'Men', // Agar filter mein category hai toh wo bhejo, warna default 'Men'
+        category: 'Men', 
+        subCategory: filters.subCategory || (filters.category !== 'Men' ? filters.category : ''),
         page: page,
         limit: 8
       };
 
-      // 🟢 Sort logic add kiya
       if (filters.sort) {
         if (filters.sort === 'price-low') params.sort = 'price_asc';
         else if (filters.sort === 'price-high') params.sort = 'price_desc';
         else if (filters.sort === 'newest') params.sort = 'newest';
-        // 'featured' default hai, kuch bhejne ki zaroorat nahi
       }
-
-      // 🟢 Price filter add kiya
-      if (filters.price && filters.price < 200) {
-        params.maxPrice = filters.price;
-      }
+      if (filters.price && filters.price < 200) params.maxPrice = filters.price;
 
       const res = await axiosClient.get('/api/products', { params });
       
-      const { products: newProducts, totalCount, currentPage: pageReturned, totalPages } = res.data;
+      const { products: newProducts, totalCount: newTotalCount, currentPage: pageReturned, totalPages } = res.data;
 
       if (reset) {
         setProducts(newProducts || []);
         setFilteredProducts(newProducts || []);
+        setTotalCount(newTotalCount || 0); // 🟢 Store exact count
       } else {
         setProducts(prev => [...prev, ...(newProducts || [])]);
         setFilteredProducts(prev => [...prev, ...(newProducts || [])]);
@@ -62,6 +58,7 @@ export default function Men() {
       if (reset) {
         setProducts([]);
         setFilteredProducts([]);
+        setTotalCount(0);
       }
     } finally {
       setLoading(false);
@@ -78,16 +75,14 @@ export default function Men() {
     fetchMenProducts(currentPage + 1);
   };
 
-  // UPDATED: Apply filters ko backend call se connect kar diya
-   const applyFilters = (filters) => {
-    setProducts([]);
+  const applyFilters = (filters) => {
+    // 🟢 FIX: Products ko turant empty mat karo, taaki count 0 na dikhe
     setFilteredProducts([]);
     setHasMore(true);
-    fetchMenProducts(1, true, filters); // Ab filters object mein subCategory bhi aa jayega
+    fetchMenProducts(1, true, filters);
   };
-  // UPDATED: Clear filters mein empty object bhejo taaki default 'Men' category load ho
+
   const clearFilters = () => {
-    setProducts([]);
     setFilteredProducts([]);
     setHasMore(true);
     fetchMenProducts(1, true, {});
@@ -141,7 +136,15 @@ export default function Men() {
         </div>
       )}
 
-      <FilterBottomSheet isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} onApply={applyFilters} onClear={clearFilters} products={products} defaultCategory="Men" />
+      <FilterBottomSheet 
+        isOpen={isFilterOpen} 
+        onClose={() => setIsFilterOpen(false)} 
+        onApply={applyFilters} 
+        onClear={clearFilters} 
+        products={filteredProducts} 
+        defaultCategory="Men" 
+        totalCount={totalCount} // 🟢 Exact count bhej rahe hain
+      />
     </div>
   );
 }
