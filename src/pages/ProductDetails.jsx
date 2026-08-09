@@ -91,12 +91,12 @@ export default function ProductDetails() {
   // 🟢 FIXED: category match ab REQUIRED hai (AND), pehle OR tha jisme dono products
   // ka subCategory blank/undefined hone par (undefined === undefined = true) 
   // category match kiye bina hi related dikha deta tha.
+    // Category aur SubCategory ke hisaab se related products
   let relatedProducts = allProducts.filter((p) => 
     p._id !== product._id && 
     normalize(p.category) === normalize(product.category)
   );
 
-  // Same category ke andar, agar subCategory available hai to usse aur tight/relevant banao
   if (product.subCategory) {
     const sameSubCategory = relatedProducts.filter(
       (p) => normalize(p.subCategory) === normalize(product.subCategory)
@@ -108,6 +108,24 @@ export default function ProductDetails() {
 
   relatedProducts = relatedProducts.slice(0, 8);
 
+  // 🟢 BULLETPROOF FALLBACK (Tier 1: Same category, Tier 2: Sitewide)
+  let fallbackCategory = product.category;
+  const titleLower = product.title.toLowerCase();
+  if (titleLower.includes("women's")) fallbackCategory = 'Women';
+  else if (titleLower.includes("men's")) fallbackCategory = 'Men';
+  else if (titleLower.includes("shoes")) fallbackCategory = 'Shoes';
+  else if (titleLower.includes("accessories")) fallbackCategory = 'Accessories';
+
+  const fallbackRelated = allProducts
+    .filter(p => normalize(p.category) === normalize(fallbackCategory) && p._id !== product._id)
+    .slice(0, 8);
+
+  // 🟢 FINAL FALLBACK (Tier 2: Agar same category mein bhi kuch nahi mila, toh site ke top 8 products dikha do!)
+  const displayRelated = relatedProducts.length > 0 
+    ? relatedProducts 
+    : fallbackRelated.length > 0 
+      ? fallbackRelated 
+      : allProducts.slice(0, 8);
   // 🟢 BULLETPROOF FALLBACK: Title ke hisaab se category guess karo
   // (sirf tab use hota hai jab product.category khud missing/wrong ho)
   let fallbackCategory = product.category;
