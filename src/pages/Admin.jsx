@@ -317,13 +317,12 @@ export default function AdminDashboard() {
                 {orders.map((order) => (
                   <div key={order._id || order.id} className="p-4 border border-gray-200 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex-1">
-                      {/* 🟢 UPDATED: Customer Details Added Here */}
                       <p className="font-medium text-gray-900">Order #{order._id || order.id}</p>
                       
-                      {/* Customer Info */}
+                      {/* 🟢 FINAL FIX: order.user?.name hata diya! */}
                       <div className="mt-1 space-y-0.5">
                         <p className="text-xs text-gray-700">
-                          <span className="font-semibold">Customer:</span> {order.shippingAddress?.fullName || order.user?.name || 'Guest'}
+                          <span className="font-semibold">Customer:</span> {order.shippingAddress?.fullName || 'Guest'}
                         </p>
                         <p className="text-xs text-gray-700">
                           <span className="font-semibold">Phone:</span> {order.shippingAddress?.phone || 'N/A'}
@@ -334,7 +333,6 @@ export default function AdminDashboard() {
                       <p className="text-xs text-gray-500">Current: {order.status ?? 'Pending'}</p>
                     </div>
                     
-                    {/* Status Dropdown */}
                     <div className="flex items-center gap-2 mt-2 sm:mt-0">
                       <select 
                         value={order.status || 'Pending'} 
