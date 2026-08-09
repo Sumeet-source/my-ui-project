@@ -90,8 +90,7 @@ export default function ProductDetails() {
 
   // 🟢 FIXED: category match ab REQUIRED hai (AND), pehle OR tha jisme dono products
   // ka subCategory blank/undefined hone par (undefined === undefined = true) 
-  // category match kiye bina hi related dikha deta tha — isi wajah se "diva", "Luffy" 
-  // jaise unrelated products Women's Scarf ke sath aa rahe the.
+  // category match kiye bina hi related dikha deta tha.
   let relatedProducts = allProducts.filter((p) => 
     p._id !== product._id && 
     normalize(p.category) === normalize(product.category)
@@ -221,7 +220,7 @@ export default function ProductDetails() {
           <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
 
-        {/* You Might Also Like */}
+        {/* 🟢 UPDATED: You Might Also Like (Now with strict AND logic) */}
         {displayRelated.length > 0 && (
           <div className="px-4 py-6 border-t border-gray-100">
             <h2 className="text-base font-bold text-gray-900 mb-4">You Might Also Like</h2>
