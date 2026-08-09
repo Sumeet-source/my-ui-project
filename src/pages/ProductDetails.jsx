@@ -35,10 +35,21 @@ export default function ProductDetails() {
     try {
       setLoading(true);
       const allRes = await axiosClient.get('/api/products');
-      setAllProducts(Array.isArray(allRes.data) ? allRes.data : []);
+      
+      let allData = allRes.data;
+      if (Array.isArray(allData)) {
+        allData = allData;
+      } else if (allData && Array.isArray(allData.products)) {
+        allData = allData.products;
+      } else if (allData && Array.isArray(allData.data)) {
+        allData = allData.data;
+      } else {
+        allData = [];
+      }
+      setAllProducts(allData);
 
       const singleRes = await axiosClient.get(`/api/products/${id}`);
-      if (!singleRes.data || typeof singleRes.data !== 'object' || Object.keys(singleRes.data).length === 0) {
+      if (!singleRes.data || Object.keys(singleRes.data).length === 0) {
         setProduct(null);
       } else {
         setProduct(singleRes.data);
@@ -54,7 +65,7 @@ export default function ProductDetails() {
   const fetchReviews = async () => {
     try {
       const res = await axiosClient.get(`/api/reviews/product/${id}`);
-      setReviews(Array.isArray(res.data) ? res.data : []);
+      setReviews(res.data);
     } catch (error) {
       console.error("Failed to fetch reviews", error);
       setReviews([]);
@@ -71,12 +82,19 @@ export default function ProductDetails() {
   };
 
   if (loading) return <div className="text-center py-20 text-lg text-gray-500">Loading product...</div>;
+  
   if (!product) return <div className="text-center py-20 text-xl text-gray-600">Product not found!</div>;
 
-  // 🟢 Safety Check: Ensure allProducts is an array before filtering
-  const relatedProducts = Array.isArray(allProducts)
-    ? allProducts.filter((p) => p.category === product.category && p._id !== product._id).slice(0, 8)
-    : [];
+  // 🟢 SMART RELATED PRODUCTS: Match by SubCategory OR Category
+  const relatedProducts = allProducts
+    .filter((p) => 
+      (p.subCategory === product.subCategory || p.category === product.category) && 
+      p._id !== product._id
+    )
+    .slice(0, 8);
+
+  // If still 0, show fallback: first 8 products from the site
+  const displayRelated = relatedProducts.length > 0 ? relatedProducts : allProducts.slice(0, 8);
 
   const handleAddToCart = () => {
     if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
@@ -106,9 +124,8 @@ export default function ProductDetails() {
     } catch (error) { showToast("Failed to submit review. Try again.", "error"); }
   };
 
-  const renderStars = (rating) => Array.from({ length: 5 }, (_, i) => <span key={i} className={i < Math.round(rating || 0) ? "text-yellow-400" : "text-gray-300"}>★</span>);
+  const renderStars = (rating) => Array.from({ length: 5 }, (_, i) => <span key={i} className={i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"}>★</span>);
 
-  // 🟢 Safety Check: images ko safely access karo
   const images = product.images?.length > 0 ? product.images : [product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'];
 
   return (
@@ -175,14 +192,22 @@ export default function ProductDetails() {
           <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
 
-        {/* You Might Also Like */}
-        {relatedProducts.length > 0 && (
+        {/* 🟢 RESTORED: You Might Also Like (Horizontal Rail) */}
+        {displayRelated.length > 0 && (
           <div className="px-4 py-6 border-t border-gray-100">
             <h2 className="text-base font-bold text-gray-900 mb-4">You Might Also Like</h2>
             <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory">
-              {relatedProducts.map((item) => (
+              {displayRelated.map((item) => (
                 <div key={item._id} className="min-w-[160px] snap-center">
-                  <ProductCard id={item._id} title={item.title} price={item.price} image={item.images?.[0] || item.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} rating={4.5} reviewsCount={reviews.length} inStock={item.inStock} />
+                  <ProductCard 
+                    id={item._id} 
+                    title={item.title} 
+                    price={item.price} 
+                    image={item.images?.[0] || item.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
+                    rating={4.5} 
+                    reviewsCount={reviews.length} 
+                    inStock={item.inStock} 
+                  />
                 </div>
               ))}
             </div>
@@ -226,7 +251,6 @@ export default function ProductDetails() {
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
                 </span>
               </div>
-              {/* Desktop Heart Button */}
               <button type="button" onClick={handleWishlistToggle} className="absolute top-4 right-4 p-3 bg-white/80 rounded-full hover:bg-white hover:scale-110 transition duration-200 z-20 shadow-md">
                 <svg className={`w-6 h-6 transition duration-200 ${isInWishlist(product._id) ? 'fill-red-500 text-red-500' : 'text-gray-700 hover:text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
