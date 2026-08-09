@@ -6,6 +6,7 @@ import FilterBottomSheet from '../components/FilterBottomSheet';
 export default function Outlet() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -14,7 +15,7 @@ export default function Outlet() {
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const fetchOutletProducts = async (page = 1, reset = false) => {
+  const fetchOutletProducts = async (page = 1, reset = false, filters = {}) => {
     if (reset) {
       setLoading(true);
       setProducts([]);
@@ -22,30 +23,44 @@ export default function Outlet() {
     }
 
     try {
-      const res = await axiosClient.get('/api/products', { params: { category: 'Outlet', page: page, limit: 8 } });
+      let params = { page: page, limit: 8 };
+
+      if (filters.category === 'Shoes' || filters.category === 'Accessories') {
+        params.category = filters.category;
+        if (filters.subCategory) params.subCategory = filters.subCategory;
+      } else {
+        params.category = 'Outlet';
+        if (filters.subCategory) params.subCategory = filters.subCategory;
+      }
+
+      if (filters.sort) {
+        if (filters.sort === 'price-low') params.sort = 'price_asc';
+        else if (filters.sort === 'price-high') params.sort = 'price_desc';
+        else if (filters.sort === 'newest') params.sort = 'newest';
+      }
+      if (filters.price && filters.price < 200) params.maxPrice = filters.price;
+
+      const res = await axiosClient.get('/api/products', { params });
       
-      const { products: newProducts, totalCount, currentPage: pageReturned, totalPages } = res.data;
+      const { products: newProducts, totalCount: newTotalCount, currentPage: pageReturned, totalPages } = res.data;
 
       if (reset) {
-        setProducts(newProducts);
-        setFilteredProducts(newProducts);
+        setProducts(newProducts || []);
+        setFilteredProducts(newProducts || []);
+        setTotalCount(newTotalCount || 0);
       } else {
-        setProducts(prev => [...prev, ...newProducts]);
-        setFilteredProducts(prev => [...prev, ...newProducts]);
+        setProducts(prev => [...prev, ...(newProducts || [])]);
+        setFilteredProducts(prev => [...prev, ...(newProducts || [])]);
       }
       
-      setCurrentPage(pageReturned);
-      
-      if (pageReturned >= totalPages) {
-        setHasMore(false);
-      } else {
-        setHasMore(true);
-      }
+      setCurrentPage(pageReturned || 1);
+      setHasMore(pageReturned < totalPages);
     } catch (error) {
       console.error('Error fetching outlet products:', error);
       if (reset) {
         setProducts([]);
         setFilteredProducts([]);
+        setTotalCount(0);
       }
     } finally {
       setLoading(false);
@@ -63,23 +78,25 @@ export default function Outlet() {
   };
 
   const applyFilters = (filters) => {
-    setProducts([]);
     setFilteredProducts([]);
     setHasMore(true);
-    fetchOutletProducts(1, true);
+    fetchOutletProducts(1, true, filters);
   };
 
   const clearFilters = () => {
-    setProducts([]);
     setFilteredProducts([]);
     setHasMore(true);
-    fetchOutletProducts(1, true);
+    fetchOutletProducts(1, true, {});
   };
 
   return (
     <div className="p-6 md:p-10 bg-white min-h-screen">
+      
+      {/* 🟢 SIMPLE THIN HEADER FOR OUTLET */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">FORGE Outlet</h1>
+        <h1 className="text-2xl font-light tracking-wide text-gray-900 uppercase">
+          Outlet
+        </h1>
         <button onClick={() => setIsFilterOpen(true)} className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded text-sm font-medium hover:bg-gray-200 transition">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
           Filters · Sort
@@ -126,11 +143,12 @@ export default function Outlet() {
 
       <FilterBottomSheet 
         isOpen={isFilterOpen} 
-        onClose={() => setIsFilterOpen(false)}
-        onApply={applyFilters}
-        onClear={clearFilters}
-        products={products}
-        defaultCategory="Outlet"
+        onClose={() => setIsFilterOpen(false)} 
+        onApply={applyFilters} 
+        onClear={clearFilters} 
+        products={filteredProducts} 
+        defaultCategory="Outlet" 
+        totalCount={totalCount}
       />
     </div>
   );
