@@ -88,15 +88,13 @@ export default function ProductDetails() {
   // 🟢 Helper: safe string compare (handles undefined/null/casing/whitespace)
   const normalize = (val) => (val || '').toString().trim().toLowerCase();
 
-  // 🟢 FIXED: category match ab REQUIRED hai (AND), pehle OR tha jisme dono products
-  // ka subCategory blank/undefined hone par (undefined === undefined = true) 
-  // category match kiye bina hi related dikha deta tha.
-    // Category aur SubCategory ke hisaab se related products
+  // 🟢 FIXED & CLEANED: Category match ab REQUIRED hai (AND logic)
   let relatedProducts = allProducts.filter((p) => 
     p._id !== product._id && 
     normalize(p.category) === normalize(product.category)
   );
 
+  // Same category ke andar, agar subCategory available hai to usse aur tight/relevant banao
   if (product.subCategory) {
     const sameSubCategory = relatedProducts.filter(
       (p) => normalize(p.subCategory) === normalize(product.subCategory)
@@ -108,7 +106,7 @@ export default function ProductDetails() {
 
   relatedProducts = relatedProducts.slice(0, 8);
 
-  // 🟢 BULLETPROOF FALLBACK (Tier 1: Same category, Tier 2: Sitewide)
+  // 🟢 BULLETPROOF FALLBACK: Title ke hisaab se category guess karo (sirf tab jab product.category missing/wrong ho)
   let fallbackCategory = product.category;
   const titleLower = product.title.toLowerCase();
   if (titleLower.includes("women's")) fallbackCategory = 'Women';
@@ -120,27 +118,12 @@ export default function ProductDetails() {
     .filter(p => normalize(p.category) === normalize(fallbackCategory) && p._id !== product._id)
     .slice(0, 8);
 
-  // 🟢 FINAL FALLBACK (Tier 2: Agar same category mein bhi kuch nahi mila, toh site ke top 8 products dikha do!)
+  // 🟢 ULTIMATE FALLBACK: Agar kuch bhi match nahi mila, toh site ke top 8 products dikha do!
   const displayRelated = relatedProducts.length > 0 
     ? relatedProducts 
     : fallbackRelated.length > 0 
       ? fallbackRelated 
       : allProducts.slice(0, 8);
-  // 🟢 BULLETPROOF FALLBACK: Title ke hisaab se category guess karo
-  // (sirf tab use hota hai jab product.category khud missing/wrong ho)
-  let fallbackCategory = product.category;
-  const titleLower = product.title.toLowerCase();
-  if (titleLower.includes("women's")) fallbackCategory = 'Women';
-  else if (titleLower.includes("men's")) fallbackCategory = 'Men';
-  else if (titleLower.includes("shoes")) fallbackCategory = 'Shoes';
-  else if (titleLower.includes("accessories")) fallbackCategory = 'Accessories';
-
-  const fallbackRelated = allProducts
-    .filter(p => normalize(p.category) === normalize(fallbackCategory) && p._id !== product._id)
-    .slice(0, 8);
-
-  // Use the related, otherwise use the filtered fallback
-  const displayRelated = relatedProducts.length > 0 ? relatedProducts : fallbackRelated;
 
   const handleAddToCart = () => {
     if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
@@ -238,8 +221,8 @@ export default function ProductDetails() {
           <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
 
-        {/* 🟢 UPDATED: You Might Also Like (Now with strict AND logic) */}
-        {displayRelated.length > 0 && (
+        {/* 🟢 CLEAN & ULTIMATE FALLBACK: You Might Also Like */}
+        {displayRelated.length > 0 ? (
           <div className="px-4 py-6 border-t border-gray-100">
             <h2 className="text-base font-bold text-gray-900 mb-4">You Might Also Like</h2>
             <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory">
@@ -257,6 +240,11 @@ export default function ProductDetails() {
                 </div>
               ))}
             </div>
+          </div>
+        ) : (
+          <div className="px-4 py-6 border-t border-gray-100">
+            <h2 className="text-base font-bold text-gray-900 mb-4">You Might Also Like</h2>
+            <p className="text-sm text-gray-500 italic">No similar products found in this category yet.</p>
           </div>
         )}
 
