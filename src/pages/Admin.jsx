@@ -308,16 +308,92 @@ export default function AdminDashboard() {
           </>
         )}
 
-        {activeTab === 'orders' && (
+                {activeTab === 'orders' && (
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold mb-4">Order History</h2>
-            {orders.length === 0 ? (<p className="text-gray-500 text-center py-8">No orders found.</p>) : (
+            {orders.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">No orders found.</p>
+            ) : (
               <div className="space-y-4">
                 {orders.map((order) => (
                   <div key={order._id || order.id} className="p-4 border border-gray-200 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex-1"><p className="font-medium text-gray-900">Order #{order._id || order.id}</p><p className="text-sm text-gray-600 mt-1">Total: ${order.totalAmount ?? order.total ?? order.amount ?? '0.00'}</p><p className="text-xs text-gray-500">Current: {order.status ?? 'Pending'}</p></div>
-                    <div className="flex items-center gap-2">
-                      <select value={order.status || 'Pending'} onChange={(e) => handleStatusUpdate(order._id, e.target.value)} className="px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:border-black"><option value="Pending">Pending</option><option value="Processing">Processing</option><option value="Shipped">Shipped</option><option value="Delivered">Delivered</option><option value="Cancelled">Cancelled</option></select>
+                    <div className="flex-1">
+                      {/* 🟢 UPDATED: Customer Details Added Here */}
+                      <p className="font-medium text-gray-900">Order #{order._id || order.id}</p>
+                      
+                      {/* Customer Info */}
+                      <div className="mt-1 space-y-0.5">
+                        <p className="text-xs text-gray-700">
+                          <span className="font-semibold">Customer:</span> {order.shippingAddress?.fullName || order.user?.name || 'Guest'}
+                        </p>
+                        <p className="text-xs text-gray-700">
+                          <span className="font-semibold">Phone:</span> {order.shippingAddress?.phone || 'N/A'}
+                        </p>
+                      </div>
+
+                      <p className="text-sm text-gray-600 mt-1">Total: ${order.totalAmount ?? order.total ?? order.amount ?? '0.00'}</p>
+                      <p className="text-xs text-gray-500">Current: {order.status ?? 'Pending'}</p>
+                    </div>
+                    
+                    {/* Status Dropdown */}
+                    <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                      <select 
+                        value={order.status || 'Pending'} 
+                        onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:border-black"
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}        {activeTab === 'orders' && (
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <h2 className="text-xl font-semibold mb-4">Order History</h2>
+            {orders.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">No orders found.</p>
+            ) : (
+              <div className="space-y-4">
+                {orders.map((order) => (
+                  <div key={order._id || order.id} className="p-4 border border-gray-200 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex-1">
+                      {/* 🟢 UPDATED: Customer Details Added Here */}
+                      <p className="font-medium text-gray-900">Order #{order._id || order.id}</p>
+                      
+                      {/* Customer Info */}
+                      <div className="mt-1 space-y-0.5">
+                        <p className="text-xs text-gray-700">
+                          <span className="font-semibold">Customer:</span> {order.shippingAddress?.fullName || order.user?.name || 'Guest'}
+                        </p>
+                        <p className="text-xs text-gray-700">
+                          <span className="font-semibold">Phone:</span> {order.shippingAddress?.phone || 'N/A'}
+                        </p>
+                      </div>
+
+                      <p className="text-sm text-gray-600 mt-1">Total: ${order.totalAmount ?? order.total ?? order.amount ?? '0.00'}</p>
+                      <p className="text-xs text-gray-500">Current: {order.status ?? 'Pending'}</p>
+                    </div>
+                    
+                    {/* Status Dropdown */}
+                    <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                      <select 
+                        value={order.status || 'Pending'} 
+                        onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:border-black"
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
                     </div>
                   </div>
                 ))}
