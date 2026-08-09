@@ -99,10 +99,10 @@ export default function Dashboard() {
             </div>
           </div>
           
-          {/* 🟢 PERFECT COMPACT LOGOUT BUTTON */}
+          {/* 🟢 BULLETPROOF LOGOUT BUTTON (self-end ensures mobile alignment) */}
           <button 
             onClick={handleLogout} 
-            className="flex items-center justify-center gap-2 px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition text-sm font-medium w-max ml-auto sm:ml-0"
+            className="flex items-center justify-center gap-2 px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition text-sm font-medium w-max ml-auto self-end sm:ml-0 sm:self-auto"
           >
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
