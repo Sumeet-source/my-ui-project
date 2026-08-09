@@ -23,17 +23,16 @@ export default function Men() {
     }
 
     try {
-      // 🟢 SMART LOGIC: Agar user Shoes/Accessories select kare, toh category change ho jayegi!
       let params = {
         page: page,
         limit: 8
       };
 
       if (filters.category === 'Shoes' || filters.category === 'Accessories') {
-        params.category = filters.category; // Fetch directly from Shoes or Accessories DB
+        params.category = filters.category;
         if (filters.subCategory) params.subCategory = filters.subCategory;
       } else {
-        params.category = 'Men'; // Default to Men (for Clothing)
+        params.category = 'Men';
         if (filters.subCategory) params.subCategory = filters.subCategory;
       }
 
@@ -96,22 +95,13 @@ export default function Men() {
   return (
     <div className="p-6 md:p-10 bg-white min-h-screen">
       
-      {/* 🟢 PREMIUM ELEGANT HEADER (Upgraded) */}
-      <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-6">
-        <div>
-          <h1 className="font-headline-lg text-4xl tracking-wide text-gray-900">
-            FORGE Men's
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">Curated for your everyday edge.</p>
-        </div>
-        
-        <button 
-          onClick={() => setIsFilterOpen(true)} 
-          className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition shadow-sm"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
+      {/* 🟢 SIMPLE THIN HEADER */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-light tracking-wide text-gray-900 uppercase">
+          Men's
+        </h1>
+        <button onClick={() => setIsFilterOpen(true)} className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded text-sm font-medium hover:bg-gray-200 transition">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
           Filters · Sort
         </button>
       </div>
