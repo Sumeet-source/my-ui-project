@@ -85,8 +85,7 @@ export default function ProductDetails() {
   
   if (!product) return <div className="text-center py-20 text-xl text-gray-600">Product not found!</div>;
 
-  // SMART RELATED PRODUCTS: Match by SubCategory OR Category
-  //  SMART RELATED PRODUCTS: Match by SubCategory OR Category
+  // 🟢 SMART RELATED PRODUCTS: Match by SubCategory OR Category
   const relatedProducts = allProducts
     .filter((p) => 
       (p.subCategory === product.subCategory || p.category === product.category) && 
@@ -94,13 +93,21 @@ export default function ProductDetails() {
     )
     .slice(0, 8);
 
-  //  FIXED FALLBACK: Agar koi match nahi mila, toh sirf same main category ke products dikhao (Men par Men, Women par Women)
+  // 🟢 BULLETPROOF FALLBACK: Title ke hisaab se category guess karo
+  let fallbackCategory = product.category;
+  const titleLower = product.title.toLowerCase();
+  if (titleLower.includes("women's")) fallbackCategory = 'Women';
+  else if (titleLower.includes("men's")) fallbackCategory = 'Men';
+  else if (titleLower.includes("shoes")) fallbackCategory = 'Shoes';
+  else if (titleLower.includes("accessories")) fallbackCategory = 'Accessories';
+
   const fallbackRelated = allProducts
-    .filter(p => p.category === product.category && p._id !== product._id)
+    .filter(p => p.category === fallbackCategory && p._id !== product._id)
     .slice(0, 8);
 
   // Use the related, otherwise use the filtered fallback
   const displayRelated = relatedProducts.length > 0 ? relatedProducts : fallbackRelated;
+
   const handleAddToCart = () => {
     if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
     if (!selectedSize) { showToast("Please select a size!", "error"); return; }
@@ -197,7 +204,7 @@ export default function ProductDetails() {
           <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
 
-        {/* RESTORED: You Might Also Like (Horizontal Rail) */}
+        {/* You Might Also Like */}
         {displayRelated.length > 0 && (
           <div className="px-4 py-6 border-t border-gray-100">
             <h2 className="text-base font-bold text-gray-900 mb-4">You Might Also Like</h2>
