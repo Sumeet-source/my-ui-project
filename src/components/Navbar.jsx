@@ -101,8 +101,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* 🔥 UPDATED LOGO */}
-                {/* 🔥 NEW STYLISH LOGO COMPONENT */}
+        {/* 🔥 NEW STYLISH LOGO COMPONENT (DESKTOP) */}
         <ForgeLogo />
 
         {/* Mobile Right Icons */}
@@ -148,68 +147,35 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* 🔥 UPDATED MOBILE FULL-SCREEN SEARCH OVERLAY (Myntra Style) */}
+      {/* --- MOBILE FULL-SCREEN SEARCH OVERLAY --- */}
       {isSearchOpen && (
         <div className="fixed inset-0 z-[9999] bg-white flex flex-col">
-          {/* Top Search Header */}
           <div className="flex items-center px-4 py-4 border-b border-gray-200 shadow-sm">
-            {/* Back/Cancel Button */}
-            <button 
-              onClick={() => setIsSearchOpen(false)} 
-              className="text-gray-600 text-base font-medium pr-4 hover:text-black transition"
-            >
+            <button onClick={() => setIsSearchOpen(false)} className="text-gray-600 text-base font-medium pr-4 hover:text-black transition">
               Cancel
             </button>
-            
-            {/* Search Input Wrapper - 🟢 FIX: Added 'min-w-0' */}
             <div className="flex-1 min-w-0 flex items-center bg-gray-100 rounded-full px-4 py-2">
               <svg className="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <input 
-                ref={inputRef}
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={handleSearchSubmit}
-                placeholder="Search for products, brands and more..." 
-                className="w-full bg-transparent text-base text-gray-900 focus:outline-none ml-3 placeholder-gray-400"
-                autoFocus
-              />
-              {/* Clear 'X' Button */}
+              <input ref={inputRef} type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} onKeyDown={handleSearchSubmit} placeholder="Search for products, brands and more..." className="w-full bg-transparent text-base text-gray-900 focus:outline-none ml-3 placeholder-gray-400" autoFocus />
               {searchInput.trim() !== '' && (
-                <button 
-                  onClick={handleSearchClear}
-                  className="text-gray-400 hover:text-gray-600 p-1 rounded-full transition"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                  </svg>
+                <button onClick={handleSearchClear} className="text-gray-400 hover:text-gray-600 p-1 rounded-full transition">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>
                 </button>
               )}
             </div>
-            
-            {/* Search Action Button */}
-            <button 
-              onClick={() => { if(searchInput.trim()) { navigate(`/search?q=${searchInput}`); setIsSearchOpen(false); } }}
-              className="ml-3 text-sm font-semibold text-black hover:underline"
-            >
+            <button onClick={() => { if(searchInput.trim()) { navigate(`/search?q=${searchInput}`); setIsSearchOpen(false); } }} className="ml-3 text-sm font-semibold text-black hover:underline">
               Search
             </button>
           </div>
-
-          {/* Suggestions / Trending Area */}
           <div className="flex-1 px-6 py-6 overflow-y-auto">
             {searchInput.trim() === '' ? (
               <>
                 <h3 className="text-sm font-bold text-gray-900 mb-4">Trending on FORGE</h3>
                 <div className="flex flex-wrap gap-2">
                   {['Men', 'Women', 'Shoes', 'Outlet', 'Hoodies', 'Leggings'].map((tag) => (
-                    <button 
-                      key={tag}
-                      onClick={() => { navigate(`/search?q=${tag}`); setIsSearchOpen(false); }}
-                      className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition"
-                    >
+                    <button key={tag} onClick={() => { navigate(`/search?q=${tag}`); setIsSearchOpen(false); }} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition">
                       {tag}
                     </button>
                   ))}
@@ -224,13 +190,15 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* --- MOBILE DRAWER --- */}
+      {/* --- MOBILE DRAWER (UPDATED LOGO) --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col overflow-hidden">
+          
+          {/* 🟢 FIXED MOBILE HEADER: Now uses the same exact ForgeLogo component as Desktop */}
           <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 shrink-0">
             <div className="flex-1"></div>
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0">
-              <span className="text-xl font-black tracking-[0.2em] text-black">FORGE</span>
+              <ForgeLogo />
             </Link>
             <div className="flex-1 flex justify-end">
               <button onClick={() => setIsMenuOpen(false)} className="text-black p-1">
