@@ -272,7 +272,6 @@ export default function AdminDashboard() {
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-8">
               <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
               <form onSubmit={handleAddProduct} className="space-y-4">
-                {/* Same Product Form as before */}
                 <div><label className="block text-sm font-semibold text-gray-900">Product Title</label><input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="e.g. Compression Shorts" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div><label className="block text-sm font-semibold text-gray-900">Price ($)</label><input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="49.99" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
@@ -308,53 +307,7 @@ export default function AdminDashboard() {
           </>
         )}
 
-                {activeTab === 'orders' && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <h2 className="text-xl font-semibold mb-4">Order History</h2>
-            {orders.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No orders found.</p>
-            ) : (
-              <div className="space-y-4">
-                {orders.map((order) => (
-                  <div key={order._id || order.id} className="p-4 border border-gray-200 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="flex-1">
-                      {/* 🟢 UPDATED: Customer Details Added Here */}
-                      <p className="font-medium text-gray-900">Order #{order._id || order.id}</p>
-                      
-                      {/* Customer Info */}
-                      <div className="mt-1 space-y-0.5">
-                        <p className="text-xs text-gray-700">
-                          <span className="font-semibold">Customer:</span> {order.shippingAddress?.fullName || order.user?.name || 'Guest'}
-                        </p>
-                        <p className="text-xs text-gray-700">
-                          <span className="font-semibold">Phone:</span> {order.shippingAddress?.phone || 'N/A'}
-                        </p>
-                      </div>
-
-                      <p className="text-sm text-gray-600 mt-1">Total: ${order.totalAmount ?? order.total ?? order.amount ?? '0.00'}</p>
-                      <p className="text-xs text-gray-500">Current: {order.status ?? 'Pending'}</p>
-                    </div>
-                    
-                    {/* Status Dropdown */}
-                    <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                      <select 
-                        value={order.status || 'Pending'} 
-                        onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:border-black"
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
-                      </select>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}        {activeTab === 'orders' && (
+        {activeTab === 'orders' && (
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold mb-4">Order History</h2>
             {orders.length === 0 ? (
