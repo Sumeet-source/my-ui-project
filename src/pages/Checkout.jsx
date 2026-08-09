@@ -28,28 +28,79 @@ export default function Checkout() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
 
+  // 🟢 NEW: Delivery availability & Location states
+  const [deliveryAvailable, setDeliveryAvailable] = useState(null); // null = not checked, true/false
+  const [checkingPincode, setCheckingPincode] = useState(false);
+
+  // 🟢 Auto-fetch Live Location on page load
   useEffect(() => {
-    const fetchDefaultAddress = async () => {
-      try {
-        const res = await axiosClient.get('/api/addresses');
-        if (res.data && Array.isArray(res.data)) {
-          const defaultAddr = res.data.find(addr => addr.isDefault === true);
-          if (defaultAddr) {
-            setAddress({
-              fullName: defaultAddr.fullName || '', street: defaultAddr.street || '',
-              city: defaultAddr.city || '', pincode: defaultAddr.pincode || '',
-              phone: defaultAddr.phone || ''
-            });
-          }
-        }
-      } catch (error) { console.log('Address API error'); }
-    };
-    if (user) fetchDefaultAddress();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`
+            );
+            const data = await res.json();
+            if (data?.address) {
+              const city = data.address.city || data.address.town || data.address.village || '';
+              const pincode = data.address.postcode || '';
+              if (pincode) {
+                setAddress(prev => ({ ...prev, city: city, pincode: pincode }));
+                checkDeliveryAvailability(pincode);
+              }
+            }
+          } catch (error) { console.log('Location auto-fetch failed.'); }
+        },
+        (error) => { console.log('Location permission denied.'); }
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDefaultAddress();
   }, [user]);
+
+  const fetchDefaultAddress = async () => {
+    try {
+      const res = await axiosClient.get('/api/addresses');
+      if (res.data && Array.isArray(res.data)) {
+        const defaultAddr = res.data.find(addr => addr.isDefault === true);
+        if (defaultAddr) {
+          setAddress({
+            fullName: defaultAddr.fullName || '', street: defaultAddr.street || '',
+            city: defaultAddr.city || '', pincode: defaultAddr.pincode || '',
+            phone: defaultAddr.phone || ''
+          });
+        }
+      }
+    } catch (error) { console.log('Address API error'); }
+  };
+
+  // 🟢 Check via Backend API
+  const checkDeliveryAvailability = async (pincodeToCheck = null) => {
+    const pincode = pincodeToCheck || address.pincode;
+    if (!pincode || pincode.length !== 6) {
+      setDeliveryAvailable(null);
+      return;
+    }
+    
+    setCheckingPincode(true);
+    try {
+      const res = await axiosClient.get(`/api/delivery/check/${pincode}`);
+      setDeliveryAvailable(res.data.success);
+    } catch (error) {
+      setDeliveryAvailable(false); // Default to false if API fails
+    } finally {
+      setCheckingPincode(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setAddress(prev => ({ ...prev, [name]: value }));
+    if (name === 'pincode') setDeliveryAvailable(null); // Reset check when pincode changes
   };
 
   const loadRazorpayScript = (src) => {
@@ -71,18 +122,18 @@ export default function Checkout() {
       showToast('Your cart is empty!', 'warning');
       return;
     }
+    if (!deliveryAvailable) {
+      showToast('We do not deliver to this pincode!', 'error');
+      return;
+    }
 
     setLoading(true);
     try {
       const orderData = {
         user: user?._id || user?.id || 'guest',
         items: cart.map(item => ({
-          productId: item.id,
-          title: item.title,
-          price: item.price,
-          quantity: item.quantity,
-          size: item.size,
-          image: item.image
+          productId: item.id, title: item.title, price: item.price,
+          quantity: item.quantity, size: item.size, image: item.image
         })),
         totalAmount: total,
         paymentMethod: paymentMethod,
@@ -91,45 +142,29 @@ export default function Checkout() {
 
       if (paymentMethod === 'Cash on Delivery') {
         const res = await axiosClient.post('/api/orders', orderData);
-        setPlacedOrder(res.data);
-        setShowConfirmation(true);
-        clearCart?.();
-        clearDiscount?.();
-      } 
-      else {
+        setPlacedOrder(res.data); setShowConfirmation(true);
+        clearCart?.(); clearDiscount?.();
+      } else {
         const orderRes = await axiosClient.post('/api/orders/create-razorpay-order', { amount: total });
         const { id: orderId, amount, currency } = orderRes.data;
         if (!orderId) throw new Error('Failed to create Razorpay order');
-
         if (!window.Razorpay) {
-          showToast('Razorpay SDK is still loading. Please try again in a moment.', 'warning');
-          setLoading(false);
-          return;
+          showToast('Razorpay SDK is still loading.', 'warning');
+          setLoading(false); return;
         }
-
         const options = {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_...',
           amount, currency, name: 'FORGE', description: 'Order Payment', order_id: orderId,
           handler: async (response) => {
             try {
-              // 🟢 ALERT HATA DIYA HAI! (Mobile par block nahi karega)
-
               const savedOrder = await axiosClient.post('/api/orders', {
                 ...orderData,
                 razorpayPaymentId: response.razorpay_payment_id,
                 razorpayOrderId: response.razorpay_order_id,
                 razorpaySignature: response.razorpay_signature
               });
-              
-              setPlacedOrder(savedOrder.data);
-              clearCart?.();
-              clearDiscount?.();
-
-              // 🟢 FIX: 500ms delay taaki mobile par Razorpay ka popup puri tarah band ho jaye
-              setTimeout(() => {
-                setShowConfirmation(true);
-              }, 500);
-
+              setPlacedOrder(savedOrder.data); clearCart?.(); clearDiscount?.();
+              setTimeout(() => setShowConfirmation(true), 500);
             } catch (saveError) {
               console.error('❌ Order save error:', saveError);
               alert('Payment successful, but failed to save order.\nError: ' + (saveError.response?.data?.message || saveError.message));
@@ -146,38 +181,25 @@ export default function Checkout() {
     } catch (error) {
       console.error('Payment error:', error);
       showToast(error.response?.data?.message || 'Failed to initiate payment', 'error');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white min-h-screen">
-      
-      {/* 🟢 CONFIRMATION MODAL */}
-      {showConfirmation && (
+      {showConfirmation && ( /* Confirmation Modal (Same as before) */
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 touch-none">
-          <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl text-center max-h-[90dvh] overflow-y-auto transform transition-all duration-300 scale-100">
+          <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl text-center max-h-[90dvh] overflow-y-auto">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-green-600 text-4xl font-bold">✓</span>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully! 🎉</h2>
             <p className="text-gray-600 mb-6">Your order has been received and will be processed and delivered soon.</p>
-            
             <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left text-sm">
               <p className="font-semibold text-gray-800">Order #{placedOrder?._id?.slice(-6) || 'N/A'}</p>
-              {/* 🟢 FIX: Total ab placedOrder se aa raha hai, ₹0 nahi dikhega! */}
               <p className="text-gray-600 mt-1">Total: ${(placedOrder?.totalAmount || total).toFixed(2)}</p>
               <p className="text-gray-600">Payment: {paymentMethod}</p>
             </div>
-
-            <button 
-              onClick={() => {
-                setShowConfirmation(false);
-                navigate('/dashboard');
-              }}
-              className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition"
-            >
+            <button onClick={() => { setShowConfirmation(false); navigate('/dashboard'); }} className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition">
               Go to Dashboard
             </button>
           </div>
@@ -188,13 +210,52 @@ export default function Checkout() {
         <div className="flex-1 bg-white p-6 lg:p-8 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-xl font-bold mb-5">Delivery Address</h2>
           <div className="space-y-5">
-            <div><label className="block text-sm font-medium text-gray-800 mb-1.5">Full Name</label><input type="text" name="fullName" value={address.fullName} onChange={handleChange} placeholder="John Doe" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" /></div>
-            <div><label className="block text-sm font-medium text-gray-800 mb-1.5">Address</label><input type="text" name="street" value={address.street} onChange={handleChange} placeholder="123 Main St" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" /></div>
-            <div className="grid grid-cols-2 gap-4">
-              <div><label className="block text-sm font-medium text-gray-800 mb-1.5">City</label><input type="text" name="city" value={address.city} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" /></div>
-              <div><label className="block text-sm font-medium text-gray-800 mb-1.5">Pincode</label><input type="text" name="pincode" value={address.pincode} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" /></div>
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1.5">Full Name</label>
+              <input type="text" name="fullName" value={address.fullName} onChange={handleChange} placeholder="John Doe" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
             </div>
-            <div><label className="block text-sm font-medium text-gray-800 mb-1.5">Phone Number</label><input type="text" name="phone" value={address.phone} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" /></div>
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1.5">Address</label>
+              <input type="text" name="street" value={address.street} onChange={handleChange} placeholder="123 Main St" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-1.5">City</label>
+                <input type="text" name="city" value={address.city} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-1.5">Pincode</label>
+                <div className="flex gap-2">
+                  <input type="text" name="pincode" value={address.pincode} onChange={handleChange} placeholder="452010" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm flex-1" />
+                  <button type="button" onClick={() => checkDeliveryAvailability()} disabled={checkingPincode || address.pincode.length !== 6} className="px-4 py-3 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition disabled:opacity-50">
+                    {checkingPincode ? '...' : 'Check'}
+                  </button>
+                </div>
+                
+                {/* 🔴 RED ALERT BLOCK FOR NON-DELIVERABLE AREAS */}
+                {deliveryAvailable === false && (
+                  <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                    <span className="text-red-500 text-xl shrink-0">🚫</span>
+                    <div>
+                      <h4 className="text-sm font-bold text-red-800">We do not deliver to this area</h4>
+                      <p className="text-xs text-red-600 mt-1">
+                        Currently, we are unable to deliver to <strong>{address.pincode}</strong>. 
+                        Please enter a different pincode.
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {/* 🟢 GREEN MESSAGE FOR DELIVERABLE AREAS */}
+                {deliveryAvailable === true && (
+                  <p className="text-sm font-semibold text-green-600 mt-2">✓ We deliver to this location!</p>
+                )}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1.5">Phone Number</label>
+              <input type="text" name="phone" value={address.phone} onChange={handleChange} placeholder="9876543210" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
+            </div>
           </div>
         </div>
 
@@ -215,7 +276,7 @@ export default function Checkout() {
                 <div className="flex justify-between text-gray-600"><span>Delivery</span><span className="text-green-600 font-medium">FREE</span></div>
               </div>
               <div className="border-t pt-4 flex justify-between font-bold text-lg"><span>Total</span><span>${total.toFixed(2)}</span></div>
-              <button onClick={handlePayment} disabled={loading} className="w-full mt-5 h-12 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition rounded-lg shadow disabled:opacity-70">
+              <button onClick={handlePayment} disabled={loading || !deliveryAvailable} className={`w-full mt-5 h-12 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition rounded-lg shadow disabled:opacity-70`}>
                 {loading ? 'Processing...' : paymentMethod === 'Cash on Delivery' ? `Place Order (COD)` : `Pay $${total.toFixed(2)}`}
               </button>
             </div>
