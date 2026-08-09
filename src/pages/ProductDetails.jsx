@@ -85,7 +85,8 @@ export default function ProductDetails() {
   
   if (!product) return <div className="text-center py-20 text-xl text-gray-600">Product not found!</div>;
 
-  // 🟢 SMART RELATED PRODUCTS: Match by SubCategory OR Category
+  // SMART RELATED PRODUCTS: Match by SubCategory OR Category
+  //  SMART RELATED PRODUCTS: Match by SubCategory OR Category
   const relatedProducts = allProducts
     .filter((p) => 
       (p.subCategory === product.subCategory || p.category === product.category) && 
@@ -93,9 +94,13 @@ export default function ProductDetails() {
     )
     .slice(0, 8);
 
-  // If still 0, show fallback: first 8 products from the site
-  const displayRelated = relatedProducts.length > 0 ? relatedProducts : allProducts.slice(0, 8);
+  //  FIXED FALLBACK: Agar koi match nahi mila, toh sirf same main category ke products dikhao (Men par Men, Women par Women)
+  const fallbackRelated = allProducts
+    .filter(p => p.category === product.category && p._id !== product._id)
+    .slice(0, 8);
 
+  // Use the related, otherwise use the filtered fallback
+  const displayRelated = relatedProducts.length > 0 ? relatedProducts : fallbackRelated;
   const handleAddToCart = () => {
     if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
     if (!selectedSize) { showToast("Please select a size!", "error"); return; }
@@ -192,7 +197,7 @@ export default function ProductDetails() {
           <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
 
-        {/* 🟢 RESTORED: You Might Also Like (Horizontal Rail) */}
+        {/* RESTORED: You Might Also Like (Horizontal Rail) */}
         {displayRelated.length > 0 && (
           <div className="px-4 py-6 border-t border-gray-100">
             <h2 className="text-base font-bold text-gray-900 mb-4">You Might Also Like</h2>
