@@ -17,11 +17,12 @@ export default function AdminDashboard() {
   
   const [uploading, setUploading] = useState(false);
 
+  // 🟢 UPDATED: State ab images array use karega
   const [formData, setFormData] = useState({
     title: '', 
     price: '', 
     description: '', 
-    imageUrl: '', 
+    images: [], 
     category: 'Men', 
     subCategory: '', 
     inStock: true
@@ -33,7 +34,7 @@ export default function AdminDashboard() {
     title: '', 
     price: '', 
     description: '', 
-    imageUrl: '', 
+    images: [], 
     category: 'Men', 
     subCategory: '', 
     inStock: true
@@ -49,7 +50,6 @@ export default function AdminDashboard() {
   });
   const [creatingCoupon, setCreatingCoupon] = useState(false);
 
-  // 🟢 NEW: Pincode Management State
   const [deliveryPincodes, setDeliveryPincodes] = useState([]);
   const [loadingPincodes, setLoadingPincodes] = useState(false);
   const [pincodeForm, setPincodeForm] = useState({ pincode: '', city: '', state: '', isActive: true });
@@ -103,7 +103,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // 🟢 NEW: Fetch Delivery Pincodes
   const fetchDeliveryPincodes = async () => {
     setLoadingPincodes(true);
     try {
@@ -116,28 +115,38 @@ export default function AdminDashboard() {
     }
   };
 
-  // --- Product / Coupon Logic (same as before) ---
-  const handleImageUpload = async (e, setter, field = 'imageUrl') => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // 🟢 NEW: Multiple Images Upload Handler
+  const handleMultiImageUpload = async (e, setter, field = 'images') => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    
     setUploading(true);
-    const formData = new FormData(); formData.append('image', file);
-    try {
-      const res = await axiosClient.post('/api/admin/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      setter(prev => ({ ...prev, [field]: res.data.secure_url }));
-      showToast('Image uploaded successfully!', 'success');
-    } catch (error) { showToast('Failed to upload image', 'error'); } finally { setUploading(false); }
+    const uploadedUrls = [];
+
+    for (const file of files) {
+      const formData = new FormData(); 
+      formData.append('image', file);
+      try {
+        const res = await axiosClient.post('/api/admin/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        uploadedUrls.push(res.data.secure_url);
+      } catch (error) {
+        showToast(`Failed to upload ${file.name}`, 'error');
+      }
+    }
+
+    setter(prev => ({ ...prev, [field]: [...prev[field], ...uploadedUrls] }));
+    setUploading(false);
+    if (uploadedUrls.length > 0) showToast(`${uploadedUrls.length} images uploaded successfully!`, 'success');
   };
 
-  const handleEditImageUpload = async (e) => {
-    const file = e.target.files[0]; if (!file) return;
-    setUploading(true);
-    const formData = new FormData(); formData.append('image', file);
-    try {
-      const res = await axiosClient.post('/api/admin/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      setEditFormData(prev => ({ ...prev, imageUrl: res.data.secure_url }));
-      showToast('Image uploaded successfully!', 'success');
-    } catch (error) { showToast('Failed to upload image', 'error'); } finally { setUploading(false); }
+  // 🟢 NEW: Remove a single image from the list
+  const removeImage = (indexToRemove, setter, field = 'images') => {
+    setter(prev => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== indexToRemove)
+    }));
   };
 
   const handleChange = (e) => {
@@ -151,25 +160,36 @@ export default function AdminDashboard() {
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
-    if (uploading) { showToast('Please wait, image is still uploading!', 'warning'); return; }
-    if (!formData.imageUrl) { showToast('Please select and upload an image first!', 'warning'); return; }
+    if (uploading) { showToast('Please wait, images are still uploading!', 'warning'); return; }
+    if (formData.images.length === 0) { showToast('Please upload at least one product image!', 'warning'); return; }
+    
     try {
-      const dataToSend = { ...formData, images: [formData.imageUrl] };
+      // 🟢 FIX: Backend compatibility ke liye `imageUrl` fallback bhi bhej rahe hain
+      const dataToSend = { 
+        ...formData, 
+        imageUrl: formData.images[0] || '' 
+      };
       await axiosClient.post('/api/products', dataToSend);
       showToast('Product added successfully!', 'success');
       fetchProducts();
-      setFormData({ title: '', price: '', description: '', imageUrl: '', category: 'Men', subCategory: '', inStock: true });
+      setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', inStock: true });
     } catch (error) { showToast('Failed to add product', 'error'); }
   };
 
   const handleEditClick = (product) => {
     setEditingProductId(product._id);
     setEditFormData({
-      title: product.title, price: product.price, description: product.description || '',
-      imageUrl: product.imageUrl || '', category: product.category, subCategory: product.subCategory || '', inStock: product.inStock
+      title: product.title, 
+      price: product.price, 
+      description: product.description || '',
+      images: product.images || [], // 🟢 Array se load karo
+      category: product.category, 
+      subCategory: product.subCategory || '', 
+      inStock: product.inStock
     });
     setIsEditModalOpen(true);
   };
+
   const handleEditChange = (e) => {
     const { name, value, type, checked } = e.target;
     setEditFormData(prev => ({
@@ -178,16 +198,25 @@ export default function AdminDashboard() {
       ...(name === 'category' && { subCategory: '' })
     }));
   };
+
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    if (uploading) { showToast('Please wait, image is still uploading!', 'warning'); return; }
+    if (uploading) { showToast('Please wait, images are still uploading!', 'warning'); return; }
+    if (editFormData.images.length === 0) { showToast('Please upload at least one product image!', 'warning'); return; }
+
     try {
-      const dataToSend = { ...editFormData, images: editFormData.imageUrl ? [editFormData.imageUrl] : [] };
+      const dataToSend = { 
+        ...editFormData, 
+        imageUrl: editFormData.images[0] || '' 
+      };
       await axiosClient.put(`/api/products/${editingProductId}`, dataToSend);
       showToast('Product updated successfully!', 'success');
-      setIsEditModalOpen(false); setEditingProductId(null); fetchProducts();
+      setIsEditModalOpen(false);
+      setEditingProductId(null);
+      fetchProducts();
     } catch (error) { showToast('Failed to update product', 'error'); }
   };
+
   const handleDelete = async (id) => {
     if(!confirm('Are you sure you want to delete this product?')) return;
     try { await axiosClient.delete(`/api/products/${id}`); showToast('Product deleted', 'info'); fetchProducts(); } catch (error) { showToast('Failed to delete', 'error'); }
@@ -215,7 +244,6 @@ export default function AdminDashboard() {
     } catch (error) { triggerCustomToast(error.response?.data?.message || 'Failed to create coupon', 'error'); } finally { setCreatingCoupon(false); }
   };
 
-  // 🟢 NEW: Pincode Handlers
   const handlePincodeChange = (e) => {
     const { name, value, type, checked } = e.target;
     setPincodeForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
@@ -272,22 +300,75 @@ export default function AdminDashboard() {
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-8">
               <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
               <form onSubmit={handleAddProduct} className="space-y-4">
-                <div><label className="block text-sm font-semibold text-gray-900">Product Title</label><input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="e.g. Compression Shorts" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-semibold text-gray-900">Price ($)</label><input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="49.99" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
-                  <div><label className="block text-sm font-semibold text-gray-900">Product Image</label><div className="flex items-center gap-2 mt-1"><input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setFormData)} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-black file:text-white hover:file:bg-gray-800" />{uploading && <span className="text-sm text-gray-500 animate-pulse">Uploading...</span>}</div>{formData.imageUrl && <p className="text-xs text-green-600 mt-1">Image uploaded successfully!</p>}</div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Product Title</label>
+                  <input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="e.g. Compression Shorts" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required />
                 </div>
-                <div><label className="block text-sm font-semibold text-gray-900">Description</label><textarea name="description" value={formData.description} onChange={handleChange} placeholder="Product details..." className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20" /></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900">Price ($)</label>
+                    <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="49.99" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900">Product Images (Select multiple)</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <input 
+                        type="file" 
+                        multiple 
+                        accept="image/*" 
+                        onChange={(e) => handleMultiImageUpload(e, setFormData)}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-black file:text-white hover:file:bg-gray-800"
+                      />
+                      {uploading && <span className="text-sm text-gray-500 animate-pulse">Uploading...</span>}
+                    </div>
+                    {/* 🟢 Image Previews */}
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {formData.images.map((url, idx) => (
+                        <div key={idx} className="relative w-20 h-20 group">
+                          <img src={url} alt={`Product ${idx+1}`} className="w-full h-full object-cover rounded border border-gray-200 shadow-sm" />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(idx, setFormData)}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-600 transition shadow-md"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Description</label>
+                  <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Product details..." className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20" />
+                </div>
                 <div className="flex items-center gap-6">
-                  <div><label className="block text-sm font-semibold text-gray-900">Category</label><select name="category" value={formData.category} onChange={handleChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Accessories">Accessories</option></select></div>
-                  <div className="flex items-center gap-2 mt-6"><input type="checkbox" name="inStock" checked={formData.inStock} onChange={handleChange} className="h-5 w-5 accent-black" /><label className="text-sm font-medium">In Stock</label></div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900">Category</label>
+                    <select name="category" value={formData.category} onChange={handleChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
+                      <option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Accessories">Accessories</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-2 mt-6">
+                    <input type="checkbox" name="inStock" checked={formData.inStock} onChange={handleChange} className="h-5 w-5 accent-black" />
+                    <label className="text-sm font-medium">In Stock</label>
+                  </div>
                 </div>
                 {formData.category && SUB_CATEGORY_MAP[formData.category] && (
-                  <div><label className="block text-sm font-semibold text-gray-900">Sub-Category</label><select name="subCategory" value={formData.subCategory} onChange={handleChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="">Select Sub-Category</option>{SUB_CATEGORY_MAP[formData.category].map((sub) => <option key={sub} value={sub}>{sub}</option>)}</select></div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900">Sub-Category</label>
+                    <select name="subCategory" value={formData.subCategory} onChange={handleChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
+                      <option value="">Select Sub-Category</option>
+                      {SUB_CATEGORY_MAP[formData.category].map((sub) => <option key={sub} value={sub}>{sub}</option>)}
+                    </select>
+                  </div>
                 )}
-                <button type="submit" disabled={uploading} className={`w-full h-10 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>{uploading ? 'Uploading...' : 'Add Product'}</button>
+                <button type="submit" disabled={uploading} className={`w-full h-10 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  {uploading ? 'Uploading Images...' : 'Add Product'}
+                </button>
               </form>
             </div>
+
             <div>
               <h2 className="text-xl font-semibold mb-4">Manage Existing Products</h2>
               {products.length === 0 ? (<p className="text-gray-500 text-center py-8">No products found.</p>) : (
@@ -310,40 +391,22 @@ export default function AdminDashboard() {
         {activeTab === 'orders' && (
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold mb-4">Order History</h2>
-            {orders.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No orders found.</p>
-            ) : (
+            {orders.length === 0 ? (<p className="text-gray-500 text-center py-8">No orders found.</p>) : (
               <div className="space-y-4">
                 {orders.map((order) => (
                   <div key={order._id || order.id} className="p-4 border border-gray-200 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">Order #{order._id || order.id}</p>
-                      
-                      {/* 🟢 FINAL FIX: order.user?.name hata diya! */}
                       <div className="mt-1 space-y-0.5">
-                        <p className="text-xs text-gray-700">
-                          <span className="font-semibold">Customer:</span> {order.shippingAddress?.fullName || 'Guest'}
-                        </p>
-                        <p className="text-xs text-gray-700">
-                          <span className="font-semibold">Phone:</span> {order.shippingAddress?.phone || 'N/A'}
-                        </p>
+                        <p className="text-xs text-gray-700"><span className="font-semibold">Customer:</span> {order.shippingAddress?.fullName || 'Guest'}</p>
+                        <p className="text-xs text-gray-700"><span className="font-semibold">Phone:</span> {order.shippingAddress?.phone || 'N/A'}</p>
                       </div>
-
                       <p className="text-sm text-gray-600 mt-1">Total: ${order.totalAmount ?? order.total ?? order.amount ?? '0.00'}</p>
                       <p className="text-xs text-gray-500">Current: {order.status ?? 'Pending'}</p>
                     </div>
-                    
                     <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                      <select 
-                        value={order.status || 'Pending'} 
-                        onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:border-black"
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
+                      <select value={order.status || 'Pending'} onChange={(e) => handleStatusUpdate(order._id, e.target.value)} className="px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:border-black">
+                        <option value="Pending">Pending</option><option value="Processing">Processing</option><option value="Shipped">Shipped</option><option value="Delivered">Delivered</option><option value="Cancelled">Cancelled</option>
                       </select>
                     </div>
                   </div>
@@ -374,63 +437,29 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* 🟢 NEW: DELIVERY MANAGEMENT TAB */}
         {activeTab === 'delivery' && (
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold mb-4">Manage Delivery Pincodes</h2>
-            
             <form onSubmit={handlePincodeSubmit} className="space-y-4 mb-6 border-b border-gray-100 pb-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">Pincode</label>
-                  <input type="text" name="pincode" value={pincodeForm.pincode} onChange={handlePincodeChange} placeholder="e.g. 452010" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required disabled={isEditPincode} />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">City</label>
-                  <input type="text" name="city" value={pincodeForm.city} onChange={handlePincodeChange} placeholder="Indore" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">State</label>
-                  <input type="text" name="state" value={pincodeForm.state} onChange={handlePincodeChange} placeholder="MP" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" />
-                </div>
+                <div><label className="block text-sm font-semibold text-gray-900">Pincode</label><input type="text" name="pincode" value={pincodeForm.pincode} onChange={handlePincodeChange} placeholder="e.g. 452010" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required disabled={isEditPincode} /></div>
+                <div><label className="block text-sm font-semibold text-gray-900">City</label><input type="text" name="city" value={pincodeForm.city} onChange={handlePincodeChange} placeholder="Indore" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" /></div>
+                <div><label className="block text-sm font-semibold text-gray-900">State</label><input type="text" name="state" value={pincodeForm.state} onChange={handlePincodeChange} placeholder="MP" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" /></div>
               </div>
               <div className="flex items-center gap-4 mt-2">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" name="isActive" checked={pincodeForm.isActive} onChange={handlePincodeChange} className="w-5 h-5 accent-black" />
-                  <span className="text-sm font-medium">Active (Deliverable)</span>
-                </label>
-                <button type="submit" className="px-6 py-2 bg-black text-white text-sm font-semibold rounded hover:bg-gray-800 transition">
-                  {isEditPincode ? 'Update Pincode' : 'Add Pincode'}
-                </button>
-                {isEditPincode && (
-                  <button type="button" onClick={() => { setIsEditPincode(false); setEditingPincodeId(null); setPincodeForm({ pincode: '', city: '', state: '', isActive: true }); }} className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-semibold rounded hover:bg-gray-300 transition">
-                    Cancel
-                  </button>
-                )}
+                <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="isActive" checked={pincodeForm.isActive} onChange={handlePincodeChange} className="w-5 h-5 accent-black" /><span className="text-sm font-medium">Active (Deliverable)</span></label>
+                <button type="submit" className="px-6 py-2 bg-black text-white text-sm font-semibold rounded hover:bg-gray-800 transition">{isEditPincode ? 'Update Pincode' : 'Add Pincode'}</button>
+                {isEditPincode && (<button type="button" onClick={() => { setIsEditPincode(false); setEditingPincodeId(null); setPincodeForm({ pincode: '', city: '', state: '', isActive: true }); }} className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-semibold rounded hover:bg-gray-300 transition">Cancel</button>)}
               </div>
             </form>
 
-            {loadingPincodes ? (
-              <p className="text-center py-4 text-gray-500">Loading pincodes...</p>
-            ) : (
+            {loadingPincodes ? (<p className="text-center py-4 text-gray-500">Loading pincodes...</p>) : (
               <div className="space-y-2">
-                {deliveryPincodes.length === 0 ? (
-                  <p className="text-center py-4 text-gray-500">No pincodes added yet.</p>
-                ) : (
+                {deliveryPincodes.length === 0 ? (<p className="text-center py-4 text-gray-500">No pincodes added yet.</p>) : (
                   deliveryPincodes.map((p) => (
                     <div key={p.pincode} className="flex items-center justify-between p-3 border border-gray-100 rounded bg-gray-50">
-                      <div className="flex gap-4 text-sm">
-                        <span className="font-bold w-24">{p.pincode}</span>
-                        <span className="w-32">{p.city || '-'}</span>
-                        <span className="w-32">{p.state || '-'}</span>
-                        <span className={`px-2 py-0.5 rounded text-xs font-semibold ${p.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                          {p.isActive ? 'Active' : 'Blocked'}
-                        </span>
-                      </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => handleEditPincode(p)} className="text-xs text-blue-600 hover:underline">Edit</button>
-                        <button onClick={() => handleDeletePincode(p.pincode)} className="text-xs text-red-600 hover:underline">Delete</button>
-                      </div>
+                      <div className="flex gap-4 text-sm"><span className="font-bold w-24">{p.pincode}</span><span className="w-32">{p.city || '-'}</span><span className="w-32">{p.state || '-'}</span><span className={`px-2 py-0.5 rounded text-xs font-semibold ${p.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{p.isActive ? 'Active' : 'Blocked'}</span></div>
+                      <div className="flex gap-2"><button onClick={() => handleEditPincode(p)} className="text-xs text-blue-600 hover:underline">Edit</button><button onClick={() => handleDeletePincode(p.pincode)} className="text-xs text-red-600 hover:underline">Delete</button></div>
                     </div>
                   ))
                 )}
@@ -440,13 +469,43 @@ export default function AdminDashboard() {
         )}
 
         {isEditModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl max-h-[90vh]">
               <h2 className="text-xl font-bold mb-4">Edit Product</h2>
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div><label className="block text-sm font-semibold">Title</label><input type="text" name="title" value={editFormData.title} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
                 <div><label className="block text-sm font-semibold">Price ($)</label><input type="number" name="price" value={editFormData.price} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
-                <div><label className="block text-sm font-semibold">Image</label><div className="flex items-center gap-2 mt-1"><input type="file" accept="image/*" onChange={(e) => handleEditImageUpload} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-black file:text-white hover:file:bg-gray-800" />{uploading && <span className="text-sm text-gray-500 animate-pulse">Uploading...</span>}</div>{editFormData.imageUrl && <p className="text-xs text-green-600 mt-1">Image uploaded successfully!</p>}</div>
+                
+                {/* 🟢 Edit Modal Multi-Image Uploader */}
+                <div>
+                  <label className="block text-sm font-semibold">Images</label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <input 
+                      type="file" 
+                      multiple 
+                      accept="image/*" 
+                      onChange={(e) => handleMultiImageUpload(e, setEditFormData, 'images')} 
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-black file:text-white hover:file:bg-gray-800" 
+                    />
+                    {uploading && <span className="text-sm text-gray-500 animate-pulse">Uploading...</span>}
+                  </div>
+                  {/* 🟢 Edit Modal Previews */}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {editFormData.images.map((url, idx) => (
+                      <div key={idx} className="relative w-20 h-20 group">
+                        <img src={url} alt={`Product ${idx+1}`} className="w-full h-full object-cover rounded border border-gray-200 shadow-sm" />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(idx, setEditFormData, 'images')}
+                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-600 transition shadow-md"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <div><label className="block text-sm font-semibold">Description</label><textarea name="description" value={editFormData.description} onChange={handleEditChange} className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20" /></div>
                 <div className="flex items-center gap-6">
                   <div><label className="block text-sm font-semibold">Category</label><select name="category" value={editFormData.category} onChange={handleEditChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Accessories">Accessories</option></select></div>
@@ -456,7 +515,9 @@ export default function AdminDashboard() {
                   <div><label className="block text-sm font-semibold text-gray-900">Sub-Category</label><select name="subCategory" value={editFormData.subCategory} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="">Select Sub-Category</option>{SUB_CATEGORY_MAP[editFormData.category].map((sub) => <option key={sub} value={sub}>{sub}</option>)}</select></div>
                 )}
                 <div className="flex gap-3 pt-2">
-                  <button type="submit" disabled={uploading} className={`flex-1 h-10 bg-black text-white font-semibold rounded hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>{uploading ? 'Uploading...' : 'Update Product'}</button>
+                  <button type="submit" disabled={uploading} className={`flex-1 h-10 bg-black text-white font-semibold rounded hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    {uploading ? 'Uploading...' : 'Update Product'}
+                  </button>
                   <button type="button" onClick={() => { setIsEditModalOpen(false); setEditingProductId(null); }} className="flex-1 h-10 bg-gray-200 text-gray-800 font-semibold rounded hover:bg-gray-300 transition">Cancel</button>
                 </div>
               </form>
