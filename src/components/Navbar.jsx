@@ -101,7 +101,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* 🔥 NEW STYLISH LOGO COMPONENT (DESKTOP) */}
+        {/* Desktop Logo */}
         <ForgeLogo />
 
         {/* Mobile Right Icons */}
@@ -190,15 +190,15 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* --- MOBILE DRAWER (UPDATED LOGO) --- */}
+      {/* --- MOBILE DRAWER (FIXED LOGO) --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col overflow-hidden">
           
-          {/* 🟢 FIXED MOBILE HEADER: Now uses the same exact ForgeLogo component as Desktop */}
+          {/* 🟢 FIXED: DIRECT TEXT SPAN USED INSTEAD OF <ForgeLogo /> */}
           <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 shrink-0">
             <div className="flex-1"></div>
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0">
-              <ForgeLogo />
+              <span className="text-xl font-black tracking-[0.2em] text-black">FORGE</span>
             </Link>
             <div className="flex-1 flex justify-end">
               <button onClick={() => setIsMenuOpen(false)} className="text-black p-1">
