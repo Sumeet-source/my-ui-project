@@ -89,9 +89,10 @@ export default function AdminDashboard() {
     }
   };
 
-  const fetchProducts = async () => {
+    const fetchProducts = async () => {
     try {
-      const res = await axiosClient.get('/api/products');
+      // 🟢 FIX: limit ko 1000 set kiya taaki saare products ek baar mein fetch ho jayein
+      const res = await axiosClient.get('/api/products', { params: { limit: 1000 } });
       let data = res.data;
       if (Array.isArray(data)) data = data;
       else if (data && Array.isArray(data.products)) data = data.products;
