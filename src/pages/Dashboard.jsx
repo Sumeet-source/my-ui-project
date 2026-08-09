@@ -26,7 +26,6 @@ export default function Dashboard() {
     }
   };
 
-  // 🟢 Helper for Status Badge Colors
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'pending': return 'bg-yellow-500 text-white';
@@ -43,7 +42,6 @@ export default function Dashboard() {
     return stored ? JSON.parse(stored) : null;
   })();
 
-  // 🟢 Page load hote hi backend se orders fetch kar lo
   useEffect(() => {
     if (effectiveUser) {
       fetchOrders();
@@ -80,7 +78,6 @@ export default function Dashboard() {
     );
   }
   
-  // Get Initials for Avatar
   const getInitials = (name) => {
     if (!name) return "U";
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -90,7 +87,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         
-        {/* Header Section with Avatar */}
+        {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
           <div className="flex items-center gap-4">
             <div className="h-16 w-16 bg-black text-white rounded-full flex items-center justify-center text-xl font-bold shrink-0">
@@ -102,9 +99,10 @@ export default function Dashboard() {
             </div>
           </div>
           
-           <button 
+          {/* 🟢 PERFECT COMPACT LOGOUT BUTTON */}
+          <button 
             onClick={handleLogout} 
-            className="flex items-center justify-center gap-2 w-auto ml-auto px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition text-sm font-medium"
+            className="flex items-center justify-center gap-2 px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition text-sm font-medium w-max ml-auto sm:ml-0"
           >
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -145,7 +143,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Right Side - Profile/Orders Content */}
           <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100 min-h-[300px]">
             {view === 'profile' && (
               <div>
@@ -168,23 +165,17 @@ export default function Dashboard() {
                   <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
                     {orders.map((order) => (
                       <div key={order._id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition">
-                        
-                        {/* Order Header */}
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 border-b border-gray-200 pb-2 gap-2">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-bold text-gray-900 text-sm">Order #{order._id.slice(-6)}</span>
-                            {/* 🟢 STATUS BADGE */}
                             <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
                               {order.status || 'Pending'}
                             </span>
                           </div>
                           <span className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</span>
                         </div>
-
-                        {/* Order Items (Clickable!) */}
                         <div className="space-y-1 mb-2">
                           {order.items.slice(0, 2).map((item, idx) => (
-                            /* 🟢 CLICKABLE PRODUCT LINK */
                             <Link key={idx} to={`/product/${item.productId}`} className="flex justify-between text-xs text-gray-600 hover:bg-gray-200 p-1 -mx-1 rounded transition">
                               <span>{item.title} {item.size ? `(Size: ${item.size})` : ''} <span className="font-bold">x{item.quantity}</span></span>
                               <span>${(item.price * item.quantity).toFixed(2)}</span>
@@ -192,8 +183,6 @@ export default function Dashboard() {
                           ))}
                           {order.items.length > 2 && <p className="text-xs text-gray-400">+ {order.items.length - 2} more items</p>}
                         </div>
-
-                        {/* 🟢 DELIVERY TRACKING MESSAGES */}
                         {order.status?.toLowerCase() === 'shipped' && (
                           <div className="bg-purple-50 border border-purple-200 rounded p-2 mb-2 flex items-center gap-2">
                             <span className="text-purple-600 text-sm">🚚</span>
@@ -206,8 +195,6 @@ export default function Dashboard() {
                             <span className="text-xs text-green-700 font-medium">Delivered successfully.</span>
                           </div>
                         )}
-
-                        {/* Order Total */}
                         <div className="flex justify-between font-bold text-sm text-gray-900 border-t border-gray-300 pt-2 mt-2">
                           <span>Total</span>
                           <span>${order.totalAmount.toFixed(2)}</span>
