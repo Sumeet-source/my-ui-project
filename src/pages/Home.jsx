@@ -51,10 +51,9 @@ export default function Home() {
           </span>
         </div>
 
-        {/* 🟢 NEW: White button to cover the bottom-right watermark */}
-        <div className="absolute bottom-0 right-0 p-6 md:p-10">
+        {/* 🟢 White button - Moved slightly away from corner */}
+        <div className="absolute bottom-4 right-4 md:bottom-10 md:right-10">
           <div className="bg-white text-black px-4 py-2.5 rounded-full shadow-md flex items-center gap-2 text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition cursor-pointer">
-            {/* Small star/icon to make it look natural */}
             <span className="text-sm leading-none opacity-80">✦</span> 
             Follow us
           </div>
