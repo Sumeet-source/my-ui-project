@@ -146,16 +146,17 @@ export default function Navbar() {
 
         {/* 🟢 LOGO SECTION WITH SCRAMBLE ON MOBILE */}
         <div className="flex items-center justify-center flex-1 md:flex-none">
-          {/* Desktop Logo (Hides on Mobile) */}
-          <div className="hidden md:block">
+          {/* 🟢 🟢 UPDATED: Desktop Logo wrapped with Link to Home */}
+          <Link to="/" className="hidden md:block">
             <ForgeLogo />
-          </div>
-          {/* Mobile Scramble Logo (Hides on Desktop) */}
-          <div className="block md:hidden">
+          </Link>
+          
+          {/* 🟢 🟢 UPDATED: Mobile Scramble Logo wrapped with Link to Home */}
+          <Link to="/" className="block md:hidden">
             <span className="text-xl font-black tracking-[0.2em] text-white">
               <ScrambleLogo text="FORGE" />
             </span>
-          </div>
+          </Link>
         </div>
 
         {/* Mobile Right Icons */}
@@ -248,7 +249,7 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col overflow-hidden">
           
-          {/* 🟢 FIXED: MOBILE DRAWER LOGO WITH SCRAMBLE */}
+          {/* 🟢 MOBILE DRAWER LOGO WITH SCRAMBLE */}
           <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 shrink-0">
             <div className="flex-1"></div>
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0">
