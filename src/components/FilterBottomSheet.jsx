@@ -15,6 +15,7 @@ export default function FilterBottomSheet({
   defaultCategory = '',
   totalCount = 0 
 }) {
+  // 🟢 Initial state mein category defaultCategory se set kari hai
   const [localFilters, setLocalFilters] = useState({
     sort: 'featured',
     category: defaultCategory,
@@ -27,20 +28,21 @@ export default function FilterBottomSheet({
     if (localFilters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (localFilters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     
-    // Category filter logic
-    if (localFilters.category) {
-      if (defaultCategory) {
-        // On Men/Women page, category selection becomes subCategory
+    // 🟢 Filter logic fix: Agar defaultCategory hai toh sirf subCategory filter karein
+    if (defaultCategory) {
         if (localFilters.subCategory) {
-          result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
+            result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
         }
-      } else {
-        result = result.filter(p => p.category.toLowerCase() === localFilters.category.toLowerCase());
-        if (localFilters.subCategory) {
-          result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
+    } else {
+        // Standard filter for general pages
+        if (localFilters.category) {
+            result = result.filter(p => p.category.toLowerCase() === localFilters.category.toLowerCase());
+            if (localFilters.subCategory) {
+                result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
+            }
         }
-      }
     }
+
     if (localFilters.price) {
       result = result.filter(p => p.price <= parseInt(localFilters.price));
     }
@@ -59,22 +61,26 @@ export default function FilterBottomSheet({
   };
 
   const handleClearAll = () => {
+    // 🟢 Clear karte waqt defaultCategory preserve rakhein
     setLocalFilters({ sort: 'featured', category: defaultCategory, subCategory: '', price: 200 });
     onClear();
   };
 
   const handleApply = () => {
     let finalFilters = { ...localFilters };
+    
+    // 🟢 BUG FIX: Agar defaultCategory hai toh category fixed rakho, sirf subCategory bhejo
     if (defaultCategory) {
       finalFilters = {
-        category: defaultCategory,
-        subCategory: localFilters.subCategory || localFilters.category,
+        category: defaultCategory, // Backend ko sahi category bhejega (Shoes)
+        subCategory: localFilters.subCategory, // Backend ko sahi subCategory bhejega (Training)
         sort: localFilters.sort,
         price: localFilters.price
       };
     } else {
       finalFilters = localFilters;
     }
+    
     onApply(finalFilters);
     onClose();
   };
@@ -103,24 +109,33 @@ export default function FilterBottomSheet({
             </select>
           </div>
 
-          <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Category</p>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {Object.keys(CATEGORIES).map((mainCat) => {
-                const isSelected = localFilters.category === mainCat;
-                return (
-                  <button key={mainCat} onClick={() => handleChange('category', isSelected ? '' : mainCat)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition border ${isSelected ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'}`}>
-                    {isSelected && '✓ '}{mainCat}
-                  </button>
-                );
-              })}
+          {/* 🟢 MAIN CATEGORY BUTTONS: Agar defaultCategory hai toh yeh hide ho jayenge */}
+          {!defaultCategory && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Category</p>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {Object.keys(CATEGORIES).map((mainCat) => {
+                  const isSelected = localFilters.category === mainCat;
+                  return (
+                    <button key={mainCat} onClick={() => handleChange('category', isSelected ? '' : mainCat)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition border ${isSelected ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'}`}>
+                      {isSelected && '✓ '}{mainCat}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+          )}
 
-            {localFilters.category && CATEGORIES[localFilters.category] && (
-              <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-xs font-medium text-gray-600 mb-2">Select Sub-Category (Optional)</p>
+          {/* 🟢 SUB-CATEGORY LOGIC: Agar defaultCategory hai toh seedha wahi subCategories dikhayenge */}
+          {((!defaultCategory && localFilters.category && CATEGORIES[localFilters.category]) || (defaultCategory && CATEGORIES[defaultCategory])) && (
+            <div className="space-y-2 mt-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                {defaultCategory ? `${defaultCategory} Sub-Categories` : 'Sub-Category (Optional)'}
+              </p>
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex flex-wrap gap-2">
-                  {CATEGORIES[localFilters.category].map((sub) => {
+                  {/* Agar defaultCategory hai toh uske subCategories dikhao, warna selected category ke */}
+                  {(defaultCategory ? CATEGORIES[defaultCategory] : CATEGORIES[localFilters.category]).map((sub) => {
                     const isSelected = localFilters.subCategory === sub;
                     return (
                       <button key={sub} onClick={() => handleChange('subCategory', isSelected ? '' : sub)} className={`px-3 py-1 rounded-full text-xs font-medium transition border ${isSelected ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
@@ -130,8 +145,8 @@ export default function FilterBottomSheet({
                   })}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Price</p>
