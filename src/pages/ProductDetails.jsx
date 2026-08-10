@@ -25,6 +25,9 @@ export default function ProductDetails() {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
 
+  // 🟢 NEW: Size Chart Modal State
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchProductData();
@@ -125,6 +128,12 @@ export default function ProductDetails() {
       ? fallbackRelated 
       : allProducts.slice(0, 8);
 
+  // 🟢 SMART SIZE LOGIC: Shoes vs Clothing
+  const isShoeProduct = product.category === 'Shoes' || titleLower.includes('shoes');
+  const clothingSizes = ['S', 'M', 'L', 'XL'];
+  const shoeSizes = ['UK 6', 'UK 7', 'UK 8', 'UK 9', 'UK 10', 'UK 11'];
+  const sizeOptions = isShoeProduct ? shoeSizes : clothingSizes;
+
   const handleAddToCart = () => {
     if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
     if (!selectedSize) { showToast("Please select a size!", "error"); return; }
@@ -159,6 +168,39 @@ export default function ProductDetails() {
 
   return (
     <div className="bg-white min-h-screen pb-20">
+      
+      {/* 🟢 SIZE CHART MODAL */}
+      {isSizeChartOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onClick={() => setIsSizeChartOpen(false)} className="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl">&times;</button>
+            <h2 className="text-xl font-bold mb-4 text-center">Shoe Size Guide</h2>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-center border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="p-2 border border-gray-200">UK</th>
+                    <th className="p-2 border border-gray-200">US</th>
+                    <th className="p-2 border border-gray-200">EU</th>
+                    <th className="p-2 border border-gray-200">Foot Length (CM)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td className="p-2 border border-gray-200">6</td><td className="p-2 border border-gray-200">7</td><td className="p-2 border border-gray-200">40</td><td className="p-2 border border-gray-200">25.0</td></tr>
+                  <tr><td className="p-2 border border-gray-200">7</td><td className="p-2 border border-gray-200">8</td><td className="p-2 border border-gray-200">41</td><td className="p-2 border border-gray-200">25.5</td></tr>
+                  <tr><td className="p-2 border border-gray-200">8</td><td className="p-2 border border-gray-200">9</td><td className="p-2 border border-gray-200">42</td><td className="p-2 border border-gray-200">26.0</td></tr>
+                  <tr><td className="p-2 border border-gray-200">9</td><td className="p-2 border border-gray-200">10</td><td className="p-2 border border-gray-200">43</td><td className="p-2 border border-gray-200">26.5</td></tr>
+                  <tr><td className="p-2 border border-gray-200">10</td><td className="p-2 border border-gray-200">11</td><td className="p-2 border border-gray-200">44</td><td className="p-2 border border-gray-200">27.0</td></tr>
+                  <tr><td className="p-2 border border-gray-200">11</td><td className="p-2 border border-gray-200">12</td><td className="p-2 border border-gray-200">45</td><td className="p-2 border border-gray-200">27.5</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-gray-500 mt-4 text-center">*This is a standard guide. Sizes may vary slightly by brand.</p>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Section */}
       <div className="md:hidden">
         {/* Carousel */}
@@ -188,13 +230,19 @@ export default function ProductDetails() {
           </div>
           <h1 className="text-base font-semibold text-gray-900 leading-snug">{product.title}</h1>
           <p className="text-xs text-gray-500 mt-1">{product.description?.substring(0, 80)}...</p>
+
+          {/* 🟢 UPDATED MOBILE SIZE SELECTOR */}
           <div className="mt-6">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-sm font-bold text-gray-900">SELECT SIZE</h3>
-              <button onClick={() => alert('Size chart is coming soon!')} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">Size Chart</button>
+              {isShoeProduct && (
+                <button onClick={() => setIsSizeChartOpen(true)} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">
+                  Size Chart
+                </button>
+              )}
             </div>
             <div className="flex flex-wrap gap-2">
-              {['S', 'M', 'L', 'XL'].map((size) => (
+              {sizeOptions.map((size) => (
                 <button key={size} onClick={() => setSelectedSize(size)} className={`w-12 h-12 rounded-full border text-sm font-medium transition ${selectedSize === size ? 'border-black bg-black text-white' : 'border-gray-300 text-gray-700 hover:border-black'}`}>{size}</button>
               ))}
             </div>
@@ -310,9 +358,17 @@ export default function ProductDetails() {
                 <span className="text-sm text-gray-500 ml-1">({reviews.length} reviews)</span>
               </div>
             </div>
-            <div><h3 className="text-sm font-bold uppercase tracking-wider text-gray-600 mb-2">Select Size</h3>
+
+            {/* 🟢 UPDATED DESKTOP SIZE SELECTOR */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-600">Select Size</h3>
+                {isShoeProduct && (
+                  <button onClick={() => setIsSizeChartOpen(true)} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">Size Chart</button>
+                )}
+              </div>
               <div className="flex gap-3">
-                {['S', 'M', 'L', 'XL'].map((size) => (
+                {sizeOptions.map((size) => (
                   <button key={size} onClick={() => setSelectedSize(size)} className={`w-12 h-12 border rounded-md font-semibold transition ${selectedSize === size ? 'bg-black text-white border-black' : 'bg-white text-black border-gray-300 hover:border-black'}`}>{size}</button>
                 ))}
               </div>
