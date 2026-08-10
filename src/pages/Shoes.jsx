@@ -15,8 +15,8 @@ export default function Shoes() {
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // 🟢 Read subCategory from URL
-  const [searchParams] = useSearchParams();
+  // 🟢 Read subCategory from URL & get setter function for clearing
+  const [searchParams, setSearchParams] = useSearchParams();
   const subCategoryFromUrl = searchParams.get('subCategory');
 
   // 🟢 Store current filters (for refetch after CRUD, etc.)
@@ -136,21 +136,26 @@ export default function Shoes() {
         </button>
       </div>
 
-      {/* 🟢 Show active URL subCategory filter */}
+      {/* 🟢 🎨 UPDATED UI: Showing box with proper filter/pill style */}
       {subCategoryFromUrl && (
-        <div className="mb-4 p-2 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm">
-          🔍 Showing: <strong>{subCategoryFromUrl}</strong>
+        <div className="mb-4 inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg text-sm font-medium text-gray-900 shadow-sm border border-gray-100 transition-all">
+          <span className="flex items-center gap-2">
+            {/* Magnifying Glass Icon */}
+            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <span>{subCategoryFromUrl}</span>
+          </span>
+          
           <button
-            onClick={() => {
-              // Remove the subCategory param from URL
-              const newParams = new URLSearchParams(searchParams);
-              newParams.delete('subCategory');
-              window.history.replaceState({}, '', `${window.location.pathname}?${newParams.toString()}`);
-              // The useEffect will trigger a refetch automatically
-            }}
-            className="ml-3 text-blue-600 underline hover:text-blue-800"
+            onClick={() => setSearchParams({})} // 🟢 Cleanly removes all query params
+            className="ml-1 p-1 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition-colors"
+            aria-label="Clear filter"
           >
-            Clear
+            {/* Cross (X) Icon */}
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
       )}
