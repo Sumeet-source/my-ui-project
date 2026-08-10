@@ -35,12 +35,14 @@ export default function Home() {
           <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1920&q=80" alt="Banner Fallback" className="w-full h-full object-cover" />
         </video>
 
-        {/* 🟢 Overlay aur Buttons (HYPERBOOST hata diya, buttons ko aur neeche shift kar diya) */}
+        {/* 🟢 Overlay aur Buttons - BILKUL NEECHE (Absolute Bottom) */}
         <div className="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
-        <div className="absolute inset-0 flex flex-col items-start justify-end p-6 md:p-24 pb-32 md:pb-40 text-left text-black">
+        
+        {/* 🟢 Buttons ab 'absolute bottom-0' se bilkul neeche chipak gaye hain! */}
+        <div className="absolute bottom-0 left-0 w-full p-6 md:p-10 flex flex-col items-start gap-4 text-black">
           
-          {/* 🟢 Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-4">
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/men" className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm text-center">
               Shop men →
             </Link>
