@@ -2,18 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
-
-  // Auto slide carousel (Dots hat gaye hain, lekin slide aage badhega)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 3);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Countdown timer
+//test
+  // Countdown timer (baaki features ke liye)
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
@@ -31,82 +22,39 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white font-body-md text-on-surface pb-16">
       
-      {/* --- HERO CAROUSEL (VIDEO BANNER) --- */}
+      {/* --- SINGLE STATIC VIDEO BANNER (Slider/Bhaagna band) --- */}
       <section className="relative w-full h-[85vh] max-h-[900px] overflow-hidden">
-        <div 
-          className="flex w-[300%] h-full transition-transform duration-700 ease-in-out"
-          style={{ transform: `translateX(-${currentSlide * 33.333}%)` }}
-        >
-          {/* 🟢 SLIDE 1: MP4 VIDEO BANNER */}
-          <div className="relative w-full h-full flex-shrink-0">
-            <video 
-              className="w-full h-full object-cover" 
-              autoPlay 
-              loop 
-              muted 
-              playsInline
-              src="/videos/hero-banner.mp4" 
-            ></video>
+        {/* 🟢 Sirf Ek Video (Left/Right nahi ghumega) */}
+        <video 
+          className="w-full h-full object-cover" 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          src="/videos/hero-banner.mp4" 
+        ></video>
 
-            <div className="absolute inset-0 bg-white/30 mix-blend-overlay"></div>
-            <div className="absolute inset-0 flex flex-col items-start justify-center p-8 md:p-24 text-left text-black">
-              <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter text-black mb-2">HYPERBOOST</h2>
-              <p className="text-xs md:text-sm font-medium text-gray-900 max-w-xs mb-6">
-                A new running experience, once you feel it, there is no going back.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 mb-4">
-                <button className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm">
-                  Shop men →
-                </button>
-                <button className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm">
-                  Shop women →
-                </button>
-              </div>
-              
-              <span className="inline-block text-xs md:text-sm font-bold uppercase tracking-wider border-b-2 border-black pb-1 cursor-pointer hover:opacity-70 transition">
-                Learn More →
-              </span>
-            </div>
+        {/* 🟢 Overlay aur Buttons (Video ke upar) */}
+        <div className="absolute inset-0 bg-white/30 mix-blend-overlay"></div>
+        <div className="absolute inset-0 flex flex-col items-start justify-center p-8 md:p-24 text-left text-black">
+          <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter text-black mb-2">HYPERBOOST</h2>
+          <p className="text-xs md:text-sm font-medium text-gray-900 max-w-xs mb-6">
+            A new running experience, once you feel it, there is no going back.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
+            <button className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm">
+              Shop men →
+            </button>
+            <button className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm">
+              Shop women →
+            </button>
           </div>
           
-          {/* SLIDE 2 */}
-          <div className="relative w-full h-full flex-shrink-0">
-            <img 
-              className="w-full h-full object-cover" 
-              src="https://images.unsplash.com/photo-1542213498-19360e5b9c23?auto=format&fit=crop&w=1920&q=80" 
-              alt="Spring Awakening" 
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 p-8 md:p-20 w-full text-white flex flex-col items-start justify-end">
-              <span className="text-[10px] md:text-[12px] uppercase tracking-[0.2em] font-bold bg-black/60 px-3 py-1 mb-4 inline-block">Vol. 02</span>
-              <h2 className="text-5xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.9] mb-4">Spring Awakening</h2>
-              <span className="inline-block text-[13px] md:text-[15px] font-bold uppercase tracking-wider border-b border-white pb-1 cursor-pointer hover:opacity-80 transition">
-                Shop Collection →
-              </span>
-            </div>
-          </div>
-          
-          {/* SLIDE 3 */}
-          <div className="relative w-full h-full flex-shrink-0">
-            <img 
-              className="w-full h-full object-cover" 
-              src="https://images.unsplash.com/photo-1517931524326-bdd55a541177?auto=format&fit=crop&w=1920&q=80" 
-              alt="Rooted in Style" 
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 p-8 md:p-20 w-full text-white flex flex-col items-start justify-end">
-              <span className="text-[10px] md:text-[12px] uppercase tracking-[0.2em] font-bold bg-black/60 px-3 py-1 mb-4 inline-block">The Archives</span>
-              <h2 className="text-5xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.9] mb-4">Rooted in Style</h2>
-              <span className="inline-block text-[13px] md:text-[15px] font-bold uppercase tracking-wider border-b border-white pb-1 cursor-pointer hover:opacity-80 transition">
-                Shop Now →
-              </span>
-            </div>
-          </div>
+          <span className="inline-block text-xs md:text-sm font-bold uppercase tracking-wider border-b-2 border-black pb-1 cursor-pointer hover:opacity-70 transition">
+            Learn More →
+          </span>
         </div>
-        
-        {/* 🚫 DOT INDICATORS COMPLETELY REMOVED */}
-        
       </section>
 
       {/* --- NEW SHOES. NEW MOVES. --- */}
