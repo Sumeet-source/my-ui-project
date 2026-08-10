@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useState, useEffect, useNavigate } from 'react-router-dom'; // 🟢 useNavigate add kiya
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // 🟢 Sahi imports
 
 export default function Home() {
-  const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
-  const [activeCategory, setActiveCategory] = useState('Running');
-  const navigate = useNavigate(); // 🟢 Hook use kiya
+  const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
   const [activeCategory, setActiveCategory] = useState('Running');
 
@@ -67,13 +63,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- NEW MOVES. (Shoes hata diya, buttons ko upar shift kar diya) --- */}
+      {/* --- NEW MOVES (Buttons with Navigation) --- */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-4">
+          <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tighter text-gray-900">NEW MOVES</h2>
+          <div className="flex justify-center items-center gap-2 mt-1">
+             <span className="text-2xl">👟</span>
+          </div>
+        </div>
         
-        {/* 🟢 Title ab sirf "NEW MOVES" hai, aur mb-4 se buttons upar aa gaye */}
-        
-        
-               {/* 🟢 Buttons ab navigate karenge */}
         <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar mt-2">
           {['Running', 'Training', 'Football', 'Originals', 'Walk', 'Slides', 'Tennis', 'Basketball'].map((cat) => {
             const isActive = activeCategory === cat;
@@ -81,8 +79,8 @@ export default function Home() {
               <button
                 key={cat}
                 onClick={() => {
-                  setActiveCategory(cat); // Pehle ring change karo
-                  navigate(`/shoes?subCategory=${cat}`); // 🟢 Phir Shoes page par subCategory bhejo
+                  setActiveCategory(cat);
+                  navigate(`/shoes?subCategory=${cat}`); // 🟢 SubCategory navigation
                 }}
                 className={`px-4 py-1.5 text-xs md:text-sm font-bold uppercase tracking-wider transition-all duration-300 snap-center whitespace-nowrap rounded-full border-2 ${
                   isActive 
@@ -95,7 +93,6 @@ export default function Home() {
             );
           })}
         </div>
-        
       </section>
 
       {/* --- SHOP BY CATEGORY --- */}

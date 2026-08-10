@@ -12,6 +12,10 @@ export default function Dashboard() {
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
 
+  // 🟢 NEW: Cancel Modal State
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
+
   const getDateFromObjectId = (id) => {
     if (!id) return 'N/A';
     try {
@@ -57,15 +61,24 @@ export default function Dashboard() {
     }
   };
 
-  // 🟢 NEW: Handle Order Cancellation
-  const handleCancelOrder = async (orderId) => {
-    if (!confirm('Are you sure you want to cancel this order?')) return;
+  // 🟢 OPEN MODAL FUNCTION
+  const openCancelModal = (orderId) => {
+    setCancellingOrderId(orderId);
+    setShowCancelModal(true);
+  };
+
+  // 🟢 ACTUAL CANCEL LOGIC (No more window.confirm!)
+  const handleCancelOrder = async () => {
+    if (!cancellingOrderId) return;
     try {
-      await axiosClient.put(`/api/orders/${orderId}/cancel`, { userId: effectiveUser.id });
+      await axiosClient.put(`/api/orders/${cancellingOrderId}/cancel`, { userId: effectiveUser.id });
       showToast('Order cancelled successfully!', 'info');
+      setShowCancelModal(false);
+      setCancellingOrderId(null);
       fetchOrders(); // Refresh list
     } catch (error) {
       showToast(error.response?.data?.message || 'Failed to cancel order', 'error');
+      setShowCancelModal(false);
     }
   };
 
@@ -93,146 +106,157 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 bg-black text-white rounded-full flex items-center justify-center text-xl font-bold shrink-0">
-              {getInitials(effectiveUser.name)}
+
+      {/* 🟢 MOBILE-FRIENDLY CUSTOM CANCEL CONFIRMATION MODAL */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 touch-none">
+          <div className="bg-white max-w-sm w-full p-6 rounded-2xl shadow-2xl text-center transform transition-all duration-300 scale-100">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-red-600 text-2xl font-bold">!</span>
             </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 break-words">Welcome back, {effectiveUser.name}!</h1>
-              <p className="text-xs sm:text-sm text-gray-500">Member since {getDateFromObjectId(effectiveUser.id)}</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Cancel Order?</h2>
+            <p className="text-gray-600 mb-6 text-sm">Are you sure you want to cancel this order? This action cannot be undone.</p>
+            
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowCancelModal(false)}
+                className="flex-1 py-2.5 bg-gray-100 text-gray-800 text-sm font-semibold rounded-lg hover:bg-gray-200 transition"
+              >
+                No, Keep it
+              </button>
+              <button 
+                onClick={handleCancelOrder}
+                className="flex-1 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition"
+              >
+                Yes, Cancel
+              </button>
             </div>
           </div>
-          
-          <button 
-            onClick={handleLogout} 
-            className="flex items-center justify-center gap-2 px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition text-sm font-medium w-max ml-auto sm:ml-0"
-          >
-            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            <span>Logout</span>
-          </button>
+        </div>
+      )}
+
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
+        <div className="flex items-center gap-4">
+          <div className="h-16 w-16 bg-black text-white rounded-full flex items-center justify-center text-xl font-bold shrink-0">
+            {getInitials(effectiveUser.name)}
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 break-words">Welcome back, {effectiveUser.name}!</h1>
+            <p className="text-xs sm:text-sm text-gray-500">Member since {getDateFromObjectId(effectiveUser.id)}</p>
+          </div>
+        </div>
+        
+        <button 
+          onClick={handleLogout} 
+          className="flex items-center justify-center gap-2 px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition text-sm font-medium w-max ml-auto sm:ml-0"
+        >
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+
+      {/* Main Dashboard Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-1 space-y-6">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Stats</h3>
+            <div className="space-y-3 text-sm text-gray-600">
+              <div className="flex justify-between"><span>Total Orders</span><span className="font-bold text-black">{orders.length}</span></div>
+              <div className="flex justify-between"><span>Member Since</span><span className="font-medium text-gray-800">{getDateFromObjectId(effectiveUser.id)}</span></div>
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Quick Actions</h3>
+            <div className="space-y-2">
+              <button onClick={() => setView('orders')} className="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 transition">View Order History</button>
+              <Link to="/wishlist" className="block w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 transition">My Wishlist</Link>
+              {effectiveUser.isAdmin && (
+                <Link to="/admin" className="block w-full text-left px-3 py-2 text-sm font-medium text-white bg-black rounded hover:bg-gray-800 transition mt-2 text-center">
+                  Go to Admin Panel
+                </Link>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          <div className="md:col-span-1 space-y-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Stats</h3>
-              <div className="space-y-3 text-sm text-gray-600">
-                <div className="flex justify-between">
-                  <span>Total Orders</span>
-                  <span className="font-bold text-black">{orders.length}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Member Since</span>
-                  <span className="font-medium text-gray-800">{getDateFromObjectId(effectiveUser.id)}</span>
-                </div>
+        <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100 min-h-[300px]">
+          {view === 'profile' && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">My Profile Details</h3>
+              <div className="space-y-3 text-gray-600 py-2">
+                <p><span className="font-medium text-gray-900">Email Address:</span> {effectiveUser.email}</p>
+                <p><span className="font-medium text-gray-900">Account Type:</span> {effectiveUser.isAdmin ? 'Administrator' : 'Customer'}</p>
               </div>
             </div>
+          )}
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Quick Actions</h3>
-              <div className="space-y-2">
-                <button onClick={() => setView('orders')} className="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 transition">View Order History</button>
-                <Link to="/wishlist" className="block w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-50 transition">My Wishlist</Link>
-                {effectiveUser.isAdmin && (
-                  <Link to="/admin" className="block w-full text-left px-3 py-2 text-sm font-medium text-white bg-black rounded hover:bg-gray-800 transition mt-2 text-center">
-                    Go to Admin Panel
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100 min-h-[300px]">
-            {view === 'profile' && (
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">My Profile Details</h3>
-                <div className="space-y-3 text-gray-600 py-2">
-                  <p><span className="font-medium text-gray-900">Email Address:</span> {effectiveUser.email}</p>
-                  <p><span className="font-medium text-gray-900">Account Type:</span> {effectiveUser.isAdmin ? 'Administrator' : 'Customer'}</p>
-                </div>
-              </div>
-            )}
-
-            {view === 'orders' && (
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Order History</h3>
-                {loadingOrders ? (
-                  <p className="text-gray-500 italic py-8 text-center">Loading your orders...</p>
-                ) : orders.length === 0 ? (
-                  <p className="text-gray-500 italic py-8 text-center">You haven't placed any orders yet. <Link to="/" className="text-black underline">Start shopping</Link></p>
-                ) : (
-                  <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-                    {orders.map((order) => (
-                      <div key={order._id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition">
-                        
-                        {/* Order Header */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 border-b border-gray-200 pb-2 gap-2">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-bold text-gray-900 text-sm">Order #{order._id.slice(-6)}</span>
-                            <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
-                              {order.status || 'Pending'}
-                            </span>
-                          </div>
-                          <span className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</span>
+          {view === 'orders' && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4 border-b pb-2">Order History</h3>
+              {loadingOrders ? (
+                <p className="text-gray-500 italic py-8 text-center">Loading your orders...</p>
+              ) : orders.length === 0 ? (
+                <p className="text-gray-500 italic py-8 text-center">You haven't placed any orders yet. <Link to="/" className="text-black underline">Start shopping</Link></p>
+              ) : (
+                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                  {orders.map((order) => (
+                    <div key={order._id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 border-b border-gray-200 pb-2 gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-gray-900 text-sm">Order #{order._id.slice(-6)}</span>
+                          <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
+                            {order.status || 'Pending'}
+                          </span>
                         </div>
-
-                        {/* Order Items */}
-                        <div className="space-y-1 mb-2">
-                          {order.items.slice(0, 2).map((item, idx) => (
-                            <Link key={idx} to={`/product/${item.productId}`} className="flex justify-between text-xs text-gray-600 hover:bg-gray-200 p-1 -mx-1 rounded transition">
-                              <span>{item.title} {item.size ? `(Size: ${item.size})` : ''} <span className="font-bold">x{item.quantity}</span></span>
-                              <span>${(item.price * item.quantity).toFixed(2)}</span>
-                            </Link>
-                          ))}
-                          {order.items.length > 2 && <p className="text-xs text-gray-400">+ {order.items.length - 2} more items</p>}
-                        </div>
-
-                        {/* 🟢 NEW: CANCEL ORDER BUTTON (Only for Pending/Processing) */}
-                        {(order.status === 'Pending' || order.status === 'Processing') && (
-                          <div className="flex justify-end mt-1">
-                            <button 
-                              onClick={() => handleCancelOrder(order._id)}
-                              className="text-xs font-medium text-red-500 hover:text-red-700 underline transition"
-                            >
-                              Cancel Order
-                            </button>
-                          </div>
-                        )}
-
-                        {/* Delivery Tracking Messages */}
-                        {order.status?.toLowerCase() === 'shipped' && (
-                          <div className="bg-purple-50 border border-purple-200 rounded p-2 mb-2 flex items-center gap-2">
-                            <span className="text-purple-600 text-sm">🚚</span>
-                            <span className="text-xs text-purple-700 font-medium">Your order will be delivered soon!</span>
-                          </div>
-                        )}
-                        {order.status?.toLowerCase() === 'delivered' && (
-                          <div className="bg-green-50 border border-green-200 rounded p-2 mb-2 flex items-center gap-2">
-                            <span className="text-green-600 text-sm">✅</span>
-                            <span className="text-xs text-green-700 font-medium">Delivered successfully.</span>
-                          </div>
-                        )}
-
-                        {/* Order Total */}
-                        <div className="flex justify-between font-bold text-sm text-gray-900 border-t border-gray-300 pt-2 mt-2">
-                          <span>Total</span>
-                          <span>${order.totalAmount.toFixed(2)}</span>
-                        </div>
+                        <span className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</span>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+                      <div className="space-y-1 mb-2">
+                        {order.items.slice(0, 2).map((item, idx) => (
+                          <Link key={idx} to={`/product/${item.productId}`} className="flex justify-between text-xs text-gray-600 hover:bg-gray-200 p-1 -mx-1 rounded transition">
+                            <span>{item.title} {item.size ? `(Size: ${item.size})` : ''} <span className="font-bold">x{item.quantity}</span></span>
+                            <span>${(item.price * item.quantity).toFixed(2)}</span>
+                          </Link>
+                        ))}
+                        {order.items.length > 2 && <p className="text-xs text-gray-400">+ {order.items.length - 2} more items</p>}
+                      </div>
+
+                      {/* 🟢 NEW: CANCEL BUTTON TRIGGERS MODAL */}
+                      {(order.status === 'Pending' || order.status === 'Processing') && (
+                        <div className="flex justify-end mt-1">
+                          <button 
+                            onClick={() => openCancelModal(order._id)}
+                            className="text-xs font-medium text-red-500 hover:text-red-700 underline transition"
+                          >
+                            Cancel Order
+                          </button>
+                        </div>
+                      )}
+
+                      {order.status?.toLowerCase() === 'shipped' && (
+                        <div className="bg-purple-50 border border-purple-200 rounded p-2 mb-2 flex items-center gap-2">
+                          <span className="text-purple-600 text-sm">🚚</span>
+                          <span className="text-xs text-purple-700 font-medium">Your order will be delivered soon!</span>
+                        </div>
+                      )}
+                      {order.status?.toLowerCase() === 'delivered' && (
+                        <div className="bg-green-50 border border-green-200 rounded p-2 mb-2 flex items-center gap-2">
+                          <span className="text-green-600 text-sm">✅</span>
+                          <span className="text-xs text-green-700 font-medium">Delivered successfully.</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between font-bold text-sm text-gray-900 border-t border-gray-300 pt-2 mt-2">
+                        <span>Total</span>
+                        <span>${order.totalAmount.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
