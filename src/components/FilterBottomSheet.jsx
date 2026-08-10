@@ -29,9 +29,9 @@ export default function FilterBottomSheet({
     if (localFilters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (localFilters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     
-    // 🟢🚨 FIX: SubCategory ke ANDAR aur Product TITLE ke ANDAR dono search karega!
+    // 🟢 FINAL FIX: Frontend count mein bhi trailing 's' hata diya (Plural -> Singular)
     if (localFilters.subCategory) {
-        const searchLower = localFilters.subCategory.toLowerCase();
+        const searchLower = localFilters.subCategory.toLowerCase().replace(/s$/, '');
         result = result.filter(p => 
             (p.subCategory && p.subCategory.toLowerCase().includes(searchLower)) || 
             (p.title && p.title.toLowerCase().includes(searchLower))
@@ -68,16 +68,19 @@ export default function FilterBottomSheet({
   const handleApply = () => {
     let finalFilters = {};
     
+    // 🟢 Backend ko bhejne se pehle bhi trailing 's' clean kar diya
+    const cleanSub = localFilters.subCategory.replace(/s$/, '');
+    
     if (isDefaultCategoryValid) {
       finalFilters = {
         category: defaultCategory,
-        subCategory: localFilters.subCategory,
+        subCategory: cleanSub,
         sort: localFilters.sort,
         price: localFilters.price
       };
     } else {
       finalFilters = {
-        subCategory: localFilters.subCategory,
+        subCategory: cleanSub,
         sort: localFilters.sort,
         price: localFilters.price
       };
