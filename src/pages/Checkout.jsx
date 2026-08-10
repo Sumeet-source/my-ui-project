@@ -22,14 +22,14 @@ export default function Checkout() {
   const deliveryFee = 0;
   const total = Math.max(0, subtotal - (discount?.amount || 0));
 
-  const [address, setAddress] = useState({ fullName: '', street: '', city: '', pincode: '', phone: '' });
+  // 🟢 UPDATED: email field added to address state
+  const [address, setAddress] = useState({ fullName: '', email: '', street: '', city: '', pincode: '', phone: '' });
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('Razorpay');
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
 
-  // 🟢 NEW: Delivery availability & Location states
-  const [deliveryAvailable, setDeliveryAvailable] = useState(null); // null = not checked, true/false
+  const [deliveryAvailable, setDeliveryAvailable] = useState(null); 
   const [checkingPincode, setCheckingPincode] = useState(false);
 
   // 🟢 Auto-fetch Live Location on page load
@@ -69,8 +69,11 @@ export default function Checkout() {
         const defaultAddr = res.data.find(addr => addr.isDefault === true);
         if (defaultAddr) {
           setAddress({
-            fullName: defaultAddr.fullName || '', street: defaultAddr.street || '',
-            city: defaultAddr.city || '', pincode: defaultAddr.pincode || '',
+            fullName: defaultAddr.fullName || '', 
+            email: defaultAddr.email || '', // 🟢 Email load karo agar address book mein ho
+            street: defaultAddr.street || '',
+            city: defaultAddr.city || '', 
+            pincode: defaultAddr.pincode || '',
             phone: defaultAddr.phone || ''
           });
         }
@@ -78,20 +81,18 @@ export default function Checkout() {
     } catch (error) { console.log('Address API error'); }
   };
 
-  // 🟢 Check via Backend API
   const checkDeliveryAvailability = async (pincodeToCheck = null) => {
     const pincode = pincodeToCheck || address.pincode;
     if (!pincode || pincode.length !== 6) {
       setDeliveryAvailable(null);
       return;
     }
-    
     setCheckingPincode(true);
     try {
       const res = await axiosClient.get(`/api/delivery/check/${pincode}`);
       setDeliveryAvailable(res.data.success);
     } catch (error) {
-      setDeliveryAvailable(false); // Default to false if API fails
+      setDeliveryAvailable(false);
     } finally {
       setCheckingPincode(false);
     }
@@ -100,7 +101,7 @@ export default function Checkout() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setAddress(prev => ({ ...prev, [name]: value }));
-    if (name === 'pincode') setDeliveryAvailable(null); // Reset check when pincode changes
+    if (name === 'pincode') setDeliveryAvailable(null);
   };
 
   const loadRazorpayScript = (src) => {
@@ -114,7 +115,7 @@ export default function Checkout() {
   };
 
   const handlePayment = async () => {
-    if (!address.fullName || !address.street || !address.city || !address.pincode || !address.phone) {
+    if (!address.fullName || !address.email || !address.street || !address.city || !address.pincode || !address.phone) {
       showToast('Please fill all delivery address fields!', 'error');
       return;
     }
@@ -137,7 +138,7 @@ export default function Checkout() {
         })),
         totalAmount: total,
         paymentMethod: paymentMethod,
-        shippingAddress: address,
+        shippingAddress: address, // 🟢 Ab isme email bhi bhejega!
       };
 
       if (paymentMethod === 'Cash on Delivery') {
@@ -171,7 +172,7 @@ export default function Checkout() {
               showToast('Payment successful, but failed to save order.', 'error');
             }
           },
-          prefill: { name: address.fullName, email: user?.email || '', contact: address.phone },
+          prefill: { name: address.fullName, email: address.email || user?.email || '', contact: address.phone },
           theme: { color: '#000000' },
           modal: { ondismiss: () => { setLoading(false); showToast('Payment cancelled', 'info'); } }
         };
@@ -186,7 +187,7 @@ export default function Checkout() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-white min-h-screen">
-      {showConfirmation && ( /* Confirmation Modal (Same as before) */
+      {showConfirmation && ( 
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 touch-none">
           <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl text-center max-h-[90dvh] overflow-y-auto">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -214,6 +215,13 @@ export default function Checkout() {
               <label className="block text-sm font-medium text-gray-800 mb-1.5">Full Name</label>
               <input type="text" name="fullName" value={address.fullName} onChange={handleChange} placeholder="John Doe" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
             </div>
+
+            {/* 🟢 NEW: Email Input for Order Updates */}
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1.5">Email Address (For Order Updates)</label>
+              <input type="email" name="email" value={address.email} onChange={handleChange} placeholder="dhakads458669@gmail.com" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-1.5">Address</label>
               <input type="text" name="street" value={address.street} onChange={handleChange} placeholder="123 Main St" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
@@ -231,8 +239,6 @@ export default function Checkout() {
                     {checkingPincode ? '...' : 'Check'}
                   </button>
                 </div>
-                
-                {/* 🔴 RED ALERT BLOCK FOR NON-DELIVERABLE AREAS */}
                 {deliveryAvailable === false && (
                   <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
                     <span className="text-red-500 text-xl shrink-0">🚫</span>
@@ -245,8 +251,6 @@ export default function Checkout() {
                     </div>
                   </div>
                 )}
-                
-                {/* 🟢 GREEN MESSAGE FOR DELIVERABLE AREAS */}
                 {deliveryAvailable === true && (
                   <p className="text-sm font-semibold text-green-600 mt-2">✓ We deliver to this location!</p>
                 )}
