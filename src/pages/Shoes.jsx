@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom'; // or 'next/navigation' for Next.js
 import { useToast } from '../context/ToastContext';
 import axiosClient from '../api/axiosClient';
 
@@ -8,6 +9,13 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [activeTab, setActiveTab] = useState('products');
   
+  // 🟢 Read subCategory from URL
+  const [searchParams] = useSearchParams();
+  const subCategoryFromUrl = searchParams.get('subCategory');
+
+  // 🟢 Filters state – we can extend later
+  const [filters, setFilters] = useState({});
+
   // --- Upload State ---
   const [uploading, setUploading] = useState(false);
 
@@ -33,11 +41,11 @@ export default function AdminDashboard() {
     inStock: true
   });
 
-  // --- Fetch Data ---
+  // --- Fetch Data on mount and when activeTab changes ---
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(filters);
     fetchOrders();
-  }, []);
+  }, []); // only once on mount
 
   useEffect(() => {
     if (activeTab === 'orders') {
@@ -45,6 +53,15 @@ export default function AdminDashboard() {
     }
   }, [activeTab]);
 
+  // 🟢 NEW: Fetch products whenever the URL subCategory changes
+  useEffect(() => {
+    // Build filters from URL
+    const newFilters = subCategoryFromUrl ? { subCategory: subCategoryFromUrl } : {};
+    setFilters(newFilters);
+    fetchProducts(newFilters);
+  }, [subCategoryFromUrl]);
+
+  // --- Fetch Orders ---
   const fetchOrders = async () => {
     try {
       const res = await axiosClient.get('/api/orders/all');
@@ -54,16 +71,20 @@ export default function AdminDashboard() {
     }
   };
 
-  const fetchProducts = async () => {
+  // 🟢 UPDATED: fetchProducts now accepts a filters object
+  const fetchProducts = async (filters = {}) => {
     try {
-      const res = await axiosClient.get('/api/products');
+      // Build query string from filters (e.g., ?subCategory=Running)
+      const query = new URLSearchParams(filters).toString();
+      const url = query ? `/api/products?${query}` : '/api/products';
+      const res = await axiosClient.get(url);
       setProducts(res.data);
     } catch (error) {
       showToast('Failed to load products', 'error');
     }
   };
 
-  // 🟢 NEW: Handle Image Upload
+  // 🟢 Handle Image Upload
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -85,7 +106,7 @@ export default function AdminDashboard() {
     }
   };
 
-  // 🟢 NEW: Handle Edit Image Upload
+  // 🟢 Handle Edit Image Upload
   const handleEditImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -121,7 +142,8 @@ export default function AdminDashboard() {
     try {
       await axiosClient.post('/api/products', formData);
       showToast('Product added successfully!', 'success');
-      fetchProducts();
+      // Refetch with current filters
+      fetchProducts(filters);
       setFormData({ title: '', price: '', description: '', imageUrl: '', category: 'Men', inStock: true });
     } catch (error) {
       showToast('Failed to add product', 'error');
@@ -157,7 +179,8 @@ export default function AdminDashboard() {
       showToast('Product updated successfully!', 'success');
       setIsEditModalOpen(false);
       setEditingProductId(null);
-      fetchProducts();
+      // Refetch with current filters
+      fetchProducts(filters);
     } catch (error) {
       showToast('Failed to update product', 'error');
     }
@@ -169,7 +192,7 @@ export default function AdminDashboard() {
     try {
       await axiosClient.delete(`/api/products/${id}`);
       showToast('Product deleted', 'info');
-      fetchProducts();
+      fetchProducts(filters);
     } catch (error) {
       showToast('Failed to delete', 'error');
     }
@@ -179,6 +202,24 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
+
+        {/* 🟢 Show active filter if any */}
+        {subCategoryFromUrl && (
+          <div className="mb-4 p-2 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm">
+            🔍 Currently filtering by sub‑category: <strong>{subCategoryFromUrl}</strong>
+            <button
+              onClick={() => {
+                // Clear URL param and reset filter
+                window.history.replaceState({}, '', window.location.pathname);
+                setFilters({});
+                fetchProducts({});
+              }}
+              className="ml-3 text-blue-600 underline hover:text-blue-800"
+            >
+              Clear filter
+            </button>
+          </div>
+        )}
 
         <div className="flex border-b border-gray-200 mb-6">
           <button 
@@ -212,7 +253,6 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-900">Product Image</label>
-                    {/* 🟢 File Upload Input */}
                     <div className="flex items-center gap-2 mt-1">
                       <input 
                         type="file" 
