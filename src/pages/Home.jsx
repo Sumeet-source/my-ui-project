@@ -62,19 +62,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- NEW SHOES | NEW MOVES (Pipe sign + Permanent Rings) --- */}
+      {/* --- NEW MOVES. (Shoes hata diya, buttons ko upar shift kar diya) --- */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-        {/* 🟢 Title with Pipe and Centered */}
-        <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tighter text-gray-900">NEW SHOES | NEW MOVES</h2>
+        {/* 🟢 Title ab sirf "NEW MOVES" hai, aur mb-4 se buttons upar aa gaye */}
+        <div className="text-center mb-4">
+          <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tighter text-gray-900">NEW MOVES</h2>
           <div className="flex justify-center items-center gap-2 mt-1">
              <span className="text-2xl">👟</span>
           </div>
         </div>
         
-        {/* 🟢 PERMANENT RINGS: Inactive = gray border, Active = black border */}
-        <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar">
+        {/* 🟢 Buttons ko upper laane ke liye mt-2 add kiya hai */}
+        <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar mt-2">
           {['Running', 'Training', 'Football', 'Originals', 'Walk', 'Slides', 'Tennis', 'Basketball'].map((cat) => {
             const isActive = activeCategory === cat;
             return (
