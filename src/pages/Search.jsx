@@ -70,32 +70,25 @@ export default function Search() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         
-        {/* 🟢 UPDATED: Faded color + Smaller text (No dance animation) */}
-        <div className="flex flex-col gap-1 mb-6">
-          {/* text-2xl (chhota), text-gray-500 (fade), hata diya animate-dance */}
-          <h1 className="text-2xl font-bold text-gray-500 capitalize inline-block">
-            {subCategory || (query ? `"${query}"` : 'Search Results')}
-          </h1>
-
-          <div className="flex items-center gap-3 mt-1">
-            {subCategory && (
-              <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-900 border border-gray-200 shadow-sm transition-all">
-                <span>{subCategory}</span>
-                <button
-                  onClick={handleClearSubCategory}
-                  className="p-0.5 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition-colors"
-                  aria-label="Clear filter"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            )}
-            <p className="text-sm text-gray-500 font-medium">
-              {itemText}
-            </p>
-          </div>
+        {/* 🟢 UPDATED: Upar wala bada 'Running Shoes' text hata diya. Ab sirf Tag aur Count hai */}
+        <div className="flex items-center flex-wrap gap-3 mb-6 mt-2">
+          {subCategory && (
+            <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-900 border border-gray-200 shadow-sm transition-all">
+              <span>{subCategory}</span>
+              <button
+                onClick={handleClearSubCategory}
+                className="p-0.5 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition-colors"
+                aria-label="Clear filter"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+          <p className="text-sm text-gray-500 font-medium">
+            {itemText}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 lg:gap-x-8 lg:gap-y-12 mt-4">
