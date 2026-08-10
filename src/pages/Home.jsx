@@ -38,8 +38,8 @@ export default function Home() {
         {/* 🟢 Overlay aur Buttons - BILKUL NEECHE (Absolute Bottom) */}
         <div className="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
         
-        {/* 🟢 Buttons ab 'absolute bottom-0' se bilkul neeche chipak gaye hain! */}
-        <div className="absolute bottom-0 left-0 w-full p-6 md:p-10 flex flex-col items-start gap-4 text-black">
+        {/* 🟢 Buttons ab 'absolute bottom-0', lekin neeche se thodi padding (pb-14) hai! */}
+        <div className="absolute bottom-0 left-0 w-full p-6 md:p-10 pb-8 md:pb-14 flex flex-col items-start gap-4 text-black">
           
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
