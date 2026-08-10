@@ -58,26 +58,35 @@ export default function Checkout() {
     }
   }, []);
 
-  useEffect(() => {
+    useEffect(() => {
     fetchDefaultAddress();
   }, [user]);
 
   const fetchDefaultAddress = async () => {
     try {
       const res = await axiosClient.get('/api/addresses');
+      let emailFromAddress = '';
+      
       if (res.data && Array.isArray(res.data)) {
         const defaultAddr = res.data.find(addr => addr.isDefault === true);
         if (defaultAddr) {
           setAddress({
             fullName: defaultAddr.fullName || '', 
-            email: defaultAddr.email || '', // 🟢 Email load karo agar address book mein ho
+            email: defaultAddr.email || '', 
             street: defaultAddr.street || '',
             city: defaultAddr.city || '', 
             pincode: defaultAddr.pincode || '',
             phone: defaultAddr.phone || ''
           });
+          emailFromAddress = defaultAddr.email || '';
         }
       }
+
+      // 🟢 NEW LOGIC: Agar user logged in hai, aur address book mein email khali hai, toh Auth email se fill kar do!
+      if (user?.email && !emailFromAddress) {
+        setAddress(prev => ({ ...prev, email: user.email }));
+      }
+
     } catch (error) { console.log('Address API error'); }
   };
 
