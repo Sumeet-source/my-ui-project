@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useState, useEffect, useNavigate } from 'react-router-dom'; // 🟢 useNavigate add kiya
+import { Link } from 'react-router-dom';
 
 export default function Home() {
+  const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
+  const [activeCategory, setActiveCategory] = useState('Running');
+  const navigate = useNavigate(); // 🟢 Hook use kiya
   const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
   const [activeCategory, setActiveCategory] = useState('Running');
 
@@ -68,14 +73,17 @@ export default function Home() {
         {/* 🟢 Title ab sirf "NEW MOVES" hai, aur mb-4 se buttons upar aa gaye */}
         
         
-        {/* 🟢 Buttons ko upper laane ke liye mt-2 add kiya hai */}
+               {/* 🟢 Buttons ab navigate karenge */}
         <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar mt-2">
           {['Running', 'Training', 'Football', 'Originals', 'Walk', 'Slides', 'Tennis', 'Basketball'].map((cat) => {
             const isActive = activeCategory === cat;
             return (
               <button
                 key={cat}
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => {
+                  setActiveCategory(cat); // Pehle ring change karo
+                  navigate(`/shoes?subCategory=${cat}`); // 🟢 Phir Shoes page par subCategory bhejo
+                }}
                 className={`px-4 py-1.5 text-xs md:text-sm font-bold uppercase tracking-wider transition-all duration-300 snap-center whitespace-nowrap rounded-full border-2 ${
                   isActive 
                     ? 'border-black text-black bg-gray-50' 
@@ -87,6 +95,7 @@ export default function Home() {
             );
           })}
         </div>
+        
       </section>
 
       {/* --- SHOP BY CATEGORY --- */}
