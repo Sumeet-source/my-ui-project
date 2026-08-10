@@ -31,19 +31,23 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white font-body-md text-on-surface pb-16">
       
-      {/* --- HERO CAROUSEL (Adidas Live Style) --- */}
+      {/* --- HERO CAROUSEL (VIDEO BANNER) --- */}
       <section className="relative w-full h-[85vh] max-h-[900px] overflow-hidden">
         <div 
           className="flex w-[300%] h-full transition-transform duration-700 ease-in-out"
           style={{ transform: `translateX(-${currentSlide * 33.333}%)` }}
         >
-          {/* Slide 1: Adidas HYPERBOOST style (Match kiya screenshot se) */}
+          {/* 🟢 SLIDE 1: MP4 VIDEO BANNER (Path: /videos/hero-banner.mp4) */}
           <div className="relative w-full h-full flex-shrink-0">
-            <img 
+            <video 
               className="w-full h-full object-cover" 
-              src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1920&q=80" 
-              alt="Hyperboost" 
-            />
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              src="/videos/hero-banner.mp4" 
+            ></video>
+
             <div className="absolute inset-0 bg-white/30 mix-blend-overlay"></div>
             <div className="absolute inset-0 flex flex-col items-start justify-center p-8 md:p-24 text-left text-black">
               <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter text-black mb-2">HYPERBOOST</h2>
@@ -51,7 +55,6 @@ export default function Home() {
                 A new running experience, once you feel it, there is no going back.
               </p>
               
-              {/* 🟢 Buttons exactly like Adidas screenshot */}
               <div className="flex flex-col sm:flex-row gap-4 mb-4">
                 <button className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm">
                   Shop men →
@@ -61,14 +64,13 @@ export default function Home() {
                 </button>
               </div>
               
-              {/* 🟢 Learn More Link */}
               <span className="inline-block text-xs md:text-sm font-bold uppercase tracking-wider border-b-2 border-black pb-1 cursor-pointer hover:opacity-70 transition">
                 Learn More →
               </span>
             </div>
           </div>
           
-          {/* Slide 2 */}
+          {/* SLIDE 2 */}
           <div className="relative w-full h-full flex-shrink-0">
             <img 
               className="w-full h-full object-cover" 
@@ -85,7 +87,7 @@ export default function Home() {
             </div>
           </div>
           
-          {/* Slide 3 */}
+          {/* SLIDE 3 */}
           <div className="relative w-full h-full flex-shrink-0">
             <img 
               className="w-full h-full object-cover" 
@@ -115,7 +117,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- NEW SHOES. NEW MOVES. (Category Swipe Row) --- */}
+      {/* --- NEW SHOES. NEW MOVES. --- */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-left mb-6">
           <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tighter text-gray-900">NEW SHOES. NEW MOVES.</h2>
@@ -124,7 +126,6 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Horizontal Category Scroller */}
         <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar">
           {['Running', 'Training', 'Football', 'Originals', 'Walk', 'Slides', 'Tennis', 'Basketball'].map((cat) => (
             <button key={cat} className="px-4 py-2 bg-transparent text-gray-900 text-sm font-medium uppercase tracking-wider border-b-2 border-transparent hover:border-black transition snap-center whitespace-nowrap">
@@ -134,7 +135,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SHOP BY CATEGORY (Adidas Grid Style) --- */}
+      {/* --- SHOP BY CATEGORY --- */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link to="/men" className="relative h-[400px] md:h-[500px] overflow-hidden group cursor-pointer">
