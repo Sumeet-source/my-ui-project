@@ -29,11 +29,12 @@ export default function FilterBottomSheet({
     if (localFilters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (localFilters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     
-    // 🟢 🚨 FIX: Exact match (===) hata kar .includes() lagaya hai.
-    // Ab frontend bhi 'Jacket' aur 'Jackets' ko ek jaisa count karega.
+    // 🟢🚨 FIX: SubCategory ke ANDAR aur Product TITLE ke ANDAR dono search karega!
     if (localFilters.subCategory) {
+        const searchLower = localFilters.subCategory.toLowerCase();
         result = result.filter(p => 
-            p.subCategory?.toLowerCase().includes(localFilters.subCategory.toLowerCase())
+            (p.subCategory && p.subCategory.toLowerCase().includes(searchLower)) || 
+            (p.title && p.title.toLowerCase().includes(searchLower))
         );
     }
 
