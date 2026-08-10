@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function Home() {
   const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
-  const [activeCategory, setActiveCategory] = useState('Running'); // 🟢 Active tab state
+  const [activeCategory, setActiveCategory] = useState('Running');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -62,35 +62,32 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- NEW MOVES. (Updated Title & Active Dot Logic) --- */}
+      {/* --- NEW SHOES. NEW MOVES. (Full Title + Centered + Circular Ring Border) --- */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-        {/* 🟢 FIX: Title centered on mobile, left on desktop */}
-        <div className="text-center md:text-left mb-6">
-          <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tighter text-gray-900">NEW MOVES.</h2>
-          <div className="flex justify-center md:justify-start items-center gap-2 mt-1">
+        {/* 🟢 FIX: Title wapas full likha aur text-center kiya */}
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tighter text-gray-900">NEW SHOES. NEW MOVES.</h2>
+          <div className="flex justify-center items-center gap-2 mt-1">
              <span className="text-2xl">👟</span>
           </div>
         </div>
         
-        {/* 🟢 Category Buttons with Active Black Dot Indicator */}
-        <div className="flex gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar">
+        {/* 🟢 Circular Black Rings (Border-2 around active item) */}
+        <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar">
           {['Running', 'Training', 'Football', 'Originals', 'Walk', 'Slides', 'Tennis', 'Basketball'].map((cat) => {
             const isActive = activeCategory === cat;
             return (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className="relative px-2 py-1 text-xs md:text-sm font-bold uppercase tracking-wider transition-colors duration-300 snap-center whitespace-nowrap"
+                className={`px-4 py-1.5 text-xs md:text-sm font-bold uppercase tracking-wider transition-all duration-300 snap-center whitespace-nowrap rounded-full border-2 ${
+                  isActive 
+                    ? 'border-black text-black' 
+                    : 'border-transparent text-gray-500 hover:text-gray-900'
+                }`}
               >
-                <span className={`transition-colors duration-300 ${isActive ? 'text-black' : 'text-gray-500 hover:text-gray-900'}`}>
-                  {cat}
-                </span>
-                
-                {/* 🟢 CIRCULAR BLACK RING INDICATOR */}
-                {isActive && (
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-black transition-all duration-300"></div>
-                )}
+                {cat}
               </button>
             );
           })}
