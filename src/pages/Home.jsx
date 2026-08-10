@@ -35,13 +35,9 @@ export default function Home() {
           <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1920&q=80" alt="Banner Fallback" className="w-full h-full object-cover" />
         </video>
 
-        {/* 🟢 Overlay aur Buttons - BILKUL NEECHE (Absolute Bottom) */}
+        {/* Overlay and Main Left Buttons */}
         <div className="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
-        
-        {/* 🟢 Buttons ab 'absolute bottom-0', lekin neeche se thodi padding (pb-14) hai! */}
         <div className="absolute bottom-0 left-0 w-full p-6 md:p-10 pb-8 md:pb-14 flex flex-col items-start gap-4 text-black">
-          
-          {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/men" className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm text-center">
               Shop men →
@@ -50,10 +46,18 @@ export default function Home() {
               Shop women →
             </Link>
           </div>
-          
           <span className="inline-block text-xs md:text-sm font-bold uppercase tracking-wider border-b-2 border-black pb-1 cursor-pointer hover:opacity-70 transition">
             Learn More →
           </span>
+        </div>
+
+        {/* 🟢 NEW: White button to cover the bottom-right watermark */}
+        <div className="absolute bottom-0 right-0 p-6 md:p-10">
+          <div className="bg-white text-black px-4 py-2.5 rounded-full shadow-md flex items-center gap-2 text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition cursor-pointer">
+            {/* Small star/icon to make it look natural */}
+            <span className="text-sm leading-none opacity-80">✦</span> 
+            Follow us
+          </div>
         </div>
       </section>
 
