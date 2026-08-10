@@ -30,19 +30,18 @@ export default function FilterBottomSheet({
     if (localFilters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (localFilters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     
-    // 🟢 FILTER LOGIC FIXED
+    // 🟢 BUG FIXED: SubCategory filter logic ko optimize kiya
     if (isDefaultCategoryValid) {
         // Shoes page logic: Sirf subCategory filter karega
         if (localFilters.subCategory) {
             result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
         }
     } else {
-        // Men/Women/Home page logic: Category aur SubCategory dono filter karega
-        if (localFilters.category) {
-            result = result.filter(p => p.category.toLowerCase() === localFilters.category.toLowerCase());
-            if (localFilters.subCategory) {
-                result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
-            }
+        // 🟢 Men/Women/Home page logic: 
+        // Local count dikhane ke liye Category match nahi karega (kyunki Men's page par products ki category 'Men' hoti hai, 'Clothing' nahi).
+        // Lekin SubCategory match zaroor karega.
+        if (localFilters.subCategory) {
+            result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
         }
     }
 
@@ -86,7 +85,7 @@ export default function FilterBottomSheet({
         price: localFilters.price
       };
     } else {
-      // 🟢 Men/Women page: backend ko poori Category aur SubCategory bhejega
+      // 🟢 Men/Women page: Backend ko Category (Clothing) aur SubCategory (Jackets) dono bhejega
       finalFilters = localFilters;
     }
     
