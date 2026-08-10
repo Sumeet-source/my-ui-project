@@ -65,12 +65,7 @@ export default function Home() {
 
       {/* --- NEW MOVES (Buttons with Navigation) --- */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-4">
-          <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tighter text-gray-900">NEW MOVES</h2>
-          <div className="flex justify-center items-center gap-2 mt-1">
-             <span className="text-2xl">👟</span>
-          </div>
-        </div>
+        
         
         <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar mt-2">
           {['Running', 'Training', 'Football', 'Originals', 'Walk', 'Slides', 'Tennis', 'Basketball'].map((cat) => {
