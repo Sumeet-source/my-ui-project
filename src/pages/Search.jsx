@@ -83,10 +83,9 @@ export default function Search() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         
-        {/* 🟢 UPDATED UI/UX: Faded Color + Dancing Animation */}
+        {/* 🟢 UPDATED UI: Size chhoti kar di (text-3xl -> text-2xl) */}
         <div className="flex flex-col gap-1 mb-6">
-          {/* 🟢 Faded (text-gray-500) aur Dancing text */}
-          <h1 className="text-3xl font-bold text-gray-500 capitalize animate-dance inline-block">
+          <h1 className="text-2xl font-bold text-black capitalize animate-dance inline-block blur-sm">
             {subCategory || (query ? `"${query}"` : 'Search Results')}
           </h1>
 
@@ -106,7 +105,6 @@ export default function Search() {
               </div>
             )}
             
-            {/* 🟢 Count text ko bhi slow pulse diya hai */}
             <p className="text-sm text-gray-500 font-medium animate-pulse">
               {itemText}
             </p>
