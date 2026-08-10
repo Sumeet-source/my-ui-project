@@ -66,7 +66,7 @@ export default function Home() {
       {/* --- NEW MOVES (Buttons with Navigation) --- */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar mt-2">
-          {['Running shoes', 'Training', 'Football', 'Originals', 'Walk', 'Slides', 'Tennis', 'Basketball'].map((cat) => {
+          {['Running shoes', 'Training', 'Jackets', 'Shorts', 'Jeans', 'T-shirts', 'Hoodies', 'Sneakers'].map((cat) => {
             const isActive = activeCategory === cat;
             return (
               <button
