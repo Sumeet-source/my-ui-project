@@ -5,7 +5,7 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
 
-  // Auto slide carousel
+  // Auto slide carousel (Dots hat gaye hain, lekin slide aage badhega)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % 3);
@@ -37,7 +37,7 @@ export default function Home() {
           className="flex w-[300%] h-full transition-transform duration-700 ease-in-out"
           style={{ transform: `translateX(-${currentSlide * 33.333}%)` }}
         >
-          {/* 🟢 SLIDE 1: MP4 VIDEO BANNER (Path: /videos/hero-banner.mp4) */}
+          {/* 🟢 SLIDE 1: MP4 VIDEO BANNER */}
           <div className="relative w-full h-full flex-shrink-0">
             <video 
               className="w-full h-full object-cover" 
@@ -105,16 +105,8 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Carousel Indicators */}
-        <div className="absolute bottom-6 right-6 md:bottom-10 md:right-10 flex gap-2">
-          {[0, 1, 2].map((idx) => (
-            <button 
-              key={idx}
-              className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-black' : 'bg-gray-400'}`}
-              onClick={() => setCurrentSlide(idx)}
-            />
-          ))}
-        </div>
+        {/* 🚫 DOT INDICATORS COMPLETELY REMOVED */}
+        
       </section>
 
       {/* --- NEW SHOES. NEW MOVES. --- */}
