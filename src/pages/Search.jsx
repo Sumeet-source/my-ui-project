@@ -5,15 +5,18 @@ import ProductCard from '../components/ProductCard.jsx';
 import axiosClient from '../api/axiosClient';
 
 export default function Search() {
-  const [searchParams] = useSearchParams();
+  // 🟢 setSearchParams bhi import kiya taaki Clean button kaam kare
+  const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
+  const subCategory = searchParams.get('subCategory') || ''; // 🟢 Ye nikaala
   
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
-      if (!query) {
+      // 🟢 Agar query aur subCategory dono empty hain toh kuch mat karo
+      if (!query && !subCategory) {
         setProducts([]);
         setLoading(false);
         return;
@@ -21,9 +24,13 @@ export default function Search() {
 
       setLoading(true);
       try {
-        const res = await axiosClient.get('/api/products', { params: { q: query } });
+        // 🟢 Params build karna
+        let params = {};
+        if (query) params.q = query;
+        if (subCategory) params.subCategory = subCategory;
+
+        const res = await axiosClient.get('/api/products', { params });
         
-        // 🟢 FIX: Agar res.data Object hai toh usme se array nikaalo, warna crash ho jayega!
         let data = res.data;
         if (Array.isArray(data)) {
           data = data;
@@ -45,7 +52,12 @@ export default function Search() {
     };
 
     fetchSearchResults();
-  }, [query]);
+  }, [query, subCategory]); // 🟢 subCategory change hone par bhi fetch chalega
+
+  // Clear button function (Sirf subCategory hatao, agar query hai toh use rahne do)
+  const handleClearSubCategory = () => {
+    setSearchParams({ q: query });
+  };
 
   return (
     <div className="bg-white min-h-screen overflow-x-hidden">
@@ -57,10 +69,38 @@ export default function Search() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="mb-2">
-          <h1 className="text-xl font-bold text-gray-900">Search Results</h1>
-          <h2 className="text-2xl font-bold text-gray-900 mt-1">"{query}"</h2>
-          <p className="text-sm text-gray-500 mt-2">{loading ? 'Searching...' : `${products.length} items`}</p>
+        <div className="mb-4">
+          <h1 className="text-xl font-bold text-gray-900">
+            {subCategory ? `Showing results for:` : 'Search Results'}
+          </h1>
+          <h2 className="text-2xl font-bold text-gray-900 mt-1">
+            {query ? `"${query}"` : subCategory ? `${subCategory}` : ''}
+          </h2>
+          
+          {/* 🟢 UI: Agar subCategory active hai toh woh clean Gray Pill dikhega */}
+          {subCategory && (
+            <div className="mt-3 inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg text-sm font-medium text-gray-900 shadow-sm border border-gray-100 transition-all">
+              <span className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <span>{subCategory}</span>
+              </span>
+              <button
+                onClick={handleClearSubCategory}
+                className="ml-1 p-1 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition-colors"
+                aria-label="Clear filter"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          <p className="text-sm text-gray-500 mt-3">
+            {loading ? 'Searching...' : `${products.length} items found`}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 lg:gap-x-8 lg:gap-y-12 mt-4">
