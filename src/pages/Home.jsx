@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function Home() {
   const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
-//test
+
   // Countdown timer (baaki features ke liye)
   useEffect(() => {
     const timer = setInterval(() => {
@@ -24,7 +24,7 @@ export default function Home() {
       
       {/* --- SINGLE STATIC VIDEO BANNER (Slider/Bhaagna band) --- */}
       <section className="relative w-full h-[85vh] max-h-[900px] overflow-hidden">
-        {/* 🟢 Sirf Ek Video (Left/Right nahi ghumega) */}
+        {/* 🟢 Video hamesha run karega (autoPlay, loop, muted) */}
         <video 
           className="w-full h-full object-cover" 
           autoPlay 
@@ -42,13 +42,14 @@ export default function Home() {
             A new running experience, once you feel it, there is no going back.
           </p>
           
+          {/* 🟢 BUTTONS AB LINKS HAIN (Kaam karenge!) */}
           <div className="flex flex-col sm:flex-row gap-4 mb-4">
-            <button className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm">
+            <Link to="/men" className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm text-center">
               Shop men →
-            </button>
-            <button className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm">
+            </Link>
+            <Link to="/women" className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm text-center">
               Shop women →
-            </button>
+            </Link>
           </div>
           
           <span className="inline-block text-xs md:text-sm font-bold uppercase tracking-wider border-b-2 border-black pb-1 cursor-pointer hover:opacity-70 transition">
