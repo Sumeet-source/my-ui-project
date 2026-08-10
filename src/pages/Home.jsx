@@ -64,7 +64,6 @@ export default function Home() {
       </section>
 
       {/* --- NEW MOVES (Buttons with Navigation) --- */}
-      {/* 🟢 1. VIDEO AUR BUTTONS KE BEECH KA GAP FIX (pt-8 pb-12) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar mt-2">
           {['Running shoes', 'Training', 'Football', 'Originals', 'Walk', 'Slides', 'Tennis', 'Basketball'].map((cat) => {
@@ -90,8 +89,8 @@ export default function Home() {
       </section>
 
       {/* --- SHOP BY CATEGORY --- */}
-      {/* 🟢 2. BUTTONS AUR PHOTO GRID KE BEECH KA GAP FIX (py-10 -> pt-4 pb-10) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-10">
+      {/* 🟢 AB AUR UPAR KAR DIYA HAI: py-10 -> pt-2 pb-10 */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link to="/men" className="relative h-[400px] md:h-[500px] overflow-hidden group cursor-pointer">
             <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://images.unsplash.com/photo-1483721310020-03333e577078?auto=format&fit=crop&w=800&q=80" alt="Shop Men" />
