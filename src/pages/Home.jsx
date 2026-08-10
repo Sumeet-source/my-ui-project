@@ -34,9 +34,9 @@ export default function Home() {
           src="/videos/hero-banner.mp4" 
         ></video>
 
-        {/* 🟢 Overlay aur Buttons (Video ke upar) */}
+        {/* 🟢 Overlay aur Buttons (Video ke upar) - Ab bilkul end mein! */}
         <div className="absolute inset-0 bg-white/30 mix-blend-overlay"></div>
-        <div className="absolute inset-0 flex flex-col items-start justify-center p-8 md:p-24 text-left text-black">
+        <div className="absolute inset-0 flex flex-col items-start justify-end p-8 md:p-24 pb-12 md:pb-20 text-left text-black">
           <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter text-black mb-2">HYPERBOOST</h2>
           <p className="text-xs md:text-sm font-medium text-gray-900 max-w-xs mb-6">
             A new running experience, once you feel it, there is no going back.
