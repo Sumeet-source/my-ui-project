@@ -29,9 +29,12 @@ export default function FilterBottomSheet({
     if (localFilters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (localFilters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     
-    // 🟢 Count logic bilkul simple kar diya: Sirf SubCategory check karega
+    // 🟢 🚨 FIX: Exact match (===) hata kar .includes() lagaya hai.
+    // Ab frontend bhi 'Jacket' aur 'Jackets' ko ek jaisa count karega.
     if (localFilters.subCategory) {
-        result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
+        result = result.filter(p => 
+            p.subCategory?.toLowerCase().includes(localFilters.subCategory.toLowerCase())
+        );
     }
 
     if (localFilters.price) {
@@ -65,7 +68,6 @@ export default function FilterBottomSheet({
     let finalFilters = {};
     
     if (isDefaultCategoryValid) {
-      // 🟢 /shoes page par sirf 'Shoes' aur uski subCategory bhejega
       finalFilters = {
         category: defaultCategory,
         subCategory: localFilters.subCategory,
@@ -73,8 +75,6 @@ export default function FilterBottomSheet({
         price: localFilters.price
       };
     } else {
-      // 🟢 🚨 FIX: /men aur /women page par 'category' (Clothing) kabhi bhi backend ko nahi bhejega!
-      // Kyonki database mein products ki category 'Men'/'Women' hai, 'Clothing' nahi!
       finalFilters = {
         subCategory: localFilters.subCategory,
         sort: localFilters.sort,
@@ -110,7 +110,6 @@ export default function FilterBottomSheet({
             </select>
           </div>
 
-          {/* 🟢 MAIN CATEGORY BUTTONS: Sirf tab dikhenge jab /shoes page par nahi ho */}
           {!isDefaultCategoryValid && (
             <div className="space-y-2">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Category</p>
@@ -127,7 +126,6 @@ export default function FilterBottomSheet({
             </div>
           )}
 
-          {/* 🟢 SUB-CATEGORY LOGIC */}
           {((!isDefaultCategoryValid && localFilters.category && CATEGORIES[localFilters.category]) || (isDefaultCategoryValid && CATEGORIES[defaultCategory])) && (
             <div className="space-y-2 mt-4">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
