@@ -35,8 +35,9 @@ export default function Home() {
           <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1920&q=80" alt="Banner Fallback" className="w-full h-full object-cover" />
         </video>
 
-        {/* Overlay and Main Left Buttons */}
         <div className="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
+
+        {/* Left Buttons */}
         <div className="absolute bottom-0 left-0 w-full p-6 md:p-10 pb-8 md:pb-14 flex flex-col items-start gap-4 text-black">
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to="/men" className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm text-center">
@@ -51,9 +52,9 @@ export default function Home() {
           </span>
         </div>
 
-        {/* 🟢 White button - Moved further right and down (bottom-6 right-6) */}
-        <div className="absolute bottom-6 right-6 md:bottom-16 md:right-16">
-          <div className="bg-white text-black px-4 py-2.5 rounded-full shadow-md flex items-center gap-2 text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition cursor-pointer">
+        {/* 🟢 ULTIMATE WATERMARK HIDE: Button bilkul corner par (right-0 bottom-0) */}
+        <div className="absolute bottom-0 right-0 md:bottom-0 md:right-0">
+          <div className="bg-white text-black px-4 py-2.5 rounded-tl-lg shadow-md flex items-center gap-2 text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition cursor-pointer">
             <span className="text-sm leading-none opacity-80">✦</span> 
             Follow us
           </div>
