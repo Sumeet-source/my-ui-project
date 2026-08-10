@@ -15,10 +15,12 @@ export default function FilterBottomSheet({
   defaultCategory = '',
   totalCount = 0 
 }) {
-  // 🟢 Initial state mein category defaultCategory se set kari hai
+  // 🟢 Check karo ki defaultCategory CATEGORIES list mein hai ya nahi (jaise 'Shoes' ya 'Clothing')
+  const isDefaultCategoryValid = defaultCategory && CATEGORIES[defaultCategory];
+
   const [localFilters, setLocalFilters] = useState({
     sort: 'featured',
-    category: defaultCategory,
+    category: isDefaultCategoryValid ? defaultCategory : '', // Agar valid hai toh set kar do
     subCategory: '',
     price: 200,
   });
@@ -28,13 +30,14 @@ export default function FilterBottomSheet({
     if (localFilters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (localFilters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     
-    // 🟢 Filter logic fix: Agar defaultCategory hai toh sirf subCategory filter karein
-    if (defaultCategory) {
+    // 🟢 FILTER LOGIC FIXED
+    if (isDefaultCategoryValid) {
+        // Shoes page logic: Sirf subCategory filter karega
         if (localFilters.subCategory) {
             result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
         }
     } else {
-        // Standard filter for general pages
+        // Men/Women/Home page logic: Category aur SubCategory dono filter karega
         if (localFilters.category) {
             result = result.filter(p => p.category.toLowerCase() === localFilters.category.toLowerCase());
             if (localFilters.subCategory) {
@@ -62,22 +65,28 @@ export default function FilterBottomSheet({
 
   const handleClearAll = () => {
     // 🟢 Clear karte waqt defaultCategory preserve rakhein
-    setLocalFilters({ sort: 'featured', category: defaultCategory, subCategory: '', price: 200 });
+    setLocalFilters({ 
+      sort: 'featured', 
+      category: isDefaultCategoryValid ? defaultCategory : '', 
+      subCategory: '', 
+      price: 200 
+    });
     onClear();
   };
 
   const handleApply = () => {
     let finalFilters = { ...localFilters };
     
-    // 🟢 BUG FIX: Agar defaultCategory hai toh category fixed rakho, sirf subCategory bhejo
-    if (defaultCategory) {
+    if (isDefaultCategoryValid) {
+      // 🟢 Shoes page: backend ko sirf Shoes aur uski SubCategory bhejega
       finalFilters = {
-        category: defaultCategory, // Backend ko sahi category bhejega (Shoes)
-        subCategory: localFilters.subCategory, // Backend ko sahi subCategory bhejega (Training)
+        category: defaultCategory,
+        subCategory: localFilters.subCategory,
         sort: localFilters.sort,
         price: localFilters.price
       };
     } else {
+      // 🟢 Men/Women page: backend ko poori Category aur SubCategory bhejega
       finalFilters = localFilters;
     }
     
@@ -109,8 +118,8 @@ export default function FilterBottomSheet({
             </select>
           </div>
 
-          {/* 🟢 MAIN CATEGORY BUTTONS: Agar defaultCategory hai toh yeh hide ho jayenge */}
-          {!defaultCategory && (
+          {/* 🟢 MAIN CATEGORY BUTTONS: Sirf tab dikhenge jab /shoes page par nahi ho */}
+          {!isDefaultCategoryValid && (
             <div className="space-y-2">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Category</p>
               <div className="flex flex-wrap gap-2 mb-2">
@@ -126,16 +135,16 @@ export default function FilterBottomSheet({
             </div>
           )}
 
-          {/* 🟢 SUB-CATEGORY LOGIC: Agar defaultCategory hai toh seedha wahi subCategories dikhayenge */}
-          {((!defaultCategory && localFilters.category && CATEGORIES[localFilters.category]) || (defaultCategory && CATEGORIES[defaultCategory])) && (
+          {/* 🟢 SUB-CATEGORY LOGIC: Correctly decide karega ki kiske sub-categories dikhane hain */}
+          {((!isDefaultCategoryValid && localFilters.category && CATEGORIES[localFilters.category]) || (isDefaultCategoryValid && CATEGORIES[defaultCategory])) && (
             <div className="space-y-2 mt-4">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                {defaultCategory ? `${defaultCategory} Sub-Categories` : 'Sub-Category (Optional)'}
+                {isDefaultCategoryValid ? `${defaultCategory} Sub-Categories` : 'Sub-Category (Optional)'}
               </p>
               <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex flex-wrap gap-2">
-                  {/* Agar defaultCategory hai toh uske subCategories dikhao, warna selected category ke */}
-                  {(defaultCategory ? CATEGORIES[defaultCategory] : CATEGORIES[localFilters.category]).map((sub) => {
+                  {/* Agar Shoes page hai toh wahi dikhao, warna selected category wali dikhao */}
+                  {(isDefaultCategoryValid ? CATEGORIES[defaultCategory] : CATEGORIES[localFilters.category]).map((sub) => {
                     const isSelected = localFilters.subCategory === sub;
                     return (
                       <button key={sub} onClick={() => handleChange('subCategory', isSelected ? '' : sub)} className={`px-3 py-1 rounded-full text-xs font-medium transition border ${isSelected ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
