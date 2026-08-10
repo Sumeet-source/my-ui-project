@@ -62,19 +62,6 @@ export default function Search() {
   return (
     <div className="bg-white min-h-screen overflow-x-hidden">
       
-      {/* 🟢 Custom Dancing Animation CSS */}
-      <style>{`
-        @keyframes dance {
-          0%, 100% { transform: rotate(-1deg) translateY(0px); }
-          25% { transform: rotate(2deg) translateY(-5px); }
-          50% { transform: rotate(-2deg) translateY(2px); }
-          75% { transform: rotate(1.5deg) translateY(-3px); }
-        }
-        .animate-dance {
-          animation: dance 1.5s ease-in-out infinite;
-        }
-      `}</style>
-
       <div className="md:hidden flex justify-center items-center border-b border-gray-200 py-3 px-4 bg-white">
         <button className="text-sm font-medium text-black flex items-center gap-1">
           Filters/ Sort <ChevronDown className="w-4 h-4" />
@@ -83,9 +70,10 @@ export default function Search() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         
-        {/* 🟢 UPDATED UI: Size chhoti kar di (text-3xl -> text-2xl) */}
+        {/* 🟢 UPDATED: Faded color + Smaller text (No dance animation) */}
         <div className="flex flex-col gap-1 mb-6">
-          <h1 className="text-2xl font-bold text-black capitalize animate-dance inline-block blur-sm">
+          {/* text-2xl (chhota), text-gray-500 (fade), hata diya animate-dance */}
+          <h1 className="text-2xl font-bold text-gray-500 capitalize inline-block">
             {subCategory || (query ? `"${query}"` : 'Search Results')}
           </h1>
 
@@ -104,8 +92,7 @@ export default function Search() {
                 </button>
               </div>
             )}
-            
-            <p className="text-sm text-gray-500 font-medium animate-pulse">
+            <p className="text-sm text-gray-500 font-medium">
               {itemText}
             </p>
           </div>
