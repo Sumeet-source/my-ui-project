@@ -17,13 +17,9 @@ export default function Dashboard() {
     try {
       const timestamp = parseInt(id.substring(0, 8), 16) * 1000;
       return new Date(timestamp).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+        year: 'numeric', month: 'long', day: 'numeric'
       });
-    } catch (error) {
-      return 'N/A';
-    }
+    } catch (error) { return 'N/A'; }
   };
 
   const getStatusColor = (status) => {
@@ -58,6 +54,18 @@ export default function Dashboard() {
       console.error('Failed to fetch orders:', error);
     } finally {
       setLoadingOrders(false);
+    }
+  };
+
+  // 🟢 NEW: Handle Order Cancellation
+  const handleCancelOrder = async (orderId) => {
+    if (!confirm('Are you sure you want to cancel this order?')) return;
+    try {
+      await axiosClient.put(`/api/orders/${orderId}/cancel`, { userId: effectiveUser.id });
+      showToast('Order cancelled successfully!', 'info');
+      fetchOrders(); // Refresh list
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Failed to cancel order', 'error');
     }
   };
 
@@ -99,10 +107,9 @@ export default function Dashboard() {
             </div>
           </div>
           
-          {/* 🟢 LOGOUT BUTTON - centered on mobile, right-aligned on desktop */}
           <button 
             onClick={handleLogout} 
-            className="flex items-center justify-center gap-2 px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition text-sm font-medium w-max mx-auto self-center sm:mx-0 sm:self-auto"
+            className="flex items-center justify-center gap-2 px-4 py-2 border border-red-300 text-red-600 rounded hover:bg-red-50 transition text-sm font-medium w-max ml-auto sm:ml-0"
           >
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -165,6 +172,8 @@ export default function Dashboard() {
                   <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
                     {orders.map((order) => (
                       <div key={order._id} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition">
+                        
+                        {/* Order Header */}
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 border-b border-gray-200 pb-2 gap-2">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-bold text-gray-900 text-sm">Order #{order._id.slice(-6)}</span>
@@ -174,6 +183,8 @@ export default function Dashboard() {
                           </div>
                           <span className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</span>
                         </div>
+
+                        {/* Order Items */}
                         <div className="space-y-1 mb-2">
                           {order.items.slice(0, 2).map((item, idx) => (
                             <Link key={idx} to={`/product/${item.productId}`} className="flex justify-between text-xs text-gray-600 hover:bg-gray-200 p-1 -mx-1 rounded transition">
@@ -183,6 +194,20 @@ export default function Dashboard() {
                           ))}
                           {order.items.length > 2 && <p className="text-xs text-gray-400">+ {order.items.length - 2} more items</p>}
                         </div>
+
+                        {/* 🟢 NEW: CANCEL ORDER BUTTON (Only for Pending/Processing) */}
+                        {(order.status === 'Pending' || order.status === 'Processing') && (
+                          <div className="flex justify-end mt-1">
+                            <button 
+                              onClick={() => handleCancelOrder(order._id)}
+                              className="text-xs font-medium text-red-500 hover:text-red-700 underline transition"
+                            >
+                              Cancel Order
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Delivery Tracking Messages */}
                         {order.status?.toLowerCase() === 'shipped' && (
                           <div className="bg-purple-50 border border-purple-200 rounded p-2 mb-2 flex items-center gap-2">
                             <span className="text-purple-600 text-sm">🚚</span>
@@ -195,6 +220,8 @@ export default function Dashboard() {
                             <span className="text-xs text-green-700 font-medium">Delivered successfully.</span>
                           </div>
                         )}
+
+                        {/* Order Total */}
                         <div className="flex justify-between font-bold text-sm text-gray-900 border-t border-gray-300 pt-2 mt-2">
                           <span>Total</span>
                           <span>${order.totalAmount.toFixed(2)}</span>
