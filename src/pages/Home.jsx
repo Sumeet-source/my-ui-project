@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function Home() {
   const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
+  const [activeCategory, setActiveCategory] = useState('Running'); // 🟢 Active tab state
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -52,8 +53,7 @@ export default function Home() {
           </span>
         </div>
 
-        {/*  ULTIMATE WATERMARK HIDE: Button bilkul corner par (right-0 bottom-0) */}
-                {/* FINAL WATERMARK HIDE: Button bilkul corner par (right-0 bottom-0) */}
+        {/* Bottom Right Corner Button (Hides watermark) */}
         <div className="absolute bottom-0 right-0 md:bottom-0 md:right-0">
           <div className="bg-white text-black px-4 py-3 rounded-tl-lg shadow-md flex items-center gap-2 text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition cursor-pointer">
             <span className="text-sm leading-none opacity-80">✦</span> 
@@ -62,21 +62,38 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- NEW SHOES. NEW MOVES. --- */}
+      {/* --- NEW MOVES. (Updated Title & Active Dot Logic) --- */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-left mb-6">
-          <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tighter text-gray-900">NEW SHOES. NEW MOVES.</h2>
-          <div className="flex items-center gap-2 mt-1">
+        
+        {/* 🟢 FIX: Title centered on mobile, left on desktop */}
+        <div className="text-center md:text-left mb-6">
+          <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tighter text-gray-900">NEW MOVES.</h2>
+          <div className="flex justify-center md:justify-start items-center gap-2 mt-1">
              <span className="text-2xl">👟</span>
           </div>
         </div>
         
-        <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar">
-          {['Running', 'Training', 'Football', 'Originals', 'Walk', 'Slides', 'Tennis', 'Basketball'].map((cat) => (
-            <button key={cat} className="px-4 py-2 bg-transparent text-gray-900 text-sm font-medium uppercase tracking-wider border-b-2 border-transparent hover:border-black transition snap-center whitespace-nowrap">
-              {cat}
-            </button>
-          ))}
+        {/* 🟢 Category Buttons with Active Black Dot Indicator */}
+        <div className="flex gap-6 md:gap-8 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar">
+          {['Running', 'Training', 'Football', 'Originals', 'Walk', 'Slides', 'Tennis', 'Basketball'].map((cat) => {
+            const isActive = activeCategory === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className="relative px-2 py-1 text-xs md:text-sm font-bold uppercase tracking-wider transition-colors duration-300 snap-center whitespace-nowrap"
+              >
+                <span className={`transition-colors duration-300 ${isActive ? 'text-black' : 'text-gray-500 hover:text-gray-900'}`}>
+                  {cat}
+                </span>
+                
+                {/* 🟢 CIRCULAR BLACK RING INDICATOR */}
+                {isActive && (
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-black transition-all duration-300"></div>
+                )}
+              </button>
+            );
+          })}
         </div>
       </section>
 
