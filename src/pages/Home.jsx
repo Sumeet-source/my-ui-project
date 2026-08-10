@@ -51,8 +51,8 @@ export default function Home() {
           </span>
         </div>
 
-        {/* 🟢 White button - Moved slightly away from corner */}
-        <div className="absolute bottom-4 right-4 md:bottom-10 md:right-10">
+        {/* 🟢 White button - Moved further right and down (bottom-6 right-6) */}
+        <div className="absolute bottom-6 right-6 md:bottom-16 md:right-16">
           <div className="bg-white text-black px-4 py-2.5 rounded-full shadow-md flex items-center gap-2 text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition cursor-pointer">
             <span className="text-sm leading-none opacity-80">✦</span> 
             Follow us
