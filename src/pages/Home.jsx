@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
-  const productCarouselRef = useRef(null);
 
   // Auto slide carousel
   useEffect(() => {
@@ -29,48 +28,57 @@ export default function Home() {
     return `${h}:${m}:${s}`;
   };
 
-  // Featured Products Mock Data (Adidas real products)
-  const featuredProducts = [
-    { id: '1', title: 'Adizero EVO SL Shoes', price: 159.99, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80' },
-    { id: '2', title: 'Men\'s Performance Tee', price: 45.00, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80' },
-    { id: '3', title: 'Women\'s Yoga Leggings', price: 65.00, image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80' },
-    { id: '4', title: 'Classic Backpack', price: 39.99, image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80' },
-    { id: '5', title: 'Ultraboost 22 Running', price: 189.99, image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=600&q=80' },
-    { id: '6', title: 'Sportswear Zip Hoodie', price: 79.99, image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=600&q=80' },
-  ];
-
   return (
     <div className="min-h-screen bg-white font-body-md text-on-surface pb-16">
       
-      {/* --- HERO CAROUSEL (Full Width) --- */}
+      {/* --- HERO CAROUSEL (Adidas Live Style) --- */}
       <section className="relative w-full h-[85vh] max-h-[900px] overflow-hidden">
         <div 
           className="flex w-[300%] h-full transition-transform duration-700 ease-in-out"
           style={{ transform: `translateX(-${currentSlide * 33.333}%)` }}
         >
-          {/* Slide 1 */}
+          {/* Slide 1: Adidas HYPERBOOST style (Match kiya screenshot se) */}
           <div className="relative w-full h-full flex-shrink-0">
-            <img className="w-full h-full object-cover" src="https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1920&q=80" alt="Men's Sportswear" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 p-8 md:p-20 w-full text-white flex flex-col items-start justify-end">
-              <span className="text-[10px] md:text-[12px] uppercase tracking-[0.2em] font-bold bg-black/60 px-3 py-1 mb-4 inline-block">New Arrivals</span>
-              <h2 className="text-5xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.9] mb-4">The Final Edit</h2>
-              <p className="text-xs md:text-base font-light opacity-90 max-w-lg mb-6">Curated pieces from the season's close. Engineered for peak performance.</p>
-              {/* 🟢 Adidas Style CTA (Text + Underline) */}
-              <span className="inline-block text-[13px] md:text-[15px] font-bold uppercase tracking-wider border-b border-white pb-1 cursor-pointer hover:opacity-80 transition">
-                Explore Archive →
+            <img 
+              className="w-full h-full object-cover" 
+              src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1920&q=80" 
+              alt="Hyperboost" 
+            />
+            <div className="absolute inset-0 bg-white/30 mix-blend-overlay"></div>
+            <div className="absolute inset-0 flex flex-col items-start justify-center p-8 md:p-24 text-left text-black">
+              <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter text-black mb-2">HYPERBOOST</h2>
+              <p className="text-xs md:text-sm font-medium text-gray-900 max-w-xs mb-6">
+                A new running experience, once you feel it, there is no going back.
+              </p>
+              
+              {/* 🟢 Buttons exactly like Adidas screenshot */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                <button className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm">
+                  Shop men →
+                </button>
+                <button className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm">
+                  Shop women →
+                </button>
+              </div>
+              
+              {/* 🟢 Learn More Link */}
+              <span className="inline-block text-xs md:text-sm font-bold uppercase tracking-wider border-b-2 border-black pb-1 cursor-pointer hover:opacity-70 transition">
+                Learn More →
               </span>
             </div>
           </div>
           
           {/* Slide 2 */}
           <div className="relative w-full h-full flex-shrink-0">
-            <img className="w-full h-full object-cover" src="https://images.unsplash.com/photo-1542213498-19360e5b9c23?auto=format&fit=crop&w=1920&q=80" alt="Women's Running" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+            <img 
+              className="w-full h-full object-cover" 
+              src="https://images.unsplash.com/photo-1542213498-19360e5b9c23?auto=format&fit=crop&w=1920&q=80" 
+              alt="Spring Awakening" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-8 md:p-20 w-full text-white flex flex-col items-start justify-end">
               <span className="text-[10px] md:text-[12px] uppercase tracking-[0.2em] font-bold bg-black/60 px-3 py-1 mb-4 inline-block">Vol. 02</span>
               <h2 className="text-5xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.9] mb-4">Spring Awakening</h2>
-              <p className="text-xs md:text-base font-light opacity-90 max-w-lg mb-6">The new collection has arrived. Lightweight, breathable, and ready.</p>
               <span className="inline-block text-[13px] md:text-[15px] font-bold uppercase tracking-wider border-b border-white pb-1 cursor-pointer hover:opacity-80 transition">
                 Shop Collection →
               </span>
@@ -79,12 +87,15 @@ export default function Home() {
           
           {/* Slide 3 */}
           <div className="relative w-full h-full flex-shrink-0">
-            <img className="w-full h-full object-cover" src="https://images.unsplash.com/photo-1517931524326-bdd55a541177?auto=format&fit=crop&w=1920&q=80" alt="Shoes & Gear" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+            <img 
+              className="w-full h-full object-cover" 
+              src="https://images.unsplash.com/photo-1517931524326-bdd55a541177?auto=format&fit=crop&w=1920&q=80" 
+              alt="Rooted in Style" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-8 md:p-20 w-full text-white flex flex-col items-start justify-end">
               <span className="text-[10px] md:text-[12px] uppercase tracking-[0.2em] font-bold bg-black/60 px-3 py-1 mb-4 inline-block">The Archives</span>
               <h2 className="text-5xl md:text-8xl font-bold uppercase tracking-tighter leading-[0.9] mb-4">Rooted in Style</h2>
-              <p className="text-xs md:text-base font-light opacity-90 max-w-lg mb-6">Premium athletic wear engineered for your peak performance.</p>
               <span className="inline-block text-[13px] md:text-[15px] font-bold uppercase tracking-wider border-b border-white pb-1 cursor-pointer hover:opacity-80 transition">
                 Shop Now →
               </span>
@@ -95,16 +106,36 @@ export default function Home() {
         {/* Carousel Indicators */}
         <div className="absolute bottom-6 right-6 md:bottom-10 md:right-10 flex gap-2">
           {[0, 1, 2].map((idx) => (
-            <button key={idx} className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-white' : 'bg-white/40'}`} onClick={() => setCurrentSlide(idx)} />
+            <button 
+              key={idx}
+              className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-black' : 'bg-gray-400'}`}
+              onClick={() => setCurrentSlide(idx)}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* --- NEW SHOES. NEW MOVES. (Category Swipe Row) --- */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-left mb-6">
+          <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tighter text-gray-900">NEW SHOES. NEW MOVES.</h2>
+          <div className="flex items-center gap-2 mt-1">
+             <span className="text-2xl">👟</span>
+          </div>
+        </div>
+        
+        {/* Horizontal Category Scroller */}
+        <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar">
+          {['Running', 'Training', 'Football', 'Originals', 'Walk', 'Slides', 'Tennis', 'Basketball'].map((cat) => (
+            <button key={cat} className="px-4 py-2 bg-transparent text-gray-900 text-sm font-medium uppercase tracking-wider border-b-2 border-transparent hover:border-black transition snap-center whitespace-nowrap">
+              {cat}
+            </button>
           ))}
         </div>
       </section>
 
       {/* --- SHOP BY CATEGORY (Adidas Grid Style) --- */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tight text-gray-900">Shop The Collection</h2>
-        </div>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link to="/men" className="relative h-[400px] md:h-[500px] overflow-hidden group cursor-pointer">
             <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://images.unsplash.com/photo-1483721310020-03333e577078?auto=format&fit=crop&w=800&q=80" alt="Shop Men" />
@@ -138,52 +169,6 @@ export default function Home() {
               <span className="mt-2 text-[13px] font-bold uppercase tracking-wider border-b border-white pb-0.5 hover:opacity-80 transition">Shop Now</span>
             </div>
           </Link>
-        </div>
-      </section>
-
-      {/* --- TRENDING PRODUCTS (Horizontal Carousel / Rail) --- */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 border-t border-gray-100">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl md:text-3xl font-bold uppercase tracking-tight text-gray-900">Trending Now</h2>
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-gray-500">
-            <span>Curated</span>
-            <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-            <span className="text-black">{formatTime(timeLeft)}</span>
-          </div>
-        </div>
-        
-        {/* 🟢 Horizontal Scroll Rail (Adidas Style) */}
-        <div 
-          ref={productCarouselRef} 
-          className="flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar"
-        >
-          {featuredProducts.map((product) => (
-            <Link key={product.id} to={`/product/${product.id}`} className="min-w-[160px] md:min-w-[240px] snap-center group">
-              <div className="relative w-full aspect-square overflow-hidden bg-gray-50">
-                <img src={product.image} alt={product.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                <button className="absolute top-2 right-2 p-2 bg-white/80 rounded-full hover:bg-white hover:scale-110 transition duration-200 z-10">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                </button>
-              </div>
-              <div className="mt-3">
-                <p className="text-xs md:text-sm font-bold text-gray-900 line-clamp-1">{product.title}</p>
-                <p className="text-xs md:text-sm text-gray-600 mt-0.5">${product.price.toFixed(2)}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* --- MID-SECTION BANNER (Adidas Lifestyle) --- */}
-      <section className="relative w-full h-[450px] bg-black overflow-hidden">
-        <img className="w-full h-full object-cover" src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1600&q=80" alt="Lifestyle Banner" />
-        <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-6">
-          <span className="text-white text-[10px] uppercase tracking-[0.2em] font-bold bg-black/60 px-3 py-1 mb-4 inline-block">Push Beyond</span>
-          <h2 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter text-white mb-2">Never Stop</h2>
-          <p className="text-white/80 text-xs md:text-sm mb-6 max-w-md">Premium athletic wear engineered for your peak performance.</p>
-          <span className="inline-block text-[13px] md:text-[15px] font-bold uppercase tracking-wider text-white border-b border-white pb-1 cursor-pointer hover:opacity-80 transition">
-            Shop Now
-          </span>
         </div>
       </section>
 
