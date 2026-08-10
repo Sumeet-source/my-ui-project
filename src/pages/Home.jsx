@@ -52,9 +52,10 @@ export default function Home() {
           </span>
         </div>
 
-        {/* 🟢 ULTIMATE WATERMARK HIDE: Button bilkul corner par (right-0 bottom-0) */}
+        {/*  ULTIMATE WATERMARK HIDE: Button bilkul corner par (right-0 bottom-0) */}
+                {/* FINAL WATERMARK HIDE: Button bilkul corner par (right-0 bottom-0) */}
         <div className="absolute bottom-0 right-0 md:bottom-0 md:right-0">
-          <div className="bg-white text-black px-4 py-2.5 rounded-tl-lg shadow-md flex items-center gap-2 text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition cursor-pointer">
+          <div className="bg-white text-black px-4 py-3 rounded-tl-lg shadow-md flex items-center gap-2 text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition cursor-pointer">
             <span className="text-sm leading-none opacity-80">✦</span> 
             Follow us
           </div>
