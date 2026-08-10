@@ -1,8 +1,51 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import ForgeLogo from './ForgeLogo';
+
+// 🟢 MOBILE SCRAMBLE DECODE ANIMATION COMPONENT
+const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
+  const [displayText, setDisplayText] = useState(text);
+
+  useEffect(() => {
+    let interval = null;
+    let iterations = 0;
+    const maxIterations = 12; // थोड़ा और smooth लगेगा
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*";
+
+    // शुरुआत में थोड़ा इंतज़ार
+    const timeout = setTimeout(() => {
+      interval = setInterval(() => {
+        const originalLetters = text.split('');
+        const scrambled = originalLetters.map((letter, index) => {
+          // जितनी iterations बीतेंगी, उतने अक्षर लॉक होते जाएंगे
+          const progress = iterations / maxIterations;
+          const lockedIndex = Math.floor(progress * originalLetters.length);
+          
+          if (index < lockedIndex) return letter;
+          return characters[Math.floor(Math.random() * characters.length)];
+        }).join('');
+
+        setDisplayText(scrambled);
+        iterations++;
+
+        // एक बार पूरा हो जाने पर रुक जाओ और असली नाम दिखाओ
+        if (iterations >= maxIterations) {
+          clearInterval(interval);
+          setDisplayText(text);
+        }
+      }, 70); // हर 70ms में बदलेगा
+    }, delay);
+
+    return () => {
+      clearTimeout(timeout);
+      if (interval) clearInterval(interval);
+    };
+  }, [text, delay]);
+
+  return <span>{displayText}</span>;
+};
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -101,8 +144,19 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Desktop Logo */}
-        <ForgeLogo />
+        {/* 🟢 LOGO SECTION WITH SCRAMBLE ON MOBILE */}
+        <div className="flex items-center justify-center flex-1 md:flex-none">
+          {/* Desktop Logo (Hides on Mobile) */}
+          <div className="hidden md:block">
+            <ForgeLogo />
+          </div>
+          {/* Mobile Scramble Logo (Hides on Desktop) */}
+          <div className="block md:hidden">
+            <span className="text-xl font-black tracking-[0.2em] text-white">
+              <ScrambleLogo text="FORGE" />
+            </span>
+          </div>
+        </div>
 
         {/* Mobile Right Icons */}
         <div className="flex items-center gap-4 md:hidden">
@@ -190,15 +244,17 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* --- MOBILE DRAWER (FIXED LOGO) --- */}
+      {/* --- MOBILE DRAWER (FIXED LOGO WITH SCRAMBLE) --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col overflow-hidden">
           
-          {/* 🟢 FIXED: DIRECT TEXT SPAN USED INSTEAD OF <ForgeLogo /> */}
+          {/* 🟢 FIXED: MOBILE DRAWER LOGO WITH SCRAMBLE */}
           <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 shrink-0">
             <div className="flex-1"></div>
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0">
-              <span className="text-xl font-black tracking-[0.2em] text-black">FORGE</span>
+              <span className="text-xl font-black tracking-[0.2em] text-black">
+                <ScrambleLogo text="FORGE" />
+              </span>
             </Link>
             <div className="flex-1 flex justify-end">
               <button onClick={() => setIsMenuOpen(false)} className="text-black p-1">
