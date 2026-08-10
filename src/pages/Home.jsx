@@ -73,7 +73,7 @@ export default function Home() {
                 key={cat}
                 onClick={() => {
                   setActiveCategory(cat);
-                  navigate(`/shoes?subCategory=${cat}`); // 🟢 SubCategory navigation
+                  navigate(`/search?subCategory=${cat}`);  // 🟢 SubCategory navigation
                 }}
                 className={`px-4 py-1.5 text-xs md:text-sm font-bold uppercase tracking-wider transition-all duration-300 snap-center whitespace-nowrap rounded-full border-2 ${
                   isActive 
