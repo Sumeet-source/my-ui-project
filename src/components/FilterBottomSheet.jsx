@@ -15,12 +15,11 @@ export default function FilterBottomSheet({
   defaultCategory = '',
   totalCount = 0 
 }) {
-  // 🟢 Check karo ki defaultCategory CATEGORIES list mein hai ya nahi (jaise 'Shoes' ya 'Clothing')
   const isDefaultCategoryValid = defaultCategory && CATEGORIES[defaultCategory];
 
   const [localFilters, setLocalFilters] = useState({
     sort: 'featured',
-    category: isDefaultCategoryValid ? defaultCategory : '', // Agar valid hai toh set kar do
+    category: isDefaultCategoryValid ? defaultCategory : '', 
     subCategory: '',
     price: 200,
   });
@@ -30,19 +29,9 @@ export default function FilterBottomSheet({
     if (localFilters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (localFilters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     
-    // 🟢 BUG FIXED: SubCategory filter logic ko optimize kiya
-    if (isDefaultCategoryValid) {
-        // Shoes page logic: Sirf subCategory filter karega
-        if (localFilters.subCategory) {
-            result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
-        }
-    } else {
-        // 🟢 Men/Women/Home page logic: 
-        // Local count dikhane ke liye Category match nahi karega (kyunki Men's page par products ki category 'Men' hoti hai, 'Clothing' nahi).
-        // Lekin SubCategory match zaroor karega.
-        if (localFilters.subCategory) {
-            result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
-        }
+    // 🟢 Count logic bilkul simple kar diya: Sirf SubCategory check karega
+    if (localFilters.subCategory) {
+        result = result.filter(p => p.subCategory?.toLowerCase() === localFilters.subCategory.toLowerCase());
     }
 
     if (localFilters.price) {
@@ -63,7 +52,6 @@ export default function FilterBottomSheet({
   };
 
   const handleClearAll = () => {
-    // 🟢 Clear karte waqt defaultCategory preserve rakhein
     setLocalFilters({ 
       sort: 'featured', 
       category: isDefaultCategoryValid ? defaultCategory : '', 
@@ -74,10 +62,10 @@ export default function FilterBottomSheet({
   };
 
   const handleApply = () => {
-    let finalFilters = { ...localFilters };
+    let finalFilters = {};
     
     if (isDefaultCategoryValid) {
-      // 🟢 Shoes page: backend ko sirf Shoes aur uski SubCategory bhejega
+      // 🟢 /shoes page par sirf 'Shoes' aur uski subCategory bhejega
       finalFilters = {
         category: defaultCategory,
         subCategory: localFilters.subCategory,
@@ -85,8 +73,13 @@ export default function FilterBottomSheet({
         price: localFilters.price
       };
     } else {
-      // 🟢 Men/Women page: Backend ko Category (Clothing) aur SubCategory (Jackets) dono bhejega
-      finalFilters = localFilters;
+      // 🟢 🚨 FIX: /men aur /women page par 'category' (Clothing) kabhi bhi backend ko nahi bhejega!
+      // Kyonki database mein products ki category 'Men'/'Women' hai, 'Clothing' nahi!
+      finalFilters = {
+        subCategory: localFilters.subCategory,
+        sort: localFilters.sort,
+        price: localFilters.price
+      };
     }
     
     onApply(finalFilters);
@@ -134,7 +127,7 @@ export default function FilterBottomSheet({
             </div>
           )}
 
-          {/* 🟢 SUB-CATEGORY LOGIC: Correctly decide karega ki kiske sub-categories dikhane hain */}
+          {/* 🟢 SUB-CATEGORY LOGIC */}
           {((!isDefaultCategoryValid && localFilters.category && CATEGORIES[localFilters.category]) || (isDefaultCategoryValid && CATEGORIES[defaultCategory])) && (
             <div className="space-y-2 mt-4">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -142,7 +135,6 @@ export default function FilterBottomSheet({
               </p>
               <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex flex-wrap gap-2">
-                  {/* Agar Shoes page hai toh wahi dikhao, warna selected category wali dikhao */}
                   {(isDefaultCategoryValid ? CATEGORIES[defaultCategory] : CATEGORIES[localFilters.category]).map((sub) => {
                     const isSelected = localFilters.subCategory === sub;
                     return (
