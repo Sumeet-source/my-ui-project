@@ -5,17 +5,15 @@ import ProductCard from '../components/ProductCard.jsx';
 import axiosClient from '../api/axiosClient';
 
 export default function Search() {
-  // 🟢 setSearchParams bhi import kiya taaki Clean button kaam kare
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const subCategory = searchParams.get('subCategory') || ''; // 🟢 Ye nikaala
+  const subCategory = searchParams.get('subCategory') || ''; 
   
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
-      // 🟢 Agar query aur subCategory dono empty hain toh kuch mat karo
       if (!query && !subCategory) {
         setProducts([]);
         setLoading(false);
@@ -24,7 +22,6 @@ export default function Search() {
 
       setLoading(true);
       try {
-        // 🟢 Params build karna
         let params = {};
         if (query) params.q = query;
         if (subCategory) params.subCategory = subCategory;
@@ -52,12 +49,16 @@ export default function Search() {
     };
 
     fetchSearchResults();
-  }, [query, subCategory]); // 🟢 subCategory change hone par bhi fetch chalega
+  }, [query, subCategory]);
 
-  // Clear button function (Sirf subCategory hatao, agar query hai toh use rahne do)
   const handleClearSubCategory = () => {
     setSearchParams({ q: query });
   };
+
+  // Text ko aur polished banane ke liye grammar logic
+  const itemText = loading 
+    ? 'Searching...' 
+    : `${products.length} item${products.length !== 1 ? 's' : ''} found`;
 
   return (
     <div className="bg-white min-h-screen overflow-x-hidden">
@@ -69,38 +70,32 @@ export default function Search() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="mb-4">
-          <h1 className="text-xl font-bold text-gray-900">
-            {subCategory ? `Showing results for:` : 'Search Results'}
+        
+        {/* 🟢 ✨ UPDATED CLEAN UI/UX: Double repetition removed */}
+        <div className="flex flex-col gap-1 mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 capitalize">
+            {subCategory || (query ? `"${query}"` : 'Search Results')}
           </h1>
-          <h2 className="text-2xl font-bold text-gray-900 mt-1">
-            {query ? `"${query}"` : subCategory ? `${subCategory}` : ''}
-          </h2>
-          
-          {/* 🟢 UI: Agar subCategory active hai toh woh clean Gray Pill dikhega */}
-          {subCategory && (
-            <div className="mt-3 inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg text-sm font-medium text-gray-900 shadow-sm border border-gray-100 transition-all">
-              <span className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <span>{subCategory}</span>
-              </span>
-              <button
-                onClick={handleClearSubCategory}
-                className="ml-1 p-1 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition-colors"
-                aria-label="Clear filter"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          )}
 
-          <p className="text-sm text-gray-500 mt-3">
-            {loading ? 'Searching...' : `${products.length} items found`}
-          </p>
+          <div className="flex items-center gap-3 mt-1">
+            {subCategory && (
+              <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-900 border border-gray-200 shadow-sm transition-all">
+                <span>{subCategory}</span>
+                <button
+                  onClick={handleClearSubCategory}
+                  className="p-0.5 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition-colors"
+                  aria-label="Clear filter"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            )}
+            <p className="text-sm text-gray-500 font-medium">
+              {itemText}
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 lg:gap-x-8 lg:gap-y-12 mt-4">
