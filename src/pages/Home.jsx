@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 export default function Home() {
   const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
 
-  // Countdown timer
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
@@ -23,27 +22,24 @@ export default function Home() {
     <div className="min-h-screen bg-white font-body-md text-on-surface pb-16">
       
       {/* --- SINGLE STATIC VIDEO BANNER --- */}
-      {/* 🟢 FIX: Mobile par pura screen cover karne ke liye min-h-[90dvh] add kiya */}
       <section className="relative w-full min-h-[90dvh] md:h-[85vh] max-h-[900px] overflow-hidden">
-        
-        {/* 🟢 Video hamesha run karega */}
         <video 
           className="w-full h-full object-cover" 
           autoPlay 
           loop 
           muted 
           playsInline
-          src="/videos/hero-banner.mp4" 
-        ></video>
+          webkit-playsInline
+        >
+          <source src="/videos/hero-banner.mp4" type="video/mp4" />
+          <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1920&q=80" alt="Banner Fallback" className="w-full h-full object-cover" />
+        </video>
 
-        {/* 🟢 Overlay aur Buttons - Mobile ke liye neeche thoda space (pb-16) diya hai */}
+        {/* 🟢 Overlay aur Buttons (HYPERBOOST hata diya, buttons ko aur neeche shift kar diya) */}
         <div className="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
-        <div className="absolute inset-0 flex flex-col items-start justify-end p-6 md:p-24 pb-16 md:pb-20 text-left text-black">
-          <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter text-black mb-2">HYPERBOOST</h2>
-          <p className="text-xs md:text-sm font-medium text-gray-900 max-w-xs mb-6">
-            A new running experience, once you feel it, there is no going back.
-          </p>
+        <div className="absolute inset-0 flex flex-col items-start justify-end p-6 md:p-24 pb-32 md:pb-40 text-left text-black">
           
+          {/* 🟢 Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <Link to="/men" className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm text-center">
               Shop men →
