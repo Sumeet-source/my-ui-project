@@ -57,7 +57,7 @@ export default function Home() {
   }, []);
 
   // 🟢 FETCH SPORT PRODUCTS (API CALL WITH SPORT FILTER)
-      const fetchSportProducts = async (sportName) => {
+  const fetchSportProducts = async (sportName) => {
     console.log("🟢 fetchSportProducts CALLED for:", sportName);
     setLoadingSport(true);
     setSelectedSport(sportName);
@@ -159,7 +159,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🟢 SHOP BY SPORT (FULLY FUNCTIONAL) --- */}
+      {/* --- 🟢 SHOP BY SPORT (NIKE STYLE - BIG HORIZONTAL CARDS) --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black">Shop By Sport</h2>
@@ -170,12 +170,12 @@ export default function Home() {
         </div>
 
         {/* 🟢 CATEGORY BUTTONS */}
-        <div className="flex overflow-x-auto gap-4 mb-6 hide-scrollbar pb-2">
+        <div className="flex gap-3 mb-6 overflow-x-auto hide-scrollbar pb-2">
           {['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga'].map((sport) => (
             <button
               key={sport}
               onClick={() => fetchSportProducts(sport)}
-              className={`px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap ${
+              className={`px-5 py-2 rounded-full text-sm font-bold tracking-wider transition-all duration-300 whitespace-nowrap ${
                 selectedSport === sport
                   ? 'bg-black text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -186,8 +186,8 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 🟢 PRODUCT SLIDER */}
-        <div ref={sportRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4">
+        {/* 🟢 NIKE-STYLE PRODUCT SLIDER (BIG RECTANGULAR CARDS) */}
+        <div ref={sportRef} className="flex overflow-x-auto gap-6 scroll-smooth hide-scrollbar pb-4">
           {loadingSport ? (
             <p className="text-gray-500 text-sm">Loading {selectedSport} products...</p>
           ) : sportProducts.length > 0 ? (
@@ -195,22 +195,27 @@ export default function Home() {
               <Link 
                 to={`/product/${product._id}`} 
                 key={product._id} 
-                className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer block"
+                className="min-w-[300px] md:min-w-[400px] flex flex-col gap-3 group cursor-pointer"
               >
-                <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
+                {/* BIG IMAGE CARD (RECTANGULAR) */}
+                <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-100 rounded-xl group-hover:shadow-lg transition">
                   <img 
                     src={product.images?.[0] || product.imageUrl} 
                     alt={product.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                     onError={(e) => {
-                      e.target.src = "https://placehold.co/600x600/f3f4f6/333333?text=No+Image";
+                      e.target.src = "https://placehold.co/600x450/f3f4f6/333333?text=No+Image";
                     }}
                   />
-                </div>
-                <div className="flex flex-col gap-0.5 px-1">
-                  <p className="font-bold text-sm text-black">{product.title}</p>
-                  <p className="text-xs text-gray-500">{product.category}</p>
-                  <p className="font-bold text-sm text-black mt-0.5">₹{product.price}</p>
+                  {/* OVERLAY TEXT (BOTTOM LEFT - NIKE STYLE) */}
+                  <div className="absolute bottom-4 left-4 text-white z-10">
+                    <h3 className="text-xl font-bold tracking-tight drop-shadow-md leading-tight">
+                      {product.title}
+                    </h3>
+                    <p className="text-xs text-gray-200 mt-1 uppercase tracking-wider">
+                      {product.category}
+                    </p>
+                  </div>
                 </div>
               </Link>
             ))
