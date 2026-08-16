@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import FilterBottomSheet from '../components/FilterBottomSheet';
+import { Filter } from 'lucide-react'; // 👈 Red line se bachne ke liye official icon
 
 export default function Shoes() {
   const [products, setProducts] = useState([]);
@@ -119,95 +120,112 @@ export default function Shoes() {
   };
 
   return (
-    <div className="p-6 md:p-10 bg-white min-h-screen">
-      {/* 🟢 Header with filter button */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-light tracking-wide text-gray-900 uppercase">
+    // 👇 Left/Right se Zero margin, full width layout
+    <div className="px-0 md:px-8 bg-white min-h-screen pb-10">
+      
+      {/* 🟢 Sticky Filter Bar (Full-width, perfectly aligned) */}
+      <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center px-3 md:px-8">
+        <span className="text-sm font-semibold text-gray-900">
           Shoes
-        </h1>
-        <button
-          onClick={() => setIsFilterOpen(true)}
-          className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded text-sm font-medium hover:bg-gray-200 transition"
+        </span>
+        <button 
+          onClick={() => setIsFilterOpen(true)} 
+          className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
-          Filters · Sort
+          <Filter className="w-4 h-4" />
+          Filter
         </button>
       </div>
 
-      {/* 🟢 🎨 UPDATED UI: Showing box with proper filter/pill style */}
+      {/* 🟢 SubCategory Filter Badge (Theke neeche, flow ke saath) */}
       {subCategoryFromUrl && (
-        <div className="mb-4 inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg text-sm font-medium text-gray-900 shadow-sm border border-gray-100 transition-all">
-          <span className="flex items-center gap-2">
-            {/* Magnifying Glass Icon */}
-            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <span>{subCategoryFromUrl}</span>
-          </span>
-          
-          <button
-            onClick={() => setSearchParams({})} // 🟢 Cleanly removes all query params
-            className="ml-1 p-1 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition-colors"
-            aria-label="Clear filter"
-          >
-            {/* Cross (X) Icon */}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+        <div className="mt-3 mb-4 px-3 md:px-8">
+          <div className="inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg text-sm font-medium text-gray-900 shadow-sm border border-gray-100 transition-all">
+            <span className="flex items-center gap-2">
+              {/* Magnifying Glass Icon */}
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span>{subCategoryFromUrl}</span>
+            </span>
+            
+            <button
+              onClick={() => setSearchParams({})} // 🟢 Cleanly removes all query params
+              className="ml-1 p-1 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition-colors"
+              aria-label="Clear filter"
+            >
+              {/* Cross (X) Icon */}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
       )}
 
       {loading ? (
-        <p className="text-center py-10 text-gray-500">Loading products...</p>
+        <p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>
       ) : (
-        <div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="mt-6">
+          {/* 👇 Nike-style gap aur perfect grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
             {filteredProducts.length === 0 ? (
-              <p className="col-span-full text-center py-10 text-gray-500">
+              <p className="col-span-full text-center py-20 text-gray-500 text-sm">
                 No shoes match your filters.
               </p>
             ) : (
               filteredProducts.map((product) => (
-                <Link to={`/product/${product._id}`} key={product._id} className="group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
+                <Link 
+                  to={`/product/${product._id}`} 
+                  key={product._id} 
+                  className="group cursor-pointer flex flex-col gap-1.5 p-0"
+                >
+                  {/* 👇 Square Image Box (No rounded corners, edge to edge) */}
+                  <div className="relative aspect-square overflow-hidden bg-gray-50 hover:bg-gray-100 transition-colors duration-300">
                     <img
                       src={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'}
                       alt={product.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out"
                       onError={(e) => {
                         e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error';
                       }}
                     />
-                    <button className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white hover:scale-110 transition duration-200 z-10">
+                    
+                    {/* 👇 Circular Heart Button */}
+                    <button className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm hover:bg-gray-50 hover:scale-105 transition-all duration-200 z-10">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
                     </button>
                   </div>
-                  <div className="mt-3">
-                    <p className="text-sm font-semibold text-gray-900">{product.title}</p>
-                    <p className="text-sm text-gray-500">${product.price}</p>
+
+                  {/* 👇 Product details text */}
+                  <div className="flex flex-col gap-1 px-1 md:px-1.5 pb-1.5">
+                    <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-snug">
+                      {product.title}
+                    </p>
+                    <p className="text-sm font-bold text-black">
+                      ${product.price}
+                    </p>
                   </div>
                 </Link>
               ))
             )}
           </div>
 
+          {/* 👇 Pill-shaped Load More Button */}
           {hasMore && !loadingMore && (
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-10">
               <button
                 onClick={handleLoadMore}
-                className="px-6 py-3 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition"
+                className="px-8 py-2.5 border border-black text-black text-sm font-medium rounded-full hover:bg-black hover:text-white transition-colors duration-300"
               >
                 Load More
               </button>
             </div>
           )}
           {loadingMore && (
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-10">
               <p className="text-sm text-gray-500">Loading more products...</p>
             </div>
           )}
