@@ -159,7 +159,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🟢 SHOP BY SPORT (NIKE STYLE - MINIMALIST CARDS) --- */}
+      {/* --- 🟢 SHOP BY SPORT (TEXT BELOW IMAGE - BLACK COLOR) --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black">Shop By Sport</h2>
@@ -186,7 +186,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 🟢 NIKE-STYLE MINIMALIST SLIDER (ONLY BIG IMAGE + BOTTOM LABEL) */}
+        {/* 🟢 NIKE-STYLE SLIDER (TEXT STRICTLY BELOW IMAGE) */}
         <div ref={sportRef} className="flex overflow-x-auto gap-6 scroll-smooth hide-scrollbar pb-4">
           {loadingSport ? (
             <p className="text-gray-500 text-sm">Loading {selectedSport} products...</p>
@@ -195,9 +195,9 @@ export default function Home() {
               <Link 
                 to={`/product/${product._id}`} 
                 key={product._id} 
-                className="min-w-[300px] md:min-w-[400px] flex flex-col gap-1 group cursor-pointer"
+                className="min-w-[300px] md:min-w-[400px] flex flex-col gap-2 group cursor-pointer"
               >
-                {/* NIKE STYLE CARD: PURE IMAGE + LABEL */}
+                {/* CARD IMAGE (Rectangle) */}
                 <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-100 rounded-xl group-hover:shadow-lg transition">
                   <img 
                     src={product.images?.[0] || product.imageUrl} 
@@ -207,13 +207,16 @@ export default function Home() {
                       e.target.src = "https://placehold.co/600x450/f3f4f6/333333?text=No+Image";
                     }}
                   />
-                  {/* NIKE STYLE BOTTOM-LEFT LABEL */}
-                  <div className="absolute bottom-4 left-4 text-white z-10">
-                    <h3 className="text-xl font-bold tracking-tight drop-shadow-md leading-tight">
-                      {/* Sirf Title, ya Category label show karo */}
-                      {product.title}
-                    </h3>
-                  </div>
+                </div>
+                
+                {/* 🟢 FIX: TEXT IS VISIBLE BLACK AND BELOW THE IMAGE */}
+                <div className="px-1 pt-1">
+                  <h3 className="text-base md:text-lg font-bold text-black leading-tight">
+                    {product.title}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {product.category}
+                  </p>
                 </div>
               </Link>
             ))
