@@ -111,8 +111,8 @@ export default function Men() {
         <p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>
       ) : (
         <div className="mt-6">
-          {/* 👇 YAHAN GAP ADD KIYA HAI (gap-1 mobile par, gap-6 desktop par) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-6">
+          {/* 👇 YAHAN GAP KO THODA SA AUR BADHAYA HAI (gap-2 md:gap-8) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
             {filteredProducts.length === 0 ? (
               <p className="col-span-full text-center py-20 text-gray-500 text-sm">No products match your filters.</p>
             ) : (
