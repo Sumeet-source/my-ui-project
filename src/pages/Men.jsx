@@ -111,8 +111,8 @@ export default function Men() {
         <p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>
       ) : (
         <div className="mt-6">
-          {/* Grid with no gaps */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-0 md:gap-0">
+          {/* 👇 YAHAN GAP ADD KIYA HAI (gap-1 mobile par, gap-6 desktop par) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-1 md:gap-6">
             {filteredProducts.length === 0 ? (
               <p className="col-span-full text-center py-20 text-gray-500 text-sm">No products match your filters.</p>
             ) : (
@@ -120,10 +120,10 @@ export default function Men() {
                 <Link 
                   to={`/product/${product._id}`} 
                   key={product._id} 
-                  className="group cursor-pointer flex flex-col gap-1.5 p-0" // 👈 Padding hata ke p-0 kar diya
+                  className="group cursor-pointer flex flex-col gap-1.5 p-0"
                 >
                   
-                  {/* Image Container - rounded-xl hata ke pura square kar diya */}
+                  {/* Image Container - Perfect Square */}
                   <div className="relative aspect-square overflow-hidden bg-gray-50 hover:bg-gray-100 transition-colors duration-300">
                     <img 
                       src={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
@@ -132,7 +132,7 @@ export default function Men() {
                       onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }} 
                     />
                     
-                    {/* Wishlist Button - rounded-full hata ke square kar diya */}
+                    {/* Wishlist Button - Square */}
                     <button className="absolute top-3 right-3 p-2 bg-white shadow-sm hover:bg-gray-50 hover:scale-105 transition-all duration-200 z-10">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
