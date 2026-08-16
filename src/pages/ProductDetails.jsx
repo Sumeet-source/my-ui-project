@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import axiosClient from '../api/axiosClient';
 import ProductCard from '../components/ProductCard';
 import { Truck, RotateCcw, X } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 export default function ProductDetails() {
   const { id } = useParams();
