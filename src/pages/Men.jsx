@@ -95,7 +95,8 @@ export default function Men() {
       
       {/* Sticky Filter Bar */}
       <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center -mx-4 md:-mx-10 px-4 md:px-10">
-        <span className="text-sm font-semibold text-gray-900">
+        {/* 👇 YAHAN pl-1 ADD KIYA HAI TAKE HAMBURGER KE ALIGN HO JAYE */}
+        <span className="text-sm font-semibold text-gray-900 pl-1">
           Men
         </span>
         <button 
@@ -110,7 +111,6 @@ export default function Men() {
       {loading ? (
         <p className="text-center py-20 text-gray-500 text-sm">Loading products...</p>
       ) : (
-        // 👇 YAHAN GAP KO TIGHT KIYA HAI (mt-0 md:mt-2)
         <div className="mt-0 md:mt-2">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
             {filteredProducts.length === 0 ? (
