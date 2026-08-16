@@ -23,10 +23,7 @@ export default function Men() {
     }
 
     try {
-      let params = {
-        page: page,
-        limit: 8
-      };
+      let params = { page: page, limit: 8 };
 
       if (filters.category === 'Shoes' || filters.category === 'Accessories') {
         params.category = filters.category;
@@ -92,13 +89,10 @@ export default function Men() {
     fetchMenProducts(1, true, {});
   };
 
-  // ===========================
-  // CLEAN UI (No Title, No Tabs)
-  // ===========================
   return (
     <div className="px-4 md:px-10 bg-white min-h-screen pb-10">
       
-      {/* 1. Sticky Filter Bar (Directly at the top, full width) */}
+      {/* Sticky Filter Bar */}
       <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center -mx-4 md:-mx-10 px-4 md:px-10">
         <span className="text-sm font-semibold text-gray-900">
           Men
@@ -114,17 +108,21 @@ export default function Men() {
         </button>
       </div>
 
-      {/* LOADING & PRODUCT GRID */}
       {loading ? (
         <p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>
       ) : (
         <div className="mt-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {/* 👇 YAHAN GAP ZERO KAR DIYA HAI (gap-0) AUR CARD PAR PADDING DAAL DI HAI */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-0 md:gap-0">
             {filteredProducts.length === 0 ? (
               <p className="col-span-full text-center py-20 text-gray-500 text-sm">No products match your filters.</p>
             ) : (
               filteredProducts.map((product) => (
-                <Link to={`/product/${product._id}`} key={product._id} className="group cursor-pointer flex flex-col gap-2">
+                <Link 
+                  to={`/product/${product._id}`} 
+                  key={product._id} 
+                  className="group cursor-pointer flex flex-col gap-1.5 p-1 md:p-1.5"
+                >
                   
                   {/* Image Container */}
                   <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors duration-300">
@@ -143,12 +141,12 @@ export default function Men() {
                     </button>
                   </div>
 
-                  {/* Product Details */}
-                  <div className="flex flex-col px-1 pb-2">
+                  {/* Product Details - Ab padding bahar se aa rahi hai, andar se px-0.5 hata diya */}
+                  <div className="flex flex-col gap-1">
                     <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-snug">
                       {product.title}
                     </p>
-                    <p className="text-sm font-bold text-black mt-1">
+                    <p className="text-sm font-bold text-black">
                       ${product.price}
                     </p>
                   </div>
@@ -177,7 +175,6 @@ export default function Men() {
         </div>
       )}
 
-      {/* Filter Bottom Sheet */}
       <FilterBottomSheet 
         isOpen={isFilterOpen} 
         onClose={() => setIsFilterOpen(false)} 
