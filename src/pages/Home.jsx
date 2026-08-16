@@ -5,17 +5,14 @@ import axiosClient from '../api/axiosClient';
 export default function Home() {
   const navigate = useNavigate();
   
-  // 🟢 STATE FOR REAL PRODUCTS
   const [allProducts, setAllProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [activeCategory, setActiveCategory] = useState('Running');
 
-  // 🟢 CAROUSEL REFS
   const bestsellerRef = useRef(null);
   const sportRef = useRef(null);
-  const trendingRef = useRef(null); // 🟢 ADDED FOR TRENDING
+  const trendingRef = useRef(null);
 
-  // 🟢 SCROLL FUNCTIONS
   const scrollBestsellerLeft = () => {
     if (bestsellerRef.current) bestsellerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
   };
@@ -35,7 +32,6 @@ export default function Home() {
     if (trendingRef.current) trendingRef.current.scrollBy({ left: 300, behavior: 'smooth' });
   };
 
-  // 🟢 FETCH REAL PRODUCTS FROM BACKEND
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -55,9 +51,8 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  // Slice products for sections
   const bestsellers = allProducts.slice(0, 4);
-  const trendingProducts = allProducts.slice(4, 9); // Trending mei next 5 products
+  const trendingProducts = allProducts.slice(4, 9);
 
   return (
     <div className="min-h-screen bg-white pb-16">
@@ -92,11 +87,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- FEATURED DOUBLE BANNER --- */}
-      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-12">
-        <h2 className="text-xl md:text-2xl font-bold text-black mb-4">Featured</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <div className="relative group overflow-hidden rounded-lg">
+      {/* --- 🟢 FEATURED DOUBLE BANNER (Gap removed, Edge to Edge) --- */}
+      <section className="w-full py-6 md:py-12">
+        <h2 className="text-xl md:text-2xl font-bold text-black px-4 md:px-10 mb-4">Featured</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full">
+          <div className="relative group overflow-hidden rounded-none">
             <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=800&q=80" alt="Training Apparel" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80"></div>
             <div className="absolute bottom-6 left-6 text-white z-10">
@@ -105,7 +100,7 @@ export default function Home() {
               <Link to="/women" className="inline-block mt-3 bg-white text-black px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition">Shop</Link>
             </div>
           </div>
-          <div className="relative group overflow-hidden rounded-lg">
+          <div className="relative group overflow-hidden rounded-none">
             <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=800&q=80" alt="Studio Fleece" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80"></div>
             <div className="absolute bottom-6 left-6 text-white z-10">
@@ -170,7 +165,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🟢 TRENDING SLIDER (With Real Products & Redirect Links) --- */}
+      {/* --- 🟢 TRENDING SLIDER (Text overlay hata diya, Niche text shift kar diya) --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black">Trending</h2>
@@ -185,14 +180,15 @@ export default function Home() {
             <p className="text-gray-500 text-sm">Loading trending...</p>
           ) : trendingProducts.length > 0 ? (
             trendingProducts.map((product) => (
-              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[280px] relative h-[350px] md:h-[450px] overflow-hidden group cursor-pointer rounded-lg bg-gray-50">
-                <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" />
-                <div className="absolute bottom-6 left-6 z-10 pr-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-gray-600">Just In</p>
-                  <h3 className="text-lg md:text-xl font-bold text-black mt-1 line-clamp-2">{product.title}</h3>
-                  <div className="inline-block mt-2 bg-white text-black px-4 py-1.5 md:px-5 md:py-2 rounded-full text-xs font-bold uppercase tracking-wider border border-gray-200 hover:bg-gray-100 transition">
-                    Shop
-                  </div>
+              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[280px] flex flex-col gap-2 group cursor-pointer">
+                <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
+                  <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" />
+                </div>
+                {/* 🟢 Text portion shifted below image, NO OVERLAY */}
+                <div className="flex flex-col gap-0.5 px-1">
+                  <p className="font-bold text-sm text-black">{product.title}</p>
+                  <p className="text-xs text-gray-500">{product.category}</p>
+                  <p className="font-bold text-sm text-black mt-0.5">₹{product.price}</p>
                 </div>
               </Link>
             ))
