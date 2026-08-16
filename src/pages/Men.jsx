@@ -93,7 +93,7 @@ export default function Men() {
   };
 
   // ===========================
-  // UPDATED UI: FLUSH STICKY BAR
+  // UPDATED UI
   // ===========================
   return (
     <div className="px-4 md:px-10 bg-white min-h-screen pb-10">
@@ -110,10 +110,11 @@ export default function Men() {
         <span className="text-sm text-gray-500 hover:text-black pb-3 cursor-pointer">Accessories</span>
       </div>
 
-      {/* 3. Sticky Filter Bar (Uses sticky top-0. No manual spacer needed!) */}
+      {/* 3. Sticky Filter Bar (Text changed to Men) */}
       <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center">
-        <span className="text-sm text-gray-500 font-medium">
-          {filteredProducts.length} Results
+        {/* 👇 YAHAN CHANGE KIYA HAI ("8 Results" ki jagah "Men" likha diya) */}
+        <span className="text-sm font-semibold text-gray-900">
+          Men
         </span>
         <button 
           onClick={() => setIsFilterOpen(true)} 
@@ -126,7 +127,7 @@ export default function Men() {
         </button>
       </div>
 
-      {/* LOADING & PRODUCT GRID - Automatically adjusts because we removed manual spacing */}
+      {/* LOADING & PRODUCT GRID */}
       {loading ? (
         <p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>
       ) : (
@@ -155,7 +156,7 @@ export default function Men() {
                     </button>
                   </div>
 
-                  {/* Product Details - Only Title & Price */}
+                  {/* Product Details */}
                   <div className="flex flex-col px-1 pb-2">
                     <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-snug">
                       {product.title}
