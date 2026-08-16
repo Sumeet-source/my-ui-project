@@ -2,59 +2,64 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1d1d1d] text-white/80 border-t border-white/10 pt-12 md:pt-16 mt-0">
-      <div className="max-w-[1600px] mx-auto px-6 py-8 md:py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-black text-white border-t border-white/10 pt-16 pb-10">
+      <div className="max-w-[1600px] mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
         
-        {/* Column 1: Brand */}
-        <div className="space-y-4">
-          <span className="text-2xl font-black tracking-[0.2em] text-white">FORGE</span>
-          <p className="text-sm leading-relaxed">Premium athletic wear engineered for your peak performance.</p>
-        </div>
-
-        {/* Column 2: Quick Links */}
-        <div className="space-y-4">
-          <h4 className="text-white font-bold text-sm uppercase tracking-wider">Quick Links</h4>
-          <ul className="space-y-2 text-sm">
-            <li><Link to="/men" className="hover:text-white transition">Men</Link></li>
-            <li><Link to="/women" className="hover:text-white transition">Women</Link></li>
-            <li><Link to="/shoes" className="hover:text-white transition">Shoes</Link></li>
-            <li><Link to="/outlet" className="hover:text-white transition">Outlet</Link></li>
+        {/* Column 1: Brand & Quick Links */}
+        <div className="col-span-2 md:col-span-1 space-y-6">
+          <span className="text-2xl font-black tracking-[0.2em] text-white block">FORGE</span>
+          <ul className="space-y-3 text-sm text-gray-400">
+            <li><Link to="/men" className="hover:text-white transition-colors">Men</Link></li>
+            <li><Link to="/women" className="hover:text-white transition-colors block">Women</Link></li>
+            <li><Link to="/shoes" className="hover:text-white transition-colors block">Shoes</Link></li>
+            <li><Link to="/outlet" className="hover:text-white transition-colors block">Outlet</Link></li>
           </ul>
         </div>
 
-        {/* Column 3: Support */}
+        {/* Column 2: Get Help */}
         <div className="space-y-4">
-          <h4 className="text-white font-bold text-sm uppercase tracking-wider">Support</h4>
-          <ul className="space-y-2 text-sm">
-            <li><Link to="#" className="hover:text-white transition">Help Center</Link></li>
-            <li><Link to="#" className="hover:text-white transition">Returns & Exchanges</Link></li>
-            <li><Link to="#" className="hover:text-white transition">Shipping Info</Link></li>
+          <h4 className="text-white font-bold text-sm uppercase tracking-wider">Get Help</h4>
+          <ul className="space-y-3 text-sm text-gray-400">
+            <li><Link to="#" className="hover:text-white transition-colors">Help Center</Link></li>
+            <li><Link to="#" className="hover:text-white transition-colors">Returns & Exchanges</Link></li>
+            <li><Link to="#" className="hover:text-white transition-colors">Shipping Info</Link></li>
           </ul>
         </div>
 
-        {/* Column 4: Contact */}
+        {/* Column 3: About FORGE */}
+        <div className="space-y-4">
+          <h4 className="text-white font-bold text-sm uppercase tracking-wider">About FORGE</h4>
+          <ul className="space-y-3 text-sm text-gray-400">
+            <li><Link to="#" className="hover:text-white transition-colors">Our Story</Link></li>
+            <li><Link to="#" className="hover:text-white transition-colors">Careers</Link></li>
+            <li><Link to="#" className="hover:text-white transition-colors">Sustainability</Link></li>
+          </ul>
+        </div>
+
+        {/* Column 4: Contact Us */}
         <div className="space-y-4">
           <h4 className="text-white font-bold text-sm uppercase tracking-wider">Contact Us</h4>
-          <div className="space-y-2 text-sm">
-            <p className="flex items-center gap-2">
+          <ul className="space-y-3 text-sm text-gray-400">
+            <li className="flex items-center gap-2">
               <span className="text-white">📞</span> 
               <span>+91 8700290497</span>
-            </p>
-            <p className="flex items-center gap-2">
+            </li>
+            <li className="flex items-center gap-2">
               <span className="text-white">✉️</span> 
               <span>support@forge.com</span>
-            </p>
-          </div>
+            </li>
+          </ul>
         </div>
       </div>
 
-      {/* Bottom Copyright Section */}
-      <div className="border-t border-white/10 bg-black/30 py-6">
-        <div className="max-w-[1600px] mx-auto px-6 flex flex-col sm:flex-row justify-between items-center text-xs text-white/60">
+      {/* Bottom Copyright Section (Exactly like Nike's copyright strip) */}
+      <div className="border-t border-white/10 mt-12 pt-8">
+        <div className="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
           <p>&copy; 2026 FORGE. All rights reserved.</p>
-          <div className="flex gap-4 mt-4 sm:mt-0">
-            <a href="#" className="hover:text-white transition">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition">Terms of Service</a>
+          <div className="flex gap-6 mt-4 md:mt-0">
+            <a href="#" className="hover:text-white transition-colors">Terms of Use</a>
+            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-white transition-colors">Store Claim Policy</a>
           </div>
         </div>
       </div>
