@@ -93,28 +93,26 @@ export default function Men() {
   };
 
   // ===========================
-  // UPDATED UI PART (Sticky Header & Brand Name Removed)
+  // UPDATED UI WITH CORRECT STICKY FILTER
   // ===========================
   return (
     <div className="px-4 py-2 md:px-10 bg-white min-h-screen relative">
       
-      {/* STICKY HEADER: Title, Tabs & Filter Bar */}
-      <div className="sticky top-[64px] z-20 bg-white pt-4 pb-2 border-b border-gray-100 shadow-[0_4px_6px_-4px_rgba(0,0,0,0.03)]">
-        
-        {/* 1. Title */}
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">Men's</h1>
-        </div>
+      {/* 1. Title Section (Scrolls away) */}
+      <div className="pt-4 pb-2">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Men's</h1>
+      </div>
 
-        {/* 2. Category Tabs */}
-        <div className="flex gap-6 border-b border-gray-200 pb-3 mb-4">
-          <span className="text-sm font-bold border-b-2 border-black pb-3 cursor-pointer">Clothing</span>
-          <span className="text-sm text-gray-500 hover:text-black pb-3 cursor-pointer">Shoes</span>
-          <span className="text-sm text-gray-500 hover:text-black pb-3 cursor-pointer">Accessories</span>
-        </div>
+      {/* 2. Tabs Section (Scrolls away) */}
+      <div className="flex gap-6 border-b border-gray-200 pb-3 mb-4">
+        <span className="text-sm font-bold border-b-2 border-black pb-3 cursor-pointer">Clothing</span>
+        <span className="text-sm text-gray-500 hover:text-black pb-3 cursor-pointer">Shoes</span>
+        <span className="text-sm text-gray-500 hover:text-black pb-3 cursor-pointer">Accessories</span>
+      </div>
 
-        {/* 3. Result Count & Filter Button (Sticky) */}
-        <div className="flex justify-between items-center pb-2">
+      {/* 3. Sticky Result Count & Filter Row (Always stays at 80px from top, behind navbar) */}
+      <div className="sticky top-[80px] z-40 bg-white py-3 border-b border-gray-100 shadow-[0_4px_6px_-4px_rgba(0,0,0,0.03)]">
+        <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500 font-medium">
             {filteredProducts.length} Results
           </span>
@@ -135,7 +133,7 @@ export default function Men() {
         <p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>
       ) : (
         <div className="mt-6">
-          {/* 4. Updated Grid & Product Cards (Brand Name Removed) */}
+          {/* 4. Updated Grid & Product Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {filteredProducts.length === 0 ? (
               <p className="col-span-full text-center py-20 text-gray-500 text-sm">No products match your filters.</p>
@@ -160,9 +158,8 @@ export default function Men() {
                     </button>
                   </div>
 
-                  {/* Product Details - ONLY Product Title & Price (Brand removed as requested) */}
+                  {/* Product Details - ONLY Product Title & Price */}
                   <div className="flex flex-col px-1 pb-2">
-                    {/* Removed the Brand Name 'Nike' here */}
                     <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-snug">
                       {product.title}
                     </p>
