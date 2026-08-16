@@ -89,7 +89,6 @@ export default function Navbar() {
     if (inputRef.current) inputRef.current.focus();
   };
 
-  // 🟢 UPDATED: Underline color changed from white to black
   const getUnderlineSpanClasses = (isActive) =>
     `relative inline-block 
     after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-black 
@@ -103,13 +102,13 @@ export default function Navbar() {
   const isActiveOutlet = location.pathname === '/outlet';
 
   return (
-    // 🟢 MAIN WRAPPER CHANGED TO bg-white AND text-black
-    <nav className="bg-white text-black relative z-50 shadow-sm border-b border-gray-200">
+    // 🟢 MAIN NAVBAR STICKY TOP 0 with consistent white background and aligned container
+    <nav className="sticky top-0 z-50 bg-white text-black shadow-sm border-b border-gray-200">
       
       {/* --- TOP UTILITY BAR --- */}
-      {/* 🟢 Border color changed to gray-200 */}
       <div className="border-b border-gray-200">
-        <div className="max-w-[1600px] mx-auto px-6 py-1.5 hidden md:flex justify-between items-center tracking-wide font-medium">
+        {/* 🟢 Width updated to max-w-[1280px] to perfectly align with Men/Women pages */}
+        <div className="max-w-[1280px] mx-auto px-4 md:px-10 py-1.5 hidden md:flex justify-between items-center tracking-wide font-medium">
           <div className="flex-1"></div>
           <Link to="/signup" className="uppercase flex-1 text-center cursor-pointer text-[13px] text-black hover:text-gray-600">
             SIGN UP FOR FASTER CHECKOUT & EASY RETURNS
@@ -118,7 +117,6 @@ export default function Navbar() {
             {user ? (
               <div className="flex items-center gap-2">
                 <Link to="/dashboard" className="cursor-pointer text-[14px] font-medium hover:text-gray-600">Account</Link>
-                {/* 🟢 Separator color changed to gray-300 */}
                 <span className="text-gray-300 text-[14px]">|</span>
                 <button onClick={handleLogout} className="cursor-pointer text-[14px] font-medium bg-transparent border-none hover:text-gray-600">Logout</button>
               </div>
@@ -134,11 +132,11 @@ export default function Navbar() {
       </div>
 
       {/* --- MAIN NAVIGATION BAR --- */}
-      <div className="flex justify-between items-center px-4 py-3 md:px-6 md:py-5 max-w-[1600px] mx-auto relative">
+      {/* 🟢 Width updated to max-w-[1280px] mx-auto with consistent px-4 md:px-10 */}
+      <div className="flex justify-between items-center px-4 md:px-10 py-3 md:py-5 max-w-[1280px] mx-auto relative">
         
         {/* Mobile Action Buttons */}
         <div className="flex items-center gap-3 md:hidden">
-          {/* 🟢 Icon changed to black */}
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-black p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
@@ -149,12 +147,9 @@ export default function Navbar() {
 
         {/* LOGO SECTION */}
         <div className="flex items-center justify-center flex-1 md:flex-none">
-          {/* Desktop Logo wrapped with Link to Home */}
           <Link to="/" className="hidden md:block">
             <ForgeLogo />
           </Link>
-          
-          {/* Mobile Scramble Logo (Text changed to black) */}
           <Link to="/" className="block md:hidden">
             <span className="text-xl font-black tracking-[0.2em] text-black">
               <ScrambleLogo text="FORGE" />
@@ -164,7 +159,6 @@ export default function Navbar() {
 
         {/* Mobile Right Icons */}
         <div className="flex items-center gap-4 md:hidden">
-          {/* 🟢 Icon changed to black */}
           <button onClick={() => setIsSearchOpen(true)} className="text-black">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </button>
@@ -174,7 +168,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* --- DESKTOP LINKS (Text changed to black) --- */}
+        {/* --- DESKTOP LINKS --- */}
         <div className="hidden md:flex justify-center flex-1 gap-10 lg:gap-20 text-[17px] lg:text-[19px] font-bold items-center h-12">
           <Link to="/new-arrivals" className="relative h-full flex items-center cursor-pointer">
             <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm">🔥</span></span>
@@ -193,7 +187,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* --- DESKTOP RIGHT ICONS (Border & Text color updated) --- */}
+        {/* --- DESKTOP RIGHT ICONS --- */}
         <div className="hidden md:flex items-center gap-6">
           <div className="hidden sm:flex items-center gap-2 border-b border-gray-300 hover:border-black transition-colors pb-0.5 w-32">
             <input type="text" value={searchTerm} onChange={handleDesktopSearch} onKeyDown={(e) => { if(e.key === 'Enter' && searchTerm.trim()) navigate(`/search?q=${searchTerm}`); }} placeholder="Search" className="bg-transparent text-black text-[15px] placeholder-gray-400 focus:outline-none w-full" />
@@ -265,7 +259,6 @@ export default function Navbar() {
               </button>
             </div>
           </div>
-
           <div className="flex-1 overflow-y-auto px-6 py-4">
             <div className="flex flex-col">
               <button onClick={() => { navigate('/new-arrivals'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full">
