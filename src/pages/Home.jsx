@@ -87,17 +87,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🟢 FEATURED BANNER (MOVED UP, IMMEDIATELY BELOW VIDEO) --- */}
+      {/* --- 🟢 FEATURED BANNER (ORDER SWAPPED + BUTTONS ADDED + LINKS FIXED) --- */}
       <section className="w-full py-0">
         <h2 className="text-xl md:text-2xl font-bold text-black px-4 md:px-10 py-6 md:py-12 mb-0">Featured</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0 w-full">
           
-          {/* Banner 1: Clean Image, NO TEXT OVERLAY */}
-          <div className="relative group overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=1000&q=80" alt="Training Apparel" className="w-full h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105" />
-          </div>
-
-          {/* Banner 2: Studio Fleece */}
+          {/* 🟢 BANNER 1 (Upar - Studio Fleece): Redirects to /women */}
           <div className="relative group overflow-hidden">
             <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1000&q=80" alt="Studio Fleece" className="w-full h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80"></div>
@@ -105,6 +100,17 @@ export default function Home() {
               <p className="text-xs font-medium uppercase tracking-wider text-gray-300">Studio Fleece</p>
               <h3 className="text-xl md:text-3xl font-bold mt-1">It's Just a Sweatsuit Until It's Not</h3>
               <Link to="/women" className="inline-block mt-3 bg-white text-black px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition">Shop</Link>
+            </div>
+          </div>
+
+          {/* 🟢 BANNER 2 (Neeche - Training Apparel): Redirects to /men */}
+          <div className="relative group overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=1000&q=80" alt="Training Apparel" className="w-full h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80"></div>
+            <div className="absolute bottom-6 left-6 text-white z-10">
+              <p className="text-xs font-medium uppercase tracking-wider text-gray-300">Training Apparel</p>
+              <h3 className="text-xl md:text-3xl font-bold mt-1">All Work, No Sweat</h3>
+              <Link to="/men" className="inline-block mt-3 bg-white text-black px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition">Shop</Link>
             </div>
           </div>
         </div>
@@ -163,24 +169,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- APP BANNER --- */}
-      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-8">
-        <div className="bg-[#F5F0E1] w-full p-6 md:p-8 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 border border-[#E8DEC5]">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-xl md:text-2xl font-black tracking-[0.2em] text-black">F</span>
-            </div>
-            <div>
-              <h3 className="text-lg md:text-2xl font-bold text-black uppercase tracking-tight">It's Better on the FORGE App</h3>
-            </div>
-          </div>
-          <Link to="/" className="bg-black text-white px-5 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-800 transition">
-            Download Now
-          </Link>
-        </div>
-      </section>
-
-      {/* --- 🟢 TRENDING (EVERYTHING BELOW THIS DELETED, NOW LAST SECTION) --- */}
+      {/* --- 🟢 TRENDING (FORGE APP CONTAINER DELETED, LAST SECTION) --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black">Trending</h2>
