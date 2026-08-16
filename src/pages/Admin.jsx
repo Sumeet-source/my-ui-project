@@ -4,10 +4,10 @@ import axiosClient from '../api/axiosClient';
 
 // 🟢 UPDATED: Sub-Category Mapping with Sports
 const SUB_CATEGORY_MAP = {
-  Clothing: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
+  Men: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
+  Women: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
   Shoes: ['Sneakers', 'Running Shoes', 'Casual Shoes', 'Formal Shoes', 'Loafers', 'Boots', 'Sandals'],
   Accessories: ['Watches', 'Sunglasses', 'Belts', 'Wallets', 'Caps & Hats', 'Backpacks', 'Socks', 'Ties', 'Cufflinks'],
-  // 🟢 NEW: Sportswear ke liye mapping add karo
   Sportswear: ['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga']
 };
 
