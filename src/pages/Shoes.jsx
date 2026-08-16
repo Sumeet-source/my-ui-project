@@ -5,6 +5,7 @@ import FilterBottomSheet from '../components/FilterBottomSheet';
 import { Filter } from 'lucide-react';
 
 export default function Shoes() {
+  // ... (Logic same as before)
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -55,12 +56,8 @@ export default function Shoes() {
 
   return (
     <div className="px-0 md:px-8 bg-white min-h-screen pb-10">
-      {/* Sticky Filter Bar */}
       <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center -mx-4 md:-mx-10 px-4 md:px-10">
-        {/* 👇 pl-5 ADDED HERE */}
-        <span className="text-sm font-semibold text-gray-900 pl-5">
-          Shoes
-        </span>
+        <span className="text-sm font-semibold text-gray-900 pl-5">Shoes</span>
         <button onClick={() => setIsFilterOpen(true)} className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors">
           <Filter className="w-4 h-4" /> Filter
         </button>
@@ -76,7 +73,8 @@ export default function Shoes() {
       )}
 
       {loading ? (<p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>) : (
-        <div className="mt-6">
+        // 👇 GAP FIXED HERE (mt-0 md:mt-2)
+        <div className="mt-0 md:mt-2">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
             {filteredProducts.length === 0 ? (<p className="col-span-full text-center py-20 text-gray-500 text-sm">No shoes match your filters.</p>) : (
               filteredProducts.map((product) => (
