@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react'; // ✅ FIXED: Duplicate imports removed
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { useWishlist } from '../context/WishlistContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -152,15 +152,15 @@ export default function ProductDetails() {
     });
   };
 
-  // 🟢 OPTIMIZED WISHLIST
-  const handleWishlistToggle = useCallback((e) => {
+  // 🟢 REMOVED useCallback (Ye slow hoga, par blank screen nahi dega)
+  const handleWishlistToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation(); 
     if (!user) { showToast("Please login to add to wishlist", "error"); return; }
     if (isInWishlist(product._id)) removeFromWishlist(product._id);
     else addToWishlist(product._id);
-  }, [user, product._id, isInWishlist, addToWishlist, removeFromWishlist, showToast]);
+  };
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -205,7 +205,6 @@ export default function ProductDetails() {
 
       {/* ================= MOBILE LAYOUT ================= */}
       <div className="md:hidden">
-        {/* Carousel, Info, Size, Add to Cart button */}
         <div className="relative w-full bg-gray-50">
           <div ref={carouselRef} onScroll={handleCarouselScroll} className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
             {images.map((img, idx) => (
@@ -218,7 +217,6 @@ export default function ProductDetails() {
             {images.map((_, idx) => <div key={idx} className={`w-1.5 h-1.5 rounded-full transition-colors ${mainImageIndex === idx ? 'bg-gray-900' : 'bg-gray-400'}`} />)}
           </div>
         </div>
-        {/* Details, Price, Size Selection */}
         <div className="px-4 py-4">
           <div className="flex items-baseline gap-3 mb-2">
             <span className="text-2xl font-bold text-gray-900">${product.price}</span>
@@ -226,7 +224,6 @@ export default function ProductDetails() {
             <span className="text-sm font-medium text-green-600">(40% OFF)</span>
           </div>
           <div className="flex items-center gap-2 mb-1">
-            {/* 🟢 DYNAMIC RATING BADGE */}
             <div className="flex items-center gap-1 bg-green-600 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">
               <span>{averageRating > 0 ? averageRating : 'New'}</span>
               <span>★</span>
@@ -261,13 +258,11 @@ export default function ProductDetails() {
           </div>
         </div>
 
-        {/* Product Details Text */}
         <div className="px-4 py-4 border-t border-gray-100">
           <h3 className="text-sm font-bold text-gray-900 mb-2">Product Details</h3>
           <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
 
-        {/* PINCODE Check */}
         <div className="px-4 py-6 border-t border-gray-100">
           <h3 className="font-bold text-gray-900 mb-1 text-sm">Check delivery date</h3>
           <p className="text-xs text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
@@ -319,7 +314,6 @@ export default function ProductDetails() {
           </div>
         </div>
 
-        {/* You Might Also Like */}
         {displayRelated.length > 0 ? (
           <div className="px-4 py-6 border-t border-gray-100">
             <h2 className="text-base font-bold text-gray-900 mb-4">You Might Also Like</h2>
@@ -333,7 +327,6 @@ export default function ProductDetails() {
           </div>
         ) : null}
         
-        {/* Reviews */}
         <div className="px-4 py-4 border-t border-gray-100 bg-gray-50">
           <h3 className="text-sm font-bold text-gray-900 mb-4">Ratings & Reviews</h3>
           <div className="space-y-4 mb-6">
@@ -364,7 +357,6 @@ export default function ProductDetails() {
       <div className="hidden md:block max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row gap-12 mb-12">
           <div className="flex-1 relative group">
-            {/* Image, hover effects, wishlist */}
             <div className="cursor-pointer relative overflow-hidden rounded-xl shadow-lg bg-gray-100 aspect-square" onClick={() => setIsLightboxOpen(true)}>
               <img src={product.images?.[mainImageIndex] || product.imageUrl} alt={product.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Product+Image'; }} />
               <button onClick={handleWishlistToggle} className="absolute top-4 right-4 p-3 bg-white/80 rounded-full hover:bg-white hover:scale-110 transition duration-200 z-20 shadow-md">
@@ -386,13 +378,11 @@ export default function ProductDetails() {
             <h1 className="text-4xl font-bold text-gray-900">{product.title}</h1>
             <div className="flex items-center gap-4">
               <span className="text-3xl font-bold text-gray-700">${product.price}</span>
-              {/* 🟢 DYNAMIC RATING & STARS */}
               <div className="flex items-center gap-1">
                 <span className="text-yellow-400 text-lg">{renderStars(averageRating)}</span>
                 <span className="text-sm text-gray-500 ml-1">({reviews.length} reviews)</span>
               </div>
             </div>
-            {/* Size Selector */}
             <div>
               <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-600">Select Size</h3>
@@ -407,7 +397,6 @@ export default function ProductDetails() {
             {!product.inStock && <div className="w-full md:w-auto bg-red-100 text-red-700 px-12 py-4 rounded-full font-bold uppercase tracking-wide text-center border border-red-200">Out of Stock</div>}
             {product.inStock && <button onClick={handleAddToCart} className="w-full md:w-auto bg-black text-white px-12 py-4 rounded-full font-bold uppercase tracking-wide hover:bg-gray-800 transition shadow-lg">Add to Cart</button>}
 
-            {/* PINCODE Check */}
             <div className="mt-8 border-t pt-6">
               <h3 className="font-bold text-gray-900 mb-1">Check delivery date</h3>
               <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
@@ -463,7 +452,6 @@ export default function ProductDetails() {
           </div>
         </div>
         
-        {/* Desktop Reviews */}
         <section className="border-t border-gray-200 pt-10 max-w-4xl">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
           <div className="space-y-6 mb-8">
