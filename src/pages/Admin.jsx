@@ -172,11 +172,14 @@ export default function AdminDashboard() {
       // 🟢 FIX: Backend compatibility ke liye `imageUrl` fallback bhi bhej rahe hain
       const dataToSend = { 
         ...formData, 
-        imageUrl: formData.images[0] || '' 
+        imageUrl: formData.images[0] || '',
+        // 🟢 IMPORTANT: Ensure 'sport' value is sent correctly
+        sport: formData.sport || 'Sportswear' 
       };
       await axiosClient.post('/api/products', dataToSend);
       showToast('Product added successfully!', 'success');
       fetchProducts();
+      // 🟢 Reset karte waqt sport ko 'Sportswear' par set karo
       setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', sport: 'Sportswear', inStock: true });
     } catch (error) { showToast('Failed to add product', 'error'); }
   };
@@ -213,7 +216,8 @@ export default function AdminDashboard() {
     try {
       const dataToSend = { 
         ...editFormData, 
-        imageUrl: editFormData.images[0] || '' 
+        imageUrl: editFormData.images[0] || '',
+        sport: editFormData.sport || 'Sportswear' 
       };
       await axiosClient.put(`/api/products/${editingProductId}`, dataToSend);
       showToast('Product updated successfully!', 'success');
