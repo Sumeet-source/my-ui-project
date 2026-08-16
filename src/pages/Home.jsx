@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // 🟢 Sahi imports
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ export default function Home() {
           </span>
         </div>
 
-        {/* Bottom Right Corner Button (Hides watermark) */}
+        {/* Bottom Right Corner Button */}
         <div className="absolute bottom-0 right-0 md:bottom-0 md:right-0">
           <div className="bg-white text-black px-4 py-3 rounded-tl-lg shadow-md flex items-center gap-2 text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition cursor-pointer">
             <span className="text-sm leading-none opacity-80">✦</span> 
@@ -63,9 +63,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- NEW MOVES (Buttons with Navigation) --- */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
-        <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar mt-2">
+      {/* --- FIXED STICKY CATEGORY FILTER BAR (Like Men/Women) --- */}
+      <div className="sticky top-[80px] z-40 bg-white border-b border-gray-100 shadow-sm">
+        <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth py-4 no-scrollbar px-4 md:px-10 max-w-[1280px] mx-auto">
           {['Running shoes', 'Training', 'Jackets', 'Shorts', 'Jeans', 'T-shirts', 'Hoodies', 'Sneakers'].map((cat) => {
             const isActive = activeCategory === cat;
             return (
@@ -73,7 +73,7 @@ export default function Home() {
                 key={cat}
                 onClick={() => {
                   setActiveCategory(cat);
-                  navigate(`/search?subCategory=${cat}`);  // 🟢 SubCategory navigation
+                  navigate(`/search?subCategory=${cat}`);
                 }}
                 className={`px-4 py-1.5 text-xs md:text-sm font-bold uppercase tracking-wider transition-all duration-300 snap-center whitespace-nowrap rounded-full border-2 ${
                   isActive 
@@ -86,10 +86,9 @@ export default function Home() {
             );
           })}
         </div>
-      </section>
+      </div>
 
       {/* --- SHOP BY CATEGORY --- */}
-      {/* 🟢 AB AUR UPAR KAR DIYA HAI: py-10 -> pt-2 pb-10 */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link to="/men" className="relative h-[400px] md:h-[500px] overflow-hidden group cursor-pointer">
