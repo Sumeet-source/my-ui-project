@@ -1,23 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react'; // 👈 Added useRef for Carousel
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const navigate = useNavigate();
-  const [timeLeft, setTimeLeft] = useState(12 * 3600 + 45 * 60);
   const [activeCategory, setActiveCategory] = useState('Running');
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  // 🟢 CAROUSEL REF & SCROLL FUNCTIONS
+  const bestsellerRef = useRef(null);
 
-  const formatTime = (seconds) => {
-    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
-    return `${h}:${m}:${s}`;
+  const scrollLeft = () => {
+    if (bestsellerRef.current) {
+      bestsellerRef.current.scrollBy({ left: -400, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (bestsellerRef.current) {
+      bestsellerRef.current.scrollBy({ left: 400, behavior: 'smooth' });
+    }
   };
 
   return (
@@ -63,8 +63,174 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- REVERTED TO ORIGINAL NON-STICKY CATEGORY BAR (BUT ALIGNED WITH NAVBAR) --- */}
-      <section className="max-w-[1280px] mx-auto px-4 md:px-10 pt-8 pb-12">
+      {/* --- FEATURED DOUBLE BANNER --- */}
+      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-8 md:py-12">
+        <h2 className="text-xl md:text-2xl font-bold text-black mb-4">Featured</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <div className="relative group overflow-hidden rounded-none">
+            <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=800&q=80" alt="Training Apparel" className="w-full h-[400px] md:h-[600px] object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition duration-300"></div>
+            <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white z-10">
+              <p className="text-xs md:text-sm font-medium uppercase tracking-wider text-gray-300">Training Apparel</p>
+              <h3 className="text-2xl md:text-4xl font-bold mt-1">All Work, No Sweat</h3>
+              <Link to="/women" className="inline-block mt-4 bg-white text-black px-6 py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition">Shop</Link>
+            </div>
+          </div>
+          <div className="relative group overflow-hidden rounded-none">
+            <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=800&q=80" alt="Studio Fleece" className="w-full h-[400px] md:h-[600px] object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition duration-300"></div>
+            <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white z-10">
+              <p className="text-xs md:text-sm font-medium uppercase tracking-wider text-gray-300">Studio Fleece</p>
+              <h3 className="text-2xl md:text-4xl font-bold mt-1">It's Just a Sweatsuit Until It's Not</h3>
+              <Link to="/women" className="inline-block mt-4 bg-white text-black px-6 py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition">Shop</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- BESTSELLERS (Carousel) --- */}
+      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-black">Bestsellers</h2>
+          {/* Navigation Arrows */}
+          <div className="flex gap-2">
+            <button onClick={scrollLeft} className="bg-white shadow-md border border-gray-200 rounded-full p-2 hover:bg-gray-50 transition">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <button onClick={scrollRight} className="bg-white shadow-md border border-gray-200 rounded-full p-2 hover:bg-gray-50 transition">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+        </div>
+        
+        <div ref={bestsellerRef} className="flex overflow-x-auto gap-4 md:gap-6 scroll-smooth hide-scrollbar pb-4">
+          {/* Product 1 */}
+          <div className="min-w-[280px] md:min-w-[320px] flex flex-col gap-3 group cursor-pointer">
+            <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
+              <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" alt="Jordan" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="font-bold text-sm text-black">Jordan Sixty Plus Low</p>
+              <p className="text-xs text-gray-600">Men's Shoes</p>
+              <p className="font-bold text-sm text-black mt-0.5">₹15,295</p>
+            </div>
+          </div>
+          {/* Product 2 */}
+          <div className="min-w-[280px] md:min-w-[320px] flex flex-col gap-3 group cursor-pointer">
+            <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
+              <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" alt="Pegasus" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="font-bold text-sm text-black">Nike Pegasus Premium</p>
+              <p className="text-xs text-gray-600">Men's Road Running Shoes</p>
+              <p className="font-bold text-sm text-black mt-0.5">₹19,295</p>
+            </div>
+          </div>
+          {/* Product 3 */}
+          <div className="min-w-[280px] md:min-w-[320px] flex flex-col gap-3 group cursor-pointer">
+            <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
+              <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80" alt="Brooklyn" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="font-bold text-sm text-black">Jordan Brooklyn</p>
+              <p className="text-xs text-gray-600">Men's T-Shirt</p>
+              <p className="font-bold text-sm text-black mt-0.5">₹2,495</p>
+            </div>
+          </div>
+          {/* Product 4 */}
+          <div className="min-w-[280px] md:min-w-[320px] flex flex-col gap-3 group cursor-pointer">
+            <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
+              <img src="https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=600&q=80" alt="Air Max" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="font-bold text-sm text-black">Nike Air Max</p>
+              <p className="text-xs text-gray-600">Men's Shoes</p>
+              <p className="font-bold text-sm text-black mt-0.5">₹16,995</p>
+            </div>
+          </div>
+          {/* Product 5 */}
+          <div className="min-w-[280px] md:min-w-[320px] flex flex-col gap-3 group cursor-pointer">
+            <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
+              <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=600&q=80" alt="Hoodie" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="font-bold text-sm text-black">FORGE Performance Hoodie</p>
+              <p className="text-xs text-gray-600">Unisex Hoodie</p>
+              <p className="font-bold text-sm text-black mt-0.5">₹3,995</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- SHOP BY SPORT (3 Images Side-by-Side) --- */}
+      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10">
+        <h2 className="text-xl md:text-2xl font-bold text-black mb-4">Shop By Sport</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          {/* Sportswear */}
+          <div className="relative h-[400px] md:h-[500px] overflow-hidden group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Sportswear" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            <div className="absolute bottom-6 left-6 text-white">
+              <h3 className="text-lg font-bold">Sportswear</h3>
+            </div>
+          </div>
+          {/* Basketball */}
+          <div className="relative h-[400px] md:h-[500px] overflow-hidden group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Basketball" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            <div className="absolute bottom-6 left-6 text-white">
+              <h3 className="text-lg font-bold">Basketball</h3>
+            </div>
+          </div>
+          {/* Football */}
+          <div className="relative h-[400px] md:h-[500px] overflow-hidden group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Football" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            <div className="absolute bottom-6 left-6 text-white">
+              <h3 className="text-lg font-bold">Football</h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- TRENDING (3 Unique Cards) --- */}
+      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10">
+        <h2 className="text-xl md:text-2xl font-bold text-black mb-4">Trending</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          {/* Trending 1: Product (Left) */}
+          <div className="relative h-[400px] md:h-[550px] overflow-hidden group cursor-pointer bg-gray-50">
+            <img src="https://images.unsplash.com/photo-1595341888016-a392ef81b7de?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-contain group-hover:scale-105 transition duration-500" alt="Tiempo" />
+            <div className="absolute bottom-6 left-6 z-10">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-600">Just In: Tiempo Maestro Elite</p>
+              <h3 className="text-xl font-bold text-black mt-1">Designed for Creative Touch</h3>
+              <Link to="/shoes" className="inline-block mt-3 bg-white text-black px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider border border-gray-200 hover:bg-gray-100 transition">Shop</Link>
+            </div>
+          </div>
+          {/* Trending 2: Lifestyle (Middle) */}
+          <div className="relative h-[400px] md:h-[550px] overflow-hidden group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1560272563-c67281a2cb65?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Nerazzurri" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+            <div className="absolute bottom-6 left-6 text-white z-10">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-300">Inter Milan Home Kit 2026/27</p>
+              <h3 className="text-2xl font-bold text-white mt-1">Nerazzurri Pride</h3>
+              <Link to="/men" className="inline-block mt-3 bg-white text-black px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition">Shop Football</Link>
+            </div>
+          </div>
+          {/* Trending 3: Kids (Right) */}
+          <div className="relative h-[400px] md:h-[550px] overflow-hidden group cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1546527868-ccb7ee7dfa6a?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Kids Jordan" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div className="absolute bottom-6 left-6 text-white z-10">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-300">Kids' Jordan</p>
+              <h3 className="text-2xl font-bold text-white mt-1">All-Day Play</h3>
+              <Link to="/men" className="inline-block mt-3 bg-white text-black px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition">Shop Jordan</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- NEW MOVES CATEGORY BUTTONS --- */}
+      <section className="max-w-[1280px] mx-auto px-4 md:px-10 pt-2 pb-8">
         <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar mt-2">
           {['Running shoes', 'Training', 'Jackets', 'Shorts', 'Jeans', 'T-shirts', 'Hoodies', 'Sneakers'].map((cat) => {
             const isActive = activeCategory === cat;
@@ -88,7 +254,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SHOP BY CATEGORY (ALIGNED WITH NAVBAR) --- */}
+      {/* --- SHOP BY CATEGORY --- */}
       <section className="max-w-[1280px] mx-auto px-4 md:px-10 pt-2 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link to="/men" className="relative h-[400px] md:h-[500px] overflow-hidden group cursor-pointer">
