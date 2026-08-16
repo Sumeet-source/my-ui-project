@@ -7,9 +7,8 @@ export default function Home() {
   
   const [allProducts, setAllProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('Running');
 
-  // 🟢 NEW STATES FOR SHOP BY SPORT
+  // 🟢 SHOP BY SPORT STATES
   const [sportProducts, setSportProducts] = useState([]);
   const [loadingSport, setLoadingSport] = useState(false);
   const [selectedSport, setSelectedSport] = useState('Running');
@@ -102,11 +101,7 @@ export default function Home() {
       <section className="relative w-full min-h-[60dvh] md:min-h-[85vh] max-h-[900px] overflow-hidden bg-black">
         <video 
           className="w-full h-full object-cover"
-          style={{ 
-            objectPosition: 'center 15%',
-            transform: 'scale(1.08)',
-            transformOrigin: 'top center'
-          }}
+          style={{ objectPosition: 'center 15%', transform: 'scale(1.08)', transformOrigin: 'top center' }}
           autoPlay 
           loop 
           muted 
@@ -164,7 +159,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🟢 SHOP BY SPORT (FULLY FUNCTIONAL NOW) --- */}
+      {/* --- 🟢 SHOP BY SPORT (FULLY FUNCTIONAL) --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black">Shop By Sport</h2>
@@ -174,7 +169,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 🟢 CATEGORY BUTTONS (Clickable -> API call) */}
+        {/* 🟢 CATEGORY BUTTONS */}
         <div className="flex overflow-x-auto gap-4 mb-6 hide-scrollbar pb-2">
           {['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga'].map((sport) => (
             <button
@@ -191,7 +186,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 🟢 PRODUCT SLIDER (Real products from API) */}
+        {/* 🟢 PRODUCT SLIDER */}
         <div ref={sportRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4">
           {loadingSport ? (
             <p className="text-gray-500 text-sm">Loading {selectedSport} products...</p>
