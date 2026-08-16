@@ -9,7 +9,7 @@ import ProductCard from '../components/ProductCard';
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const { addToCart } = useCart();
+  const { addToCart, openAddedToBag } = useCart();
   const { showToast } = useToast();
   const { user } = useAuth();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
@@ -134,11 +134,23 @@ export default function ProductDetails() {
   const shoeSizes = ['UK 6', 'UK 7', 'UK 8', 'UK 9', 'UK 10', 'UK 11'];
   const sizeOptions = isShoeProduct ? shoeSizes : clothingSizes;
 
-  const handleAddToCart = () => {
+    const handleAddToCart = () => {
     if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
     if (!selectedSize) { showToast("Please select a size!", "error"); return; }
+    
+    // 1. Cart mein item add karo
     addToCart({ ...product, id: product._id, size: selectedSize, image: product.images?.[0] || product.imageUrl });
-    showToast(`${product.title} (Size: ${selectedSize}) added to cart!`, 'success');
+    
+    // 2. (Old way) showToast hata diya
+    // showToast(`${product.title} (Size: ${selectedSize}) added to cart!`, 'success');
+
+    // 3. (New way) Popup kholo
+    openAddedToBag({ 
+      title: product.title, 
+      price: product.price, 
+      size: selectedSize, 
+      image: product.images?.[0] || product.imageUrl 
+    });
   };
 
   const handleWishlistToggle = (e) => {

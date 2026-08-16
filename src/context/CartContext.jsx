@@ -10,6 +10,10 @@ export function CartProvider({ children }) {
 
   const [discount, setDiscount] = useState({ amount: 0, code: '' });
 
+  // 🟢 NEW STATES FOR POPUP
+  const [isAddedToBagOpen, setIsAddedToBagOpen] = useState(false);
+  const [addedProductData, setAddedProductData] = useState(null);
+
   useEffect(() => {
     localStorage.setItem('shopping_cart', JSON.stringify(cart));
   }, [cart]);
@@ -26,6 +30,18 @@ export function CartProvider({ children }) {
       }
       return [...prev, { ...item, quantity: 1 }];
     });
+  };
+
+  // 🟢 NEW FUNCTIONS TO HANDLE POPUP
+  const openAddedToBag = (product) => {
+    setAddedProductData(product);
+    setIsAddedToBagOpen(true);
+  };
+
+  const closeAddedToBag = () => {
+    setIsAddedToBagOpen(false);
+    // Data ko thodi der baad clear kar dete hain taaki animation smooth rahe
+    setTimeout(() => setAddedProductData(null), 300);
   };
 
   const removeFromCart = (id, size) => {
@@ -69,7 +85,12 @@ export function CartProvider({ children }) {
       clearCart,
       discount,
       applyDiscount,
-      clearDiscount
+      clearDiscount,
+      // 🟢 EXPORT NEW POPUP STATES & FUNCTIONS
+      isAddedToBagOpen,
+      addedProductData,
+      openAddedToBag,
+      closeAddedToBag
     }}>
       {children}
     </CartContext.Provider>
