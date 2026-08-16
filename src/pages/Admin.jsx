@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { useToast } from '../context/ToastContext';
 import axiosClient from '../api/axiosClient';
 
-// 🟢 NEW: Sub-Category Mapping
+// 🟢 UPDATED: Sub-Category Mapping with Sports
 const SUB_CATEGORY_MAP = {
   Clothing: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
   Shoes: ['Sneakers', 'Running Shoes', 'Casual Shoes', 'Formal Shoes', 'Loafers', 'Boots', 'Sandals'],
   Accessories: ['Watches', 'Sunglasses', 'Belts', 'Wallets', 'Caps & Hats', 'Backpacks', 'Socks', 'Ties', 'Cufflinks'],
+  // 🟢 NEW: Sport options for Shop By Sport
+  Sport: ['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga']
 };
 
 export default function AdminDashboard() {
@@ -17,7 +19,7 @@ export default function AdminDashboard() {
   
   const [uploading, setUploading] = useState(false);
 
-  // 🟢 UPDATED: State ab images array use karega
+  // 🟢 UPDATED: State mein 'sport' add kiya
   const [formData, setFormData] = useState({
     title: '', 
     price: '', 
@@ -25,6 +27,7 @@ export default function AdminDashboard() {
     images: [], 
     category: 'Men', 
     subCategory: '', 
+    sport: 'Sportswear', // 🟢 NEW field
     inStock: true
   });
 
@@ -37,6 +40,7 @@ export default function AdminDashboard() {
     images: [], 
     category: 'Men', 
     subCategory: '', 
+    sport: 'Sportswear', // 🟢 NEW field
     inStock: true
   });
 
@@ -58,7 +62,7 @@ export default function AdminDashboard() {
 
   const [customToast, setCustomToast] = useState({ show: false, message: '', type: 'success' });
   const triggerCustomToast = (message, type = 'success') => {
-    setCustomToast({ show: true, message, type });
+    setCustomToast({ show: false, message, type });
     setTimeout(() => setCustomToast({ show: false, message: '', type: 'success' }), 3000);
   };
 
@@ -173,7 +177,7 @@ export default function AdminDashboard() {
       await axiosClient.post('/api/products', dataToSend);
       showToast('Product added successfully!', 'success');
       fetchProducts();
-      setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', inStock: true });
+      setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', sport: 'Sportswear', inStock: true });
     } catch (error) { showToast('Failed to add product', 'error'); }
   };
 
@@ -183,9 +187,10 @@ export default function AdminDashboard() {
       title: product.title, 
       price: product.price, 
       description: product.description || '',
-      images: product.images || [], // 🟢 Array se load karo
+      images: product.images || [], 
       category: product.category, 
       subCategory: product.subCategory || '', 
+      sport: product.sport || 'Sportswear', // 🟢 Load sport field
       inStock: product.inStock
     });
     setIsEditModalOpen(true);
@@ -364,6 +369,20 @@ export default function AdminDashboard() {
                     </select>
                   </div>
                 )}
+                
+                {/* 🟢 NEW: Sport Select Dropdown */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Sport (For Shop By Sport)</label>
+                  <select name="sport" value={formData.sport} onChange={handleChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
+                    <option value="Running">Running</option>
+                    <option value="Training">Training</option>
+                    <option value="Sportswear">Sportswear</option>
+                    <option value="Basketball">Basketball</option>
+                    <option value="Football">Football</option>
+                    <option value="Yoga">Yoga</option>
+                  </select>
+                </div>
+
                 <button type="submit" disabled={uploading} className={`w-full h-10 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                   {uploading ? 'Uploading Images...' : 'Add Product'}
                 </button>
@@ -515,6 +534,20 @@ export default function AdminDashboard() {
                 {editFormData.category && SUB_CATEGORY_MAP[editFormData.category] && (
                   <div><label className="block text-sm font-semibold text-gray-900">Sub-Category</label><select name="subCategory" value={editFormData.subCategory} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="">Select Sub-Category</option>{SUB_CATEGORY_MAP[editFormData.category].map((sub) => <option key={sub} value={sub}>{sub}</option>)}</select></div>
                 )}
+                
+                {/* 🟢 NEW: Sport Select Dropdown in Edit Modal */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Sport (For Shop By Sport)</label>
+                  <select name="sport" value={editFormData.sport} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
+                    <option value="Running">Running</option>
+                    <option value="Training">Training</option>
+                    <option value="Sportswear">Sportswear</option>
+                    <option value="Basketball">Basketball</option>
+                    <option value="Football">Football</option>
+                    <option value="Yoga">Yoga</option>
+                  </select>
+                </div>
+
                 <div className="flex gap-3 pt-2">
                   <button type="submit" disabled={uploading} className={`flex-1 h-10 bg-black text-white font-semibold rounded hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     {uploading ? 'Uploading...' : 'Update Product'}
