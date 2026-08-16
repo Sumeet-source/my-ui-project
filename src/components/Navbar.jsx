@@ -53,11 +53,14 @@ export default function Navbar() {
   const { cart } = useCart();
   const { user, logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const location = useLocation();
+  const location = useLocation(); // 🟢 Already imported
   const navigate = useNavigate();
 
   const searchTerm = searchParams.get('search') || '';
   const activeCategory = searchParams.get('category');
+
+  // 🟢 Check karo ki current page Home hai ya nahi
+  const isHome = location.pathname === '/';
 
   const handleSearchSubmit = (e) => {
     if (e.key === 'Enter' && searchInput.trim()) {
@@ -102,12 +105,11 @@ export default function Navbar() {
   const isActiveOutlet = location.pathname === '/outlet';
 
   return (
-    // 🟢 MAIN NAVBAR STICKY TOP 0 with consistent white background and aligned container
-    <nav className="sticky top-0 z-50 bg-white text-black shadow-sm border-b border-gray-200">
+    // 🟢 CONDITIONALLY STICKY: Sirf Home par sticky, baaki par relative
+    <nav className={`${isHome ? 'sticky top-0' : 'relative'} z-50 bg-white text-black shadow-sm border-b border-gray-200`}>
       
       {/* --- TOP UTILITY BAR --- */}
       <div className="border-b border-gray-200">
-        {/* 🟢 Width updated to max-w-[1280px] to perfectly align with Men/Women pages */}
         <div className="max-w-[1280px] mx-auto px-4 md:px-10 py-1.5 hidden md:flex justify-between items-center tracking-wide font-medium">
           <div className="flex-1"></div>
           <Link to="/signup" className="uppercase flex-1 text-center cursor-pointer text-[13px] text-black hover:text-gray-600">
@@ -132,7 +134,6 @@ export default function Navbar() {
       </div>
 
       {/* --- MAIN NAVIGATION BAR --- */}
-      {/* 🟢 Width updated to max-w-[1280px] mx-auto with consistent px-4 md:px-10 */}
       <div className="flex justify-between items-center px-4 md:px-10 py-3 md:py-5 max-w-[1280px] mx-auto relative">
         
         {/* Mobile Action Buttons */}
