@@ -6,11 +6,12 @@ import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import axiosClient from '../api/axiosClient';
 import ProductCard from '../components/ProductCard';
-import { Truck, RotateCcw, MapPin, Box, Info, X } from 'lucide-react';
+// 👇 Import icons for modals
+import { Truck, RotateCcw, X } from 'lucide-react';
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const { addToCart, openAddedToBag } = useCart(); // 👈 Popup trigger added
+  const { addToCart, openAddedToBag } = useCart(); 
   const { showToast } = useToast();
   const { user } = useAuth();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
@@ -26,6 +27,10 @@ export default function ProductDetails() {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
+
+  // 🟢 NEW STATES FOR THE MODALS
+  const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -114,8 +119,6 @@ export default function ProductDetails() {
     if (!selectedSize) { showToast("Please select a size!", "error"); return; }
     
     addToCart({ ...product, id: product._id, size: selectedSize, image: product.images?.[0] || product.imageUrl });
-    
-    // 🟢 YAHAN POPUP TRIGGER HO RAHA HAI
     openAddedToBag({ 
       title: product.title, 
       price: product.price, 
@@ -176,7 +179,7 @@ export default function ProductDetails() {
 
       {/* ================= MOBILE LAYOUT ================= */}
       <div className="md:hidden">
-        {/* Carousel, Info, Size, Add to Cart button (Everything same) */}
+        {/* Carousel, Info, Size, Add to Cart button */}
         <div className="relative w-full bg-gray-50">
           <div ref={carouselRef} onScroll={handleCarouselScroll} className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
             {images.map((img, idx) => (
@@ -234,8 +237,7 @@ export default function ProductDetails() {
           <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
 
-        {/* 🔴🔴🔴 CHECKPOINT 1: MOBILE KE LIYE NIKE SECTIONS (Ye dekho ki neeche aa raha hai ya nahi) */}
-        {/* 1. Check Delivery Date */}
+        {/* 🔴 UPDATED: Delivery Details & Return Details Rows */}
         <div className="px-4 py-6 border-t border-gray-100">
           <h3 className="font-bold text-gray-900 mb-1 text-sm">Check delivery date</h3>
           <p className="text-xs text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
@@ -246,49 +248,19 @@ export default function ProductDetails() {
           <div className="space-y-3">
             <div className="flex justify-between items-center text-xs">
               <div className="flex items-center gap-2 text-gray-700"><RotateCcw className="w-4 h-4" /><span>14-day return and size exchange</span></div>
-              <span className="text-gray-500 underline cursor-pointer hover:text-black font-medium">Know More</span>
+              {/* 👇 Know More Button Opens Return Modal */}
+              <button onClick={() => setIsReturnModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium">Know More</button>
             </div>
             <div className="flex justify-between items-center text-xs">
               <div className="flex items-center gap-2 text-gray-700"><Truck className="w-4 h-4" /><span>Free delivery available</span></div>
-              <span className="text-gray-500 underline cursor-pointer hover:text-black font-medium">Know More</span>
+              {/* 👇 Know More Button Opens Delivery Modal */}
+              <button onClick={() => setIsDeliveryModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium">Know More</button>
             </div>
           </div>
         </div>
+        {/* 🔴 END UPDATES */}
 
-        {/* 2. Vendor Details */}
-        <div className="px-4 border-t border-gray-100 pb-4 pt-4">
-          <details className="group">
-            <summary className="flex justify-between items-center cursor-pointer list-none text-sm font-bold text-gray-900">
-              <span>Vendor Details</span>
-              <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
-            </summary>
-            <div className="mt-4 space-y-2 text-xs text-gray-600">
-              <div className="grid grid-cols-[100px_1fr]"><span className="text-gray-500">Sold By</span><span className="font-medium text-gray-900">Nykasa Fashion Ltd</span></div>
-              <div className="grid grid-cols-[100px_1fr]"><span className="text-gray-500">Country Of Origin</span><span className="font-medium text-gray-900">Vietnam</span></div>
-              <div className="grid grid-cols-[100px_1fr]"><span className="text-gray-500">Manufacturer</span><span className="font-medium text-gray-900">Nike</span></div>
-              <div className="grid grid-cols-[100px_1fr]"><span className="text-gray-500">Manufacturer Address</span><span className="text-gray-900">Worldion Vietnam Co. Ltd, Hoa Phu Commune Cu Chi District, Ho Chi Minh, 70000</span></div>
-            </div>
-          </details>
-        </div>
-
-        {/* 3. Return And Exchange Policy */}
-        <div className="px-4 border-t border-gray-100 pb-2">
-          <details className="group">
-            <summary className="flex justify-between items-center cursor-pointer list-none text-sm font-bold text-gray-900 py-4">
-              <span>Return And Exchange Policy</span>
-              <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
-            </summary>
-            <div className="pb-4 space-y-3 text-xs text-gray-600 leading-relaxed">
-              <p>1. Most Nike products are eligible for returns or exchanges and can be requested within 14 days of delivery.</p>
-              <p>2. Items must be unused, unworn, and returned in original condition with all tags.</p>
-              <p>3. If you receive a defective or incorrect product, contact us immediately at <span className="text-gray-900 font-medium">support@forge.com</span>.</p>
-              <p>4. Refunds are initiated within 5–7 working days after pickup.</p>
-            </div>
-          </details>
-        </div>
-        {/* 🔴🔴🔴 END CHECKPOINT 1 */}
-
-        {/* You Might Also Like & Reviews (Same as before) */}
+        {/* You Might Also Like */}
         {displayRelated.length > 0 ? (
           <div className="px-4 py-6 border-t border-gray-100">
             <h2 className="text-base font-bold text-gray-900 mb-4">You Might Also Like</h2>
@@ -301,7 +273,31 @@ export default function ProductDetails() {
             </div>
           </div>
         ) : null}
-        {/* Rest of reviews can be kept */}
+        
+        {/* Reviews */}
+        <div className="px-4 py-4 border-t border-gray-100 bg-gray-50">
+          <h3 className="text-sm font-bold text-gray-900 mb-4">Ratings & Reviews</h3>
+          <div className="space-y-4 mb-6">
+            {reviews.length === 0 ? <p className="text-gray-500 italic text-sm text-center py-4">No reviews yet. Be the first to review!</p> : reviews.map((review, index) => (
+              <div key={index} className="bg-white p-3 rounded border border-gray-100">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-bold text-xs text-gray-800">{review.user?.name || review.user || 'Anonymous'}</span>
+                  <span className="text-yellow-400 text-xs">{renderStars(review.rating)}</span>
+                </div>
+                <p className="text-xs text-gray-600">{review.comment}</p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-white border border-gray-200 rounded p-4">
+            <h4 className="text-sm font-bold text-gray-900 mb-3">Write a Review</h4>
+            <form onSubmit={handleReviewSubmit} className="space-y-3">
+              <input type="text" value={newReview.user} onChange={(e) => setNewReview({...newReview, user: e.target.value})} placeholder="Your Name" className="w-full border border-gray-300 rounded p-2 text-sm focus:outline-none focus:border-black" />
+              <select value={newReview.rating} onChange={(e) => setNewReview({...newReview, rating: Number(e.target.value)})} className="w-full border border-gray-300 rounded p-2 text-sm focus:outline-none focus:border-black"><option value="5">5 Stars</option><option value="4">4 Stars</option><option value="3">3 Stars</option><option value="2">2 Stars</option><option value="1">1 Star</option></select>
+              <textarea value={newReview.comment} onChange={(e) => setNewReview({...newReview, comment: e.target.value})} placeholder="Tell us what you think..." className="w-full border border-gray-300 rounded p-2 text-sm focus:outline-none focus:border-black h-20 resize-none"></textarea>
+              <button type="submit" className="w-full bg-black text-white py-2 rounded font-bold text-sm hover:bg-gray-800 transition">Submit Review</button>
+            </form>
+          </div>
+        </div>
       </div>
 
 
@@ -348,8 +344,7 @@ export default function ProductDetails() {
             {!product.inStock && <div className="w-full md:w-auto bg-red-100 text-red-700 px-12 py-4 rounded-full font-bold uppercase tracking-wide text-center border border-red-200">Out of Stock</div>}
             {product.inStock && <button onClick={handleAddToCart} className="w-full md:w-auto bg-black text-white px-12 py-4 rounded-full font-bold uppercase tracking-wide hover:bg-gray-800 transition shadow-lg">Add to Cart</button>}
 
-            {/* 🔴🔴🔴 CHECKPOINT 2: DESKTOP KE LIYE NIKE SECTIONS */}
-            {/* 1. Check Delivery Date */}
+            {/* 🔴 DESKTOP: DELIVERY, RETURN MODALS TRIGGERS */}
             <div className="mt-8 border-t pt-6">
               <h3 className="font-bold text-gray-900 mb-1">Check delivery date</h3>
               <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
@@ -360,53 +355,107 @@ export default function ProductDetails() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex items-center gap-2 text-gray-700"><RotateCcw className="w-4 h-4" /><span>14-day return and size exchange</span></div>
-                  <span className="text-gray-500 underline cursor-pointer hover:text-black font-medium text-xs">Know More</span>
+                  <button onClick={() => setIsReturnModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium text-xs">Know More</button>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex items-center gap-2 text-gray-700"><Truck className="w-4 h-4" /><span>Free delivery available</span></div>
-                  <span className="text-gray-500 underline cursor-pointer hover:text-black font-medium text-xs">Know More</span>
+                  <button onClick={() => setIsDeliveryModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium text-xs">Know More</button>
                 </div>
               </div>
             </div>
-
-            {/* 2. Vendor Details */}
-            <div className="mt-8 border-t pt-5 pb-4 border-b">
-              <details className="group">
-                <summary className="flex justify-between items-center cursor-pointer list-none text-sm font-bold text-gray-900">
-                  <span>Vendor Details</span>
-                  <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
-                </summary>
-                <div className="mt-4 space-y-3 text-sm text-gray-600">
-                  <div className="grid grid-cols-[120px_1fr]"><span className="text-gray-500">Sold By</span><span className="font-medium text-gray-900">Nykasa Fashion Ltd</span></div>
-                  <div className="grid grid-cols-[120px_1fr]"><span className="text-gray-500">Country Of Origin</span><span className="font-medium text-gray-900">Vietnam</span></div>
-                  <div className="grid grid-cols-[120px_1fr]"><span className="text-gray-500">Name Of Manufacturer</span><span className="font-medium text-gray-900">Nike</span></div>
-                  <div className="grid grid-cols-[120px_1fr]"><span className="text-gray-500">Manufacturer Address</span><span className="text-gray-900">Worldion Vietnam Co. Ltd, Hoa Phu Commune Cu Chi District, Ho Chi Minh, 70000</span></div>
-                </div>
-              </details>
-            </div>
-
-            {/* 3. Return And Exchange Policy */}
-            <div className="border-b pb-4">
-              <details className="group">
-                <summary className="flex justify-between items-center cursor-pointer list-none text-sm font-bold text-gray-900 py-4">
-                  <span>Return And Exchange Policy</span>
-                  <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
-                </summary>
-                <div className="pb-4 space-y-4 text-sm text-gray-600 leading-relaxed">
-                  <p>1. Most Nike products are eligible for returns or exchanges and can be requested within 14 days of delivery.</p>
-                  <p>2. Items must be unused, unworn, and returned in original condition.</p>
-                  <p>3. If you receive a defective or incorrect product, contact Customer Service at <span className="text-gray-900 font-medium">support@forge.com</span>.</p>
-                  <p>4. Refunds are initiated within 5–7 working days after pickup.</p>
-                </div>
-              </details>
-            </div>
-            {/* 🔴🔴🔴 END CHECKPOINT 2 */}
+            {/* 🔴 END DESKTOP UPDATES */}
 
             <Link to="/" className="block text-gray-500 hover:text-black underline mt-4">Continue Shopping</Link>
           </div>
         </div>
-        {/* Reviews can stay here */}
+        
+        {/* Desktop Reviews */}
+        <section className="border-t border-gray-200 pt-10 max-w-4xl">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
+          <div className="space-y-6 mb-8">
+            {reviews.map((review, index) => (
+              <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-bold text-gray-800">{review.user?.name || review.user || 'Anonymous'}</span>
+                  <span className="text-yellow-400 text-sm">{renderStars(review.rating)}</span>
+                </div>
+                <p className="text-gray-600 text-sm">{review.comment}</p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Write a Review</h3>
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1"><label className="block text-sm font-semibold text-gray-700 mb-1">Your Name</label><input type="text" value={newReview.user} onChange={(e) => setNewReview({...newReview, user: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black" placeholder="John Doe" /></div>
+                <div><label className="block text-sm font-semibold text-gray-700 mb-1">Rating</label><select value={newReview.rating} onChange={(e) => setNewReview({...newReview, rating: Number(e.target.value)})} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black"><option value="5">5 Stars ⭐⭐⭐⭐⭐</option><option value="4">4 Stars ⭐⭐⭐⭐</option><option value="3">3 Stars ⭐⭐⭐</option><option value="2">2 Stars ⭐⭐</option><option value="1">1 Star ⭐</option></select></div>
+              </div>
+              <div><label className="block text-sm font-semibold text-gray-700 mb-1">Comment</label><textarea value={newReview.comment} onChange={(e) => setNewReview({...newReview, comment: e.target.value})} className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-black h-24 resize-none" placeholder="Tell us what you think..."></textarea></div>
+              <button type="submit" className="bg-black text-white px-6 py-2 rounded font-bold hover:bg-gray-800 transition text-sm uppercase tracking-wider">Submit Review</button>
+            </form>
+          </div>
+        </section>
       </div>
+
+      {/* 🟢 DELIVERY DETAILS MODAL */}
+      {isDeliveryModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-end justify-center md:items-center bg-black/50 backdrop-blur-sm p-0 md:p-4" onClick={() => setIsDeliveryModalOpen(false)}>
+          <div className="bg-white w-full max-w-md rounded-t-2xl md:rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto p-6 pb-10" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setIsDeliveryModalOpen(false)} className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors z-10">
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+            <div className="flex items-start gap-3 mb-4">
+              <Truck className="w-6 h-6 mt-1 flex-shrink-0" />
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Delivery Details</h2>
+                <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                  We offer free shipping on all orders across India, with no minimum order value and no additional delivery, platform, or hidden charges.
+                </p>
+                <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                  Orders are typically processed within 3-5 business days Delivery timelines may vary based on location, product availability, and other factors. If your order includes multiple items, they may be shipped separately.
+                </p>
+                <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                  Delivery timelines may vary based on location, product availability, and other factors. If your order includes multiple items, they may be shipped separately.
+                </p>
+                <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                  Estimated delivery dates shown at checkout are indicative and may be impacted by factors beyond our control, such as extreme weather, public holidays, or logistical constraints. While we aim to meet these timelines, delays may occur, and we'll keep you informed if your order is affected.
+                </p>
+                <h4 className="text-sm font-bold text-gray-900 uppercase mb-2">CANCELLATION POLICY</h4>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  You can cancel your order directly from the My Orders section before the item is shipped. Once an order has been processed and shipped, cancellation is not possible. In such cases, you can initiate a return after delivery through our returns process. For cancelled orders, refunds are processed within 5 business days from the date of cancellation.
+                </p>
+                <p className="text-sm text-gray-600 leading-relaxed mt-2">
+                  If you need any assistance, our Customer Service team is always here for you at <a href="mailto:support@forge.com" className="text-black font-medium underline">support@forge.com</a>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🟢 RETURN & EXCHANGE MODAL */}
+      {isReturnModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-end justify-center md:items-center bg-black/50 backdrop-blur-sm p-0 md:p-4" onClick={() => setIsReturnModalOpen(false)}>
+          <div className="bg-white w-full max-w-md rounded-t-2xl md:rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto p-6 pb-10" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setIsReturnModalOpen(false)} className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors z-10">
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+            <div className="flex items-start gap-3 mb-4">
+              <RotateCcw className="w-6 h-6 mt-1 flex-shrink-0" />
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Return & Exchange</h2>
+                <div className="text-sm text-gray-600 leading-relaxed space-y-3 list-decimal pl-5">
+                  <p className="mb-2"><span className="font-bold">1.</span> Most Nike products are eligible for returns or exchanges and can be requested within 14 days of delivery from the My Orders section on our website. Requests after this window will not be accepted. For select high-heat products, eligibility may vary and will be specified on the product page.</p>
+                  <p className="mb-2"><span className="font-bold">2.</span> Items must be unused, unworn, and returned in original condition with all tags, packaging, brand box, invoice, and accessories intact. Products showing signs of use or alteration will not be eligible.</p>
+                  <p className="mb-2"><span className="font-bold">3.</span> If you receive a defective or incorrect product, please contact Customer Service immediately with product images at <a href="mailto:support@forge.com" className="text-black font-medium underline">support@forge.com</a>.</p>
+                  <p className="mb-2"><span className="font-bold">4.</span> Once a request is placed, our logistics partner will arrange a free pickup within the return window. Size exchanges can be requested via My Orders or by emailing <a href="mailto:support@forge.com" className="text-black font-medium underline">support@forge.com</a>. If the requested size is unavailable, a return will be offered instead.</p>
+                  <p className="mb-2"><span className="font-bold">5.</span> For approved returns, refunds are initiated within 5–7 working days after pickup. If you need any additional help, our Customer Service team is always here for you at <a href="mailto:support@forge.com" className="text-black font-medium underline">support@forge.com</a>.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
