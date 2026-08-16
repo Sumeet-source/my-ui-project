@@ -87,7 +87,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🟢 FIXED FEATURED BANNER (Gap 0, Exact Same Height, First Banner Text Removed) --- */}
+      {/* --- 🟢 FEATURED BANNER (MOVED UP, IMMEDIATELY BELOW VIDEO) --- */}
       <section className="w-full py-0">
         <h2 className="text-xl md:text-2xl font-bold text-black px-4 md:px-10 py-6 md:py-12 mb-0">Featured</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0 w-full">
@@ -95,10 +95,9 @@ export default function Home() {
           {/* Banner 1: Clean Image, NO TEXT OVERLAY */}
           <div className="relative group overflow-hidden">
             <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=1000&q=80" alt="Training Apparel" className="w-full h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105" />
-            {/* 🟢 NO OVERLAY, NO TEXT. Sirf ek clean image */}
           </div>
 
-          {/* Banner 2: Studio Fleece (Text ekdum same style mein rakha hai) */}
+          {/* Banner 2: Studio Fleece */}
           <div className="relative group overflow-hidden">
             <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1000&q=80" alt="Studio Fleece" className="w-full h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80"></div>
@@ -111,7 +110,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- BESTSELLERS (Carousel with REAL PRODUCTS) --- */}
+      {/* --- BESTSELLERS --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black">Bestsellers</h2>
@@ -142,7 +141,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SHOP BY SPORT (Slider) --- */}
+      {/* --- SHOP BY SPORT --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black">Shop By Sport</h2>
@@ -164,7 +163,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🟢 TRENDING SLIDER (Text below image) --- */}
+      {/* --- APP BANNER --- */}
+      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-8">
+        <div className="bg-[#F5F0E1] w-full p-6 md:p-8 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 border border-[#E8DEC5]">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-xl flex items-center justify-center shadow-sm">
+              <span className="text-xl md:text-2xl font-black tracking-[0.2em] text-black">F</span>
+            </div>
+            <div>
+              <h3 className="text-lg md:text-2xl font-bold text-black uppercase tracking-tight">It's Better on the FORGE App</h3>
+            </div>
+          </div>
+          <Link to="/" className="bg-black text-white px-5 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-800 transition">
+            Download Now
+          </Link>
+        </div>
+      </section>
+
+      {/* --- 🟢 TRENDING (EVERYTHING BELOW THIS DELETED, NOW LAST SECTION) --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black">Trending</h2>
@@ -193,86 +209,6 @@ export default function Home() {
           ) : (
             <p className="text-gray-400 text-sm">No trending products found.</p>
           )}
-        </div>
-      </section>
-
-      {/* --- NEW MOVES CATEGORY BUTTONS --- */}
-      <section className="max-w-[1280px] mx-auto px-4 md:px-10 pt-2 pb-8">
-        <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar mt-2">
-          {['Running shoes', 'Training', 'Jackets', 'Shorts', 'Jeans', 'T-shirts', 'Hoodies', 'Sneakers'].map((cat) => {
-            const isActive = activeCategory === cat;
-            return (
-              <button
-                key={cat}
-                onClick={() => {
-                  setActiveCategory(cat);
-                  navigate(`/search?subCategory=${cat}`);
-                }}
-                className={`px-4 py-1.5 text-xs md:text-sm font-bold uppercase tracking-wider transition-all duration-300 snap-center whitespace-nowrap rounded-full border-2 ${
-                  isActive 
-                    ? 'border-black text-black bg-gray-50' 
-                    : 'border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-400'
-                }`}
-              >
-                {cat}
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* --- BETTER ON THE APP BANNER --- */}
-      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-8">
-        <div className="bg-[#F5F0E1] w-full p-6 md:p-8 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 border border-[#E8DEC5]">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-xl md:text-2xl font-black tracking-[0.2em] text-black">F</span>
-            </div>
-            <div>
-              <h3 className="text-lg md:text-2xl font-bold text-black uppercase tracking-tight">It's Better on the FORGE App</h3>
-            </div>
-          </div>
-          <Link to="/" className="bg-black text-white px-5 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-800 transition">
-            Download Now
-          </Link>
-        </div>
-      </section>
-
-      {/* --- SHOP BY CATEGORY --- */}
-      <section className="max-w-[1280px] mx-auto px-4 md:px-10 pt-2 pb-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Link to="/men" className="relative h-[300px] md:h-[500px] overflow-hidden group cursor-pointer">
-            <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://images.unsplash.com/photo-1483721310020-03333e577078?auto=format&fit=crop&w=800&q=80" alt="Shop Men" />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition duration-300"></div>
-            <div className="absolute inset-0 flex flex-col items-start justify-end p-6 text-white">
-              <h3 className="text-3xl md:text-5xl font-bold uppercase tracking-tighter">Men's</h3>
-              <span className="mt-2 text-[13px] font-bold uppercase tracking-wider border-b border-white pb-0.5 hover:opacity-80 transition">Shop Now</span>
-            </div>
-          </Link>
-          <Link to="/women" className="relative h-[300px] md:h-[500px] overflow-hidden group cursor-pointer">
-            <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80" alt="Shop Women" />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition duration-300"></div>
-            <div className="absolute inset-0 flex flex-col items-start justify-end p-6 text-white">
-              <h3 className="text-3xl md:text-5xl font-bold uppercase tracking-tighter">Women's</h3>
-              <span className="mt-2 text-[13px] font-bold uppercase tracking-wider border-b border-white pb-0.5 hover:opacity-80 transition">Shop Now</span>
-            </div>
-          </Link>
-          <Link to="/shoes" className="relative h-[300px] md:h-[350px] overflow-hidden group cursor-pointer">
-            <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=800&q=80" alt="Shop Shoes" />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition duration-300"></div>
-            <div className="absolute inset-0 flex flex-col items-start justify-end p-6 text-white">
-              <h3 className="text-3xl md:text-5xl font-bold uppercase tracking-tighter">Shoes</h3>
-              <span className="mt-2 text-[13px] font-bold uppercase tracking-wider border-b border-white pb-0.5 hover:opacity-80 transition">Shop Now</span>
-            </div>
-          </Link>
-          <Link to="/outlet" className="relative h-[300px] md:h-[350px] overflow-hidden group cursor-pointer">
-            <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=800&q=80" alt="Shop Accessories" />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition duration-300"></div>
-            <div className="absolute inset-0 flex flex-col items-start justify-end p-6 text-white">
-              <h3 className="text-3xl md:text-5xl font-bold uppercase tracking-tighter">Accessories</h3>
-              <span className="mt-2 text-[13px] font-bold uppercase tracking-wider border-b border-white pb-0.5 hover:opacity-80 transition">Shop Now</span>
-            </div>
-          </Link>
         </div>
       </section>
 
