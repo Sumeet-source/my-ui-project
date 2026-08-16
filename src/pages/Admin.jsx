@@ -7,8 +7,8 @@ const SUB_CATEGORY_MAP = {
   Clothing: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
   Shoes: ['Sneakers', 'Running Shoes', 'Casual Shoes', 'Formal Shoes', 'Loafers', 'Boots', 'Sandals'],
   Accessories: ['Watches', 'Sunglasses', 'Belts', 'Wallets', 'Caps & Hats', 'Backpacks', 'Socks', 'Ties', 'Cufflinks'],
-  // 🟢 NEW: Sport options for Shop By Sport
-  Sport: ['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga']
+  // 🟢 NEW: Sportswear ke liye mapping add karo
+  Sportswear: ['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga']
 };
 
 export default function AdminDashboard() {
