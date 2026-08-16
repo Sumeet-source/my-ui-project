@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState, useRef, useEffect, useMemo } from 'react'; // 👈 Added useMemo
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'; // ✅ FIXED: Duplicate imports removed
 import { useCart } from '../context/CartContext.jsx';
 import { useWishlist } from '../context/WishlistContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -7,7 +7,6 @@ import { useAuth } from '../context/AuthContext.jsx';
 import axiosClient from '../api/axiosClient';
 import ProductCard from '../components/ProductCard';
 import { Truck, RotateCcw, X } from 'lucide-react';
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -81,11 +80,11 @@ export default function ProductDetails() {
     }
   };
 
-  // 🟢 🆕 CALCULATE LIVE AVERAGE RATING based on reviews array
+  // 🟢 LIVE AVERAGE RATING
   const averageRating = useMemo(() => {
     if (reviews.length === 0) return 0;
     const total = reviews.reduce((sum, review) => sum + review.rating, 0);
-    return (total / reviews.length).toFixed(1); // 1 decimal place
+    return (total / reviews.length).toFixed(1);
   }, [reviews]);
 
   const handleCarouselScroll = () => {
@@ -153,7 +152,7 @@ export default function ProductDetails() {
     });
   };
 
-    // 🟢 OPTIMIZED: useCallback prevents unnecessary re-renders
+  // 🟢 OPTIMIZED WISHLIST
   const handleWishlistToggle = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -170,7 +169,7 @@ export default function ProductDetails() {
     try {
       await axiosClient.post('/api/reviews', { user: user.id, product: product._id, rating: newReview.rating, comment: newReview.comment });
       setNewReview({ user: '', comment: '', rating: 5 });
-      fetchReviews(); // 🟢 Refetches reviews, which automatically updates averageRating!
+      fetchReviews();
       showToast("Review submitted successfully!", "success");
     } catch (error) { showToast("Failed to submit review. Try again.", "error"); }
   };
@@ -227,7 +226,7 @@ export default function ProductDetails() {
             <span className="text-sm font-medium text-green-600">(40% OFF)</span>
           </div>
           <div className="flex items-center gap-2 mb-1">
-            {/* 🟢 DYNAMIC RATING BADGE (Updated) */}
+            {/* 🟢 DYNAMIC RATING BADGE */}
             <div className="flex items-center gap-1 bg-green-600 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">
               <span>{averageRating > 0 ? averageRating : 'New'}</span>
               <span>★</span>
@@ -387,7 +386,7 @@ export default function ProductDetails() {
             <h1 className="text-4xl font-bold text-gray-900">{product.title}</h1>
             <div className="flex items-center gap-4">
               <span className="text-3xl font-bold text-gray-700">${product.price}</span>
-              {/* 🟢 DYNAMIC RATING & STARS (Updated) */}
+              {/* 🟢 DYNAMIC RATING & STARS */}
               <div className="flex items-center gap-1">
                 <span className="text-yellow-400 text-lg">{renderStars(averageRating)}</span>
                 <span className="text-sm text-gray-500 ml-1">({reviews.length} reviews)</span>
