@@ -93,51 +93,44 @@ export default function Men() {
   };
 
   // ===========================
-  // FIXED HEADER UI UPDATE
+  // UPDATED UI: FLUSH STICKY BAR
   // ===========================
   return (
-    <div className="px-4 py-2 md:px-10 bg-white min-h-screen relative">
+    <div className="px-4 md:px-10 bg-white min-h-screen pb-10">
       
-      {/* 1. Title Section (Scrolls away) */}
+      {/* 1. Title Section */}
       <div className="pt-4 pb-2">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Men's</h1>
       </div>
 
-      {/* 2. Tabs Section (Scrolls away) */}
+      {/* 2. Tabs Section */}
       <div className="flex gap-6 border-b border-gray-200 pb-3 mb-4">
         <span className="text-sm font-bold border-b-2 border-black pb-3 cursor-pointer">Clothing</span>
         <span className="text-sm text-gray-500 hover:text-black pb-3 cursor-pointer">Shoes</span>
         <span className="text-sm text-gray-500 hover:text-black pb-3 cursor-pointer">Accessories</span>
       </div>
 
-      {/* 3. FIXED Result Count & Filter Row (Always stuck to header) */}
-      {/* Note: Agar aapke Navbar ki height 80px se alag hai, toh top-[80px] ko top-[75px] ya top-[85px] mein badal lena */}
-      <div className="fixed top-[80px] left-0 right-0 z-30 bg-white py-3 px-4 md:px-10 border-b border-gray-100 shadow-sm">
-        <div className="max-w-[1280px] mx-auto flex justify-between items-center">
-          <span className="text-sm text-gray-500 font-medium">
-            {filteredProducts.length} Results
-          </span>
-          <button 
-            onClick={() => setIsFilterOpen(true)} 
-            className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-            </svg>
-            Filter
-          </button>
-        </div>
+      {/* 3. Sticky Filter Bar (Uses sticky top-0. No manual spacer needed!) */}
+      <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center">
+        <span className="text-sm text-gray-500 font-medium">
+          {filteredProducts.length} Results
+        </span>
+        <button 
+          onClick={() => setIsFilterOpen(true)} 
+          className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
+          Filter
+        </button>
       </div>
 
-      {/* 4. Spacer Div (Taaki Fixed bar ke neeche products chhupe nahi) */}
-      <div className="h-[60px] mt-2"></div>
-
-      {/* LOADING STATE */}
+      {/* LOADING & PRODUCT GRID - Automatically adjusts because we removed manual spacing */}
       {loading ? (
-        <p className="text-center py-20 text-gray-500 text-sm">Loading products...</p>
+        <p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>
       ) : (
-        <div className="mt-4">
-          {/* 5. Updated Grid & Product Cards */}
+        <div className="mt-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {filteredProducts.length === 0 ? (
               <p className="col-span-full text-center py-20 text-gray-500 text-sm">No products match your filters.</p>
@@ -162,7 +155,7 @@ export default function Men() {
                     </button>
                   </div>
 
-                  {/* Product Details - ONLY Product Title & Price */}
+                  {/* Product Details - Only Title & Price */}
                   <div className="flex flex-col px-1 pb-2">
                     <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-snug">
                       {product.title}
@@ -177,9 +170,9 @@ export default function Men() {
             )}
           </div>
 
-          {/* 6. Load More Button */}
+          {/* Load More Button */}
           {hasMore && !loadingMore && (
-            <div className="flex justify-center mt-10 mb-8">
+            <div className="flex justify-center mt-10">
               <button 
                 onClick={handleLoadMore} 
                 className="px-8 py-2.5 border border-black text-black text-sm font-medium rounded-full hover:bg-black hover:text-white transition-colors duration-300"
@@ -189,7 +182,7 @@ export default function Men() {
             </div>
           )}
           {loadingMore && (
-            <div className="flex justify-center mt-10 mb-8">
+            <div className="flex justify-center mt-10">
               <p className="text-sm text-gray-500">Loading more products...</p>
             </div>
           )}
