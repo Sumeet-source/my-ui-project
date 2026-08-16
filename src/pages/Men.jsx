@@ -94,7 +94,7 @@ export default function Men() {
     <div className="px-0 md:px-8 bg-white min-h-screen pb-10">
       
       {/* Sticky Filter Bar */}
-      <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center px-3 md:px-8">
+      <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center -mx-4 md:-mx-10 px-4 md:px-10">
         <span className="text-sm font-semibold text-gray-900">
           Men
         </span>
@@ -108,9 +108,10 @@ export default function Men() {
       </div>
 
       {loading ? (
-        <p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>
+        <p className="text-center py-20 text-gray-500 text-sm">Loading products...</p>
       ) : (
-        <div className="mt-6">
+        // 👇 YAHAN GAP KO TIGHT KIYA HAI (mt-0 md:mt-2)
+        <div className="mt-0 md:mt-2">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-8">
             {filteredProducts.length === 0 ? (
               <p className="col-span-full text-center py-20 text-gray-500 text-sm">No products match your filters.</p>
@@ -131,7 +132,7 @@ export default function Men() {
                       onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }} 
                     />
                     
-                    {/* 👇 Wishlist Button - Ab ye circular (`rounded-full`) ho gaya hai */}
+                    {/* Wishlist Button - Circular */}
                     <button className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm hover:bg-gray-50 hover:scale-105 transition-all duration-200 z-10">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
