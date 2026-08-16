@@ -1,12 +1,11 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react'; // 👈 Added useMemo
 import { useCart } from '../context/CartContext.jsx';
 import { useWishlist } from '../context/WishlistContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import axiosClient from '../api/axiosClient';
 import ProductCard from '../components/ProductCard';
-// 👇 Import icons for modals
 import { Truck, RotateCcw, X } from 'lucide-react';
 
 export default function ProductDetails() {
@@ -28,11 +27,8 @@ export default function ProductDetails() {
   const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
 
-  // 🟢 NEW STATES FOR THE MODALS
   const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
-
-  // 🟢 🆕 PINCODE STATES (Missing in your file)
   const [pincodeInput, setPincodeInput] = useState('');
   const [deliveryAvailable, setDeliveryAvailable] = useState(null);
   const [checkingPincode, setCheckingPincode] = useState(false);
@@ -84,6 +80,13 @@ export default function ProductDetails() {
     }
   };
 
+  // 🟢 🆕 CALCULATE LIVE AVERAGE RATING based on reviews array
+  const averageRating = useMemo(() => {
+    if (reviews.length === 0) return 0;
+    const total = reviews.reduce((sum, review) => sum + review.rating, 0);
+    return (total / reviews.length).toFixed(1); // 1 decimal place
+  }, [reviews]);
+
   const handleCarouselScroll = () => {
     if (carouselRef.current) {
       const scrollLeft = carouselRef.current.scrollLeft;
@@ -93,7 +96,6 @@ export default function ProductDetails() {
     }
   };
 
-  // 🟢 🆕 PINCODE CHECK FUNCTION (with Toast Error if length is less)
   const checkDeliveryAvailability = async () => {
     if (!pincodeInput || pincodeInput.length !== 6) {
       showToast("Please enter a valid 6-digit pincode!", "warning");
@@ -166,7 +168,7 @@ export default function ProductDetails() {
     try {
       await axiosClient.post('/api/reviews', { user: user.id, product: product._id, rating: newReview.rating, comment: newReview.comment });
       setNewReview({ user: '', comment: '', rating: 5 });
-      fetchReviews();
+      fetchReviews(); // 🟢 Refetches reviews, which automatically updates averageRating!
       showToast("Review submitted successfully!", "success");
     } catch (error) { showToast("Failed to submit review. Try again.", "error"); }
   };
@@ -223,7 +225,11 @@ export default function ProductDetails() {
             <span className="text-sm font-medium text-green-600">(40% OFF)</span>
           </div>
           <div className="flex items-center gap-2 mb-1">
-            <div className="flex items-center gap-1 bg-green-600 text-white px-1.5 py-0.5 rounded text-[10px] font-bold"><span>4.5</span><span>★</span></div>
+            {/* 🟢 DYNAMIC RATING BADGE (Updated) */}
+            <div className="flex items-center gap-1 bg-green-600 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">
+              <span>{averageRating > 0 ? averageRating : 'New'}</span>
+              <span>★</span>
+            </div>
             <span className="text-xs text-gray-500">{reviews.length} Reviews</span>
           </div>
           <h1 className="text-base font-semibold text-gray-900 leading-snug">{product.title}</h1>
@@ -260,7 +266,7 @@ export default function ProductDetails() {
           <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
 
-        {/* 🔴 UPDATED: Delivery Details & Return Details Rows with WORKING PINCODE */}
+        {/* PINCODE Check */}
         <div className="px-4 py-6 border-t border-gray-100">
           <h3 className="font-bold text-gray-900 mb-1 text-sm">Check delivery date</h3>
           <p className="text-xs text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
@@ -270,21 +276,19 @@ export default function ProductDetails() {
               value={pincodeInput} 
               onChange={(e) => {
                 setPincodeInput(e.target.value);
-                setDeliveryAvailable(null); // Reset message on typing
+                setDeliveryAvailable(null);
               }}
               placeholder="Pincode" 
               className="border border-gray-300 rounded px-3 py-2 text-xs w-36 outline-none focus:border-black" 
             />
             <button 
-              onClick={checkDeliveryAvailability} // 👈 Button click ab kaam karega
+              onClick={checkDeliveryAvailability}
               disabled={checkingPincode} 
               className="bg-white border border-gray-300 rounded px-4 py-2 text-xs font-medium hover:bg-gray-50 transition-colors text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {checkingPincode ? '...' : 'Check'}
             </button>
           </div>
-
-          {/* Delivery Status Messages */}
           {deliveryAvailable === false && (
             <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-3 mb-4">
               <span className="text-red-500 text-lg shrink-0">🚫</span>
@@ -302,21 +306,17 @@ export default function ProductDetails() {
               <p className="text-sm font-semibold text-green-600">We deliver to this location!</p>
             </div>
           )}
-
           <div className="space-y-3">
             <div className="flex justify-between items-center text-xs">
               <div className="flex items-center gap-2 text-gray-700"><RotateCcw className="w-4 h-4" /><span>14-day return and size exchange</span></div>
-              {/* 👇 Know More Button Opens Return Modal */}
               <button onClick={() => setIsReturnModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium">Know More</button>
             </div>
             <div className="flex justify-between items-center text-xs">
               <div className="flex items-center gap-2 text-gray-700"><Truck className="w-4 h-4" /><span>Free delivery available</span></div>
-              {/* 👇 Know More Button Opens Delivery Modal */}
               <button onClick={() => setIsDeliveryModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium">Know More</button>
             </div>
           </div>
         </div>
-        {/* 🔴 END UPDATES */}
 
         {/* You Might Also Like */}
         {displayRelated.length > 0 ? (
@@ -385,7 +385,11 @@ export default function ProductDetails() {
             <h1 className="text-4xl font-bold text-gray-900">{product.title}</h1>
             <div className="flex items-center gap-4">
               <span className="text-3xl font-bold text-gray-700">${product.price}</span>
-              <div className="flex items-center gap-1"><span className="text-yellow-400 text-lg">{renderStars(4.5)}</span><span className="text-sm text-gray-500 ml-1">({reviews.length} reviews)</span></div>
+              {/* 🟢 DYNAMIC RATING & STARS (Updated) */}
+              <div className="flex items-center gap-1">
+                <span className="text-yellow-400 text-lg">{renderStars(averageRating)}</span>
+                <span className="text-sm text-gray-500 ml-1">({reviews.length} reviews)</span>
+              </div>
             </div>
             {/* Size Selector */}
             <div>
@@ -402,7 +406,7 @@ export default function ProductDetails() {
             {!product.inStock && <div className="w-full md:w-auto bg-red-100 text-red-700 px-12 py-4 rounded-full font-bold uppercase tracking-wide text-center border border-red-200">Out of Stock</div>}
             {product.inStock && <button onClick={handleAddToCart} className="w-full md:w-auto bg-black text-white px-12 py-4 rounded-full font-bold uppercase tracking-wide hover:bg-gray-800 transition shadow-lg">Add to Cart</button>}
 
-            {/* 🔴 DESKTOP: DELIVERY, RETURN MODALS TRIGGERS WITH WORKING PINCODE */}
+            {/* PINCODE Check */}
             <div className="mt-8 border-t pt-6">
               <h3 className="font-bold text-gray-900 mb-1">Check delivery date</h3>
               <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
@@ -418,15 +422,13 @@ export default function ProductDetails() {
                   className="border border-gray-300 rounded px-3 py-2 text-sm w-40 outline-none focus:border-black" 
                 />
                 <button 
-                  onClick={checkDeliveryAvailability} // 👈 Button click ab kaam karega
+                  onClick={checkDeliveryAvailability}
                   disabled={checkingPincode}
                   className="bg-white border border-gray-300 rounded px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {checkingPincode ? '...' : 'Check'}
                 </button>
               </div>
-
-              {/* Delivery Status Messages */}
               {deliveryAvailable === false && (
                 <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3 max-w-[400px]">
                   <span className="text-red-500 text-xl shrink-0">🚫</span>
@@ -444,7 +446,6 @@ export default function ProductDetails() {
                   <p className="text-sm font-semibold text-green-600">We deliver to this location!</p>
                 </div>
               )}
-
               <div className="mt-5 space-y-3">
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex items-center gap-2 text-gray-700"><RotateCcw className="w-4 h-4" /><span>14-day return and size exchange</span></div>
@@ -456,7 +457,6 @@ export default function ProductDetails() {
                 </div>
               </div>
             </div>
-            {/* 🔴 END DESKTOP UPDATES */}
 
             <Link to="/" className="block text-gray-500 hover:text-black underline mt-4">Continue Shopping</Link>
           </div>
@@ -490,7 +490,7 @@ export default function ProductDetails() {
         </section>
       </div>
 
-      {/* 🟢 DELIVERY DETAILS MODAL */}
+      {/* Delivery & Return Modals */}
       {isDeliveryModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-end justify-center md:items-center bg-black/50 backdrop-blur-sm p-0 md:p-4" onClick={() => setIsDeliveryModalOpen(false)}>
           <div className="bg-white w-full max-w-md rounded-t-2xl md:rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto p-6 pb-10" onClick={(e) => e.stopPropagation()}>
@@ -525,8 +525,6 @@ export default function ProductDetails() {
           </div>
         </div>
       )}
-
-      {/* 🟢 RETURN & EXCHANGE MODAL */}
       {isReturnModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-end justify-center md:items-center bg-black/50 backdrop-blur-sm p-0 md:p-4" onClick={() => setIsReturnModalOpen(false)}>
           <div className="bg-white w-full max-w-md rounded-t-2xl md:rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto p-6 pb-10" onClick={(e) => e.stopPropagation()}>
