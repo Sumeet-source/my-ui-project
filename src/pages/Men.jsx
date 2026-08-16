@@ -93,7 +93,7 @@ export default function Men() {
   };
 
   // ===========================
-  // UPDATED UI WITH CORRECT STICKY FILTER
+  // FIXED HEADER UI UPDATE
   // ===========================
   return (
     <div className="px-4 py-2 md:px-10 bg-white min-h-screen relative">
@@ -110,9 +110,10 @@ export default function Men() {
         <span className="text-sm text-gray-500 hover:text-black pb-3 cursor-pointer">Accessories</span>
       </div>
 
-      {/* 3. Sticky Result Count & Filter Row (Always stays at 80px from top, behind navbar) */}
-      <div className="sticky top-[80px] z-40 bg-white py-3 border-b border-gray-100 shadow-[0_4px_6px_-4px_rgba(0,0,0,0.03)]">
-        <div className="flex justify-between items-center">
+      {/* 3. FIXED Result Count & Filter Row (Always stuck to header) */}
+      {/* Note: Agar aapke Navbar ki height 80px se alag hai, toh top-[80px] ko top-[75px] ya top-[85px] mein badal lena */}
+      <div className="fixed top-[80px] left-0 right-0 z-30 bg-white py-3 px-4 md:px-10 border-b border-gray-100 shadow-sm">
+        <div className="max-w-[1280px] mx-auto flex justify-between items-center">
           <span className="text-sm text-gray-500 font-medium">
             {filteredProducts.length} Results
           </span>
@@ -128,12 +129,15 @@ export default function Men() {
         </div>
       </div>
 
+      {/* 4. Spacer Div (Taaki Fixed bar ke neeche products chhupe nahi) */}
+      <div className="h-[60px] mt-2"></div>
+
       {/* LOADING STATE */}
       {loading ? (
-        <p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>
+        <p className="text-center py-20 text-gray-500 text-sm">Loading products...</p>
       ) : (
-        <div className="mt-6">
-          {/* 4. Updated Grid & Product Cards */}
+        <div className="mt-4">
+          {/* 5. Updated Grid & Product Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {filteredProducts.length === 0 ? (
               <p className="col-span-full text-center py-20 text-gray-500 text-sm">No products match your filters.</p>
@@ -173,7 +177,7 @@ export default function Men() {
             )}
           </div>
 
-          {/* 5. Load More Button */}
+          {/* 6. Load More Button */}
           {hasMore && !loadingMore && (
             <div className="flex justify-center mt-10 mb-8">
               <button 
