@@ -70,8 +70,15 @@ export default function Home() {
 
       {/* --- SINGLE STATIC VIDEO BANNER --- */}
       <section className="relative w-full min-h-[60dvh] md:min-h-[85vh] max-h-[900px] overflow-hidden bg-black">
+        
+        {/* 🟢 VIDEO CROPPED & ZOOMED MORE FROM BOTTOM TO HIDE WATERMARK (AGGRESSIVE SHIFT) */}
         <video 
-          className="w-full h-full object-cover" 
+          className="w-full h-full object-cover"
+          style={{ 
+            objectPosition: 'center 15%', /* Aur upar shift kar diya */
+            transform: 'scale(1.08)', /* Aur zoom kar diya taaki neeche ka hissa bahar chala jaye */
+            transformOrigin: 'top center'
+          }}
           autoPlay 
           loop 
           muted 
@@ -83,10 +90,7 @@ export default function Home() {
         </video>
         <div className="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
 
-        {/* 🟢 BLACK BOX AT BOTTOM TO HIDE WATERMARK */}
-        <div className="absolute bottom-0 left-0 w-full h-[120px] md:h-[160px] bg-black z-10 pointer-events-none"></div>
-
-        <div className="absolute bottom-0 left-0 w-full p-4 md:p-10 pb-6 md:pb-14 flex flex-col items-start gap-3 md:gap-4 text-black z-20">
+        <div className="absolute bottom-0 left-0 w-full p-4 md:p-10 pb-6 md:pb-14 flex flex-col items-start gap-3 md:gap-4 text-black">
           <div className="flex flex-col sm:flex-row gap-3">
             <Link to="/men" className="bg-white text-black border-2 border-black px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm text-center">
               Shop men →
