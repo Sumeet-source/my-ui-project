@@ -63,9 +63,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- FIXED STICKY CATEGORY FILTER BAR (Like Men/Women) --- */}
-      <div className="sticky top-[80px] z-40 bg-white border-b border-gray-100 shadow-sm">
-        <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth py-4 no-scrollbar px-4 md:px-10 max-w-[1280px] mx-auto">
+      {/* --- REVERTED TO ORIGINAL NON-STICKY CATEGORY BAR (BUT ALIGNED WITH NAVBAR) --- */}
+      <section className="max-w-[1280px] mx-auto px-4 md:px-10 pt-8 pb-12">
+        <div className="flex justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar mt-2">
           {['Running shoes', 'Training', 'Jackets', 'Shorts', 'Jeans', 'T-shirts', 'Hoodies', 'Sneakers'].map((cat) => {
             const isActive = activeCategory === cat;
             return (
@@ -86,10 +86,10 @@ export default function Home() {
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* --- SHOP BY CATEGORY --- */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-10">
+      {/* --- SHOP BY CATEGORY (ALIGNED WITH NAVBAR) --- */}
+      <section className="max-w-[1280px] mx-auto px-4 md:px-10 pt-2 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link to="/men" className="relative h-[400px] md:h-[500px] overflow-hidden group cursor-pointer">
             <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://images.unsplash.com/photo-1483721310020-03333e577078?auto=format&fit=crop&w=800&q=80" alt="Shop Men" />
