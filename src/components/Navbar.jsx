@@ -11,15 +11,13 @@ const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
   useEffect(() => {
     let interval = null;
     let iterations = 0;
-    const maxIterations = 12; // थोड़ा और smooth लगेगा
+    const maxIterations = 12; 
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*";
 
-    // शुरुआत में थोड़ा इंतज़ार
     const timeout = setTimeout(() => {
       interval = setInterval(() => {
         const originalLetters = text.split('');
         const scrambled = originalLetters.map((letter, index) => {
-          // जितनी iterations बीतेंगी, उतने अक्षर लॉक होते जाएंगे
           const progress = iterations / maxIterations;
           const lockedIndex = Math.floor(progress * originalLetters.length);
           
@@ -30,12 +28,11 @@ const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
         setDisplayText(scrambled);
         iterations++;
 
-        // एक बार पूरा हो जाने पर रुक जाओ और असली नाम दिखाओ
         if (iterations >= maxIterations) {
           clearInterval(interval);
           setDisplayText(text);
         }
-      }, 70); // हर 70ms में बदलेगा
+      }, 70); 
     }, delay);
 
     return () => {
@@ -92,9 +89,10 @@ export default function Navbar() {
     if (inputRef.current) inputRef.current.focus();
   };
 
+  // 🟢 UPDATED: Underline color changed from white to black
   const getUnderlineSpanClasses = (isActive) =>
     `relative inline-block 
-    after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white 
+    after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-black 
     after:transition-all after:duration-300 hover:after:w-full 
     ${isActive ? 'after:w-full' : ''}`;
 
@@ -105,26 +103,30 @@ export default function Navbar() {
   const isActiveOutlet = location.pathname === '/outlet';
 
   return (
-    <nav className="bg-[#1d1d1d] text-white relative z-50">
+    // 🟢 MAIN WRAPPER CHANGED TO bg-white AND text-black
+    <nav className="bg-white text-black relative z-50 shadow-sm border-b border-gray-200">
+      
       {/* --- TOP UTILITY BAR --- */}
-      <div className="border-b border-white/10">
+      {/* 🟢 Border color changed to gray-200 */}
+      <div className="border-b border-gray-200">
         <div className="max-w-[1600px] mx-auto px-6 py-1.5 hidden md:flex justify-between items-center tracking-wide font-medium">
           <div className="flex-1"></div>
-          <Link to="/signup" className="uppercase flex-1 text-center cursor-pointer text-[13px]">
+          <Link to="/signup" className="uppercase flex-1 text-center cursor-pointer text-[13px] text-black hover:text-gray-600">
             SIGN UP FOR FASTER CHECKOUT & EASY RETURNS
           </Link>
           <div className="flex-1 flex justify-end items-center gap-2 pr-1">
             {user ? (
               <div className="flex items-center gap-2">
-                <Link to="/dashboard" className="cursor-pointer text-[14px] font-medium hover:underline">Account</Link>
-                <span className="text-[#4a4a4a] text-[14px]">|</span>
-                <button onClick={handleLogout} className="cursor-pointer text-[14px] font-medium bg-transparent border-none text-white hover:underline">Logout</button>
+                <Link to="/dashboard" className="cursor-pointer text-[14px] font-medium hover:text-gray-600">Account</Link>
+                {/* 🟢 Separator color changed to gray-300 */}
+                <span className="text-gray-300 text-[14px]">|</span>
+                <button onClick={handleLogout} className="cursor-pointer text-[14px] font-medium bg-transparent border-none hover:text-gray-600">Logout</button>
               </div>
             ) : (
               <>
-                <Link to="/signup" className="cursor-pointer text-[14px] font-medium hover:underline">Register</Link>
-                <span className="text-[#4a4a4a] text-[14px]">|</span>
-                <Link to="/login" className="cursor-pointer text-[14px] font-medium hover:underline">Log In</Link>
+                <Link to="/signup" className="cursor-pointer text-[14px] font-medium hover:text-gray-600">Register</Link>
+                <span className="text-gray-300 text-[14px]">|</span>
+                <Link to="/login" className="cursor-pointer text-[14px] font-medium hover:text-gray-600">Log In</Link>
               </>
             )}
           </div>
@@ -136,24 +138,25 @@ export default function Navbar() {
         
         {/* Mobile Action Buttons */}
         <div className="flex items-center gap-3 md:hidden">
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-1">
+          {/* 🟢 Icon changed to black */}
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-black p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <Link to={user ? "/dashboard" : "/login"} className="text-white">
+          <Link to={user ? "/dashboard" : "/login"} className="text-black">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
           </Link>
         </div>
 
-        {/* 🟢 LOGO SECTION WITH SCRAMBLE ON MOBILE */}
+        {/* LOGO SECTION */}
         <div className="flex items-center justify-center flex-1 md:flex-none">
-          {/* 🟢 🟢 UPDATED: Desktop Logo wrapped with Link to Home */}
+          {/* Desktop Logo wrapped with Link to Home */}
           <Link to="/" className="hidden md:block">
             <ForgeLogo />
           </Link>
           
-          {/* 🟢 🟢 UPDATED: Mobile Scramble Logo wrapped with Link to Home */}
+          {/* Mobile Scramble Logo (Text changed to black) */}
           <Link to="/" className="block md:hidden">
-            <span className="text-xl font-black tracking-[0.2em] text-white">
+            <span className="text-xl font-black tracking-[0.2em] text-black">
               <ScrambleLogo text="FORGE" />
             </span>
           </Link>
@@ -161,16 +164,17 @@ export default function Navbar() {
 
         {/* Mobile Right Icons */}
         <div className="flex items-center gap-4 md:hidden">
-          <button onClick={() => setIsSearchOpen(true)} className="text-white">
+          {/* 🟢 Icon changed to black */}
+          <button onClick={() => setIsSearchOpen(true)} className="text-black">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </button>
-          <Link to="/cart" className="relative text-white">
+          <Link to="/cart" className="relative text-black">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             {cart.length > 0 && <span className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </Link>
         </div>
 
-        {/* --- CLEAN DESKTOP LINKS --- */}
+        {/* --- DESKTOP LINKS (Text changed to black) --- */}
         <div className="hidden md:flex justify-center flex-1 gap-10 lg:gap-20 text-[17px] lg:text-[19px] font-bold items-center h-12">
           <Link to="/new-arrivals" className="relative h-full flex items-center cursor-pointer">
             <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm">🔥</span></span>
@@ -189,13 +193,13 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* --- DESKTOP RIGHT ICONS --- */}
+        {/* --- DESKTOP RIGHT ICONS (Border & Text color updated) --- */}
         <div className="hidden md:flex items-center gap-6">
-          <div className="hidden sm:flex items-center gap-2 border-b border-white/30 hover:border-white transition-colors pb-0.5 w-32">
-            <input type="text" value={searchTerm} onChange={handleDesktopSearch} onKeyDown={(e) => { if(e.key === 'Enter' && searchTerm.trim()) navigate(`/search?q=${searchTerm}`); }} placeholder="Search" className="bg-transparent text-white text-[15px] placeholder-white/70 focus:outline-none w-full" />
-            <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <div className="hidden sm:flex items-center gap-2 border-b border-gray-300 hover:border-black transition-colors pb-0.5 w-32">
+            <input type="text" value={searchTerm} onChange={handleDesktopSearch} onKeyDown={(e) => { if(e.key === 'Enter' && searchTerm.trim()) navigate(`/search?q=${searchTerm}`); }} placeholder="Search" className="bg-transparent text-black text-[15px] placeholder-gray-400 focus:outline-none w-full" />
+            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
-          <Link to="/cart" className="relative">
+          <Link to="/cart" className="relative text-black">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             {cart.length > 0 && <span className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </Link>
@@ -245,11 +249,9 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* --- MOBILE DRAWER (FIXED LOGO WITH SCRAMBLE) --- */}
+      {/* --- MOBILE DRAWER --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col overflow-hidden">
-          
-          {/* 🟢 MOBILE DRAWER LOGO WITH SCRAMBLE */}
           <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 shrink-0">
             <div className="flex-1"></div>
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0">
