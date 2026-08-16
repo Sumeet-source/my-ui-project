@@ -9,6 +9,11 @@ export default function Home() {
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [activeCategory, setActiveCategory] = useState('Running');
 
+  // 🟢 NEW STATES FOR SHOP BY SPORT
+  const [sportProducts, setSportProducts] = useState([]);
+  const [loadingSport, setLoadingSport] = useState(false);
+  const [selectedSport, setSelectedSport] = useState('Running');
+
   const bestsellerRef = useRef(null);
   const sportRef = useRef(null);
   const trendingRef = useRef(null);
@@ -32,6 +37,7 @@ export default function Home() {
     if (trendingRef.current) trendingRef.current.scrollBy({ left: 300, behavior: 'smooth' });
   };
 
+  // 🟢 FETCH ALL PRODUCTS
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -49,6 +55,30 @@ export default function Home() {
       }
     };
     fetchProducts();
+  }, []);
+
+  // 🟢 FETCH SPORT PRODUCTS (API CALL WITH SPORT FILTER)
+  const fetchSportProducts = async (sportName) => {
+    setLoadingSport(true);
+    setSelectedSport(sportName);
+    try {
+      const res = await axiosClient.get(`/api/products?sport=${sportName}`);
+      let data = res.data;
+      if (Array.isArray(data)) data = data;
+      else if (data && data.products) data = data.products;
+      else data = [];
+      setSportProducts(data);
+    } catch (err) {
+      console.error("Error fetching sport products", err);
+      setSportProducts([]);
+    } finally {
+      setLoadingSport(false);
+    }
+  };
+
+  // Load default sport on mount
+  useEffect(() => {
+    fetchSportProducts('Running');
   }, []);
 
   const bestsellers = allProducts.slice(0, 4);
@@ -70,13 +100,11 @@ export default function Home() {
 
       {/* --- SINGLE STATIC VIDEO BANNER --- */}
       <section className="relative w-full min-h-[60dvh] md:min-h-[85vh] max-h-[900px] overflow-hidden bg-black">
-        
-        {/* 🟢 VIDEO CROPPED & ZOOMED MORE FROM BOTTOM TO HIDE WATERMARK (AGGRESSIVE SHIFT) */}
         <video 
           className="w-full h-full object-cover"
           style={{ 
-            objectPosition: 'center 15%', /* Aur upar shift kar diya */
-            transform: 'scale(1.08)', /* Aur zoom kar diya taaki neeche ka hissa bahar chala jaye */
+            objectPosition: 'center 15%',
+            transform: 'scale(1.08)',
             transformOrigin: 'top center'
           }}
           autoPlay 
@@ -121,7 +149,7 @@ export default function Home() {
             bestsellers.map((product) => (
               <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer">
                 <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
-                  <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                  <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
                 </div>
                 <div className="flex flex-col gap-0.5 px-1">
                   <p className="font-bold text-sm text-black">{product.title}</p>
@@ -136,7 +164,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SHOP BY SPORT --- */}
+      {/* --- 🟢 SHOP BY SPORT (FULLY FUNCTIONAL NOW) --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black">Shop By Sport</h2>
@@ -145,16 +173,55 @@ export default function Home() {
             <button onClick={scrollSportRight} className="bg-white shadow border border-gray-200 rounded-full p-1.5 md:p-2 hover:bg-gray-50 transition"><svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg></button>
           </div>
         </div>
-        <div ref={sportRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4">
+
+        {/* 🟢 CATEGORY BUTTONS (Clickable -> API call) */}
+        <div className="flex overflow-x-auto gap-4 mb-6 hide-scrollbar pb-2">
           {['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga'].map((sport) => (
-            <div key={sport} className="min-w-[240px] md:min-w-[300px] relative h-[300px] md:h-[450px] overflow-hidden group cursor-pointer rounded-lg">
-              <img src={`https://source.unsplash.com/featured/?${sport},fitness`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={sport} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-              <div className="absolute bottom-6 left-6 text-white">
-                <h3 className="text-xl font-bold">{sport}</h3>
-              </div>
-            </div>
+            <button
+              key={sport}
+              onClick={() => fetchSportProducts(sport)}
+              className={`px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap ${
+                selectedSport === sport
+                  ? 'bg-black text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {sport}
+            </button>
           ))}
+        </div>
+
+        {/* 🟢 PRODUCT SLIDER (Real products from API) */}
+        <div ref={sportRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4">
+          {loadingSport ? (
+            <p className="text-gray-500 text-sm">Loading {selectedSport} products...</p>
+          ) : sportProducts.length > 0 ? (
+            sportProducts.map((product) => (
+              <Link 
+                to={`/product/${product._id}`} 
+                key={product._id} 
+                className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer block"
+              >
+                <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
+                  <img 
+                    src={product.images?.[0] || product.imageUrl} 
+                    alt={product.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    onError={(e) => {
+                      e.target.src = "https://placehold.co/600x600/f3f4f6/333333?text=No+Image";
+                    }}
+                  />
+                </div>
+                <div className="flex flex-col gap-0.5 px-1">
+                  <p className="font-bold text-sm text-black">{product.title}</p>
+                  <p className="text-xs text-gray-500">{product.category}</p>
+                  <p className="font-bold text-sm text-black mt-0.5">₹{product.price}</p>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <p className="text-gray-400 text-sm">No products found for {selectedSport}.</p>
+          )}
         </div>
       </section>
 
@@ -175,7 +242,7 @@ export default function Home() {
             trendingProducts.map((product) => (
               <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[280px] flex flex-col gap-2 group cursor-pointer">
                 <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
-                  <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" />
+                  <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
                 </div>
                 <div className="flex flex-col gap-0.5 px-1">
                   <p className="font-bold text-sm text-black">{product.title}</p>
