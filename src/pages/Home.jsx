@@ -57,24 +57,25 @@ export default function Home() {
   }, []);
 
   // 🟢 FETCH SPORT PRODUCTS (API CALL WITH SPORT FILTER)
-  const fetchSportProducts = async (sportName) => {
+    const fetchSportProducts = async (sportName) => {
+    console.log("🟢 fetchSportProducts CALLED for:", sportName); // 🟢 YEH LINE ADD KARO
     setLoadingSport(true);
     setSelectedSport(sportName);
     try {
       const res = await axiosClient.get(`/api/products?sport=${sportName}`);
+      console.log("🟢 API RESPONSE:", res.data); // 🟢 AUR YEH LINE ADD KARO
       let data = res.data;
       if (Array.isArray(data)) data = data;
       else if (data && data.products) data = data.products;
       else data = [];
       setSportProducts(data);
     } catch (err) {
-      console.error("Error fetching sport products", err);
+      console.error("❌ Error fetching sport products", err);
       setSportProducts([]);
     } finally {
       setLoadingSport(false);
     }
   };
-
   // Load default sport on mount
   useEffect(() => {
     fetchSportProducts('Running');
