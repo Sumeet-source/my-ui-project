@@ -32,6 +32,11 @@ export default function ProductDetails() {
   const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
+  // 🟢 🆕 PINCODE STATES (Missing in your file)
+  const [pincodeInput, setPincodeInput] = useState('');
+  const [deliveryAvailable, setDeliveryAvailable] = useState(null);
+  const [checkingPincode, setCheckingPincode] = useState(false);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchProductData();
@@ -85,6 +90,24 @@ export default function ProductDetails() {
       const width = carouselRef.current.clientWidth;
       const index = Math.round(scrollLeft / width);
       setMainImageIndex(index);
+    }
+  };
+
+  // 🟢 🆕 PINCODE CHECK FUNCTION (with Toast Error if length is less)
+  const checkDeliveryAvailability = async () => {
+    if (!pincodeInput || pincodeInput.length !== 6) {
+      showToast("Please enter a valid 6-digit pincode!", "warning");
+      return;
+    }
+    setCheckingPincode(true);
+    try {
+      const res = await axiosClient.get(`/api/delivery/check/${pincodeInput}`);
+      setDeliveryAvailable(res.data.success);
+    } catch (error) {
+      console.error("Pincode API Error:", error);
+      setDeliveryAvailable(false);
+    } finally {
+      setCheckingPincode(false);
     }
   };
 
@@ -237,14 +260,49 @@ export default function ProductDetails() {
           <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
 
-        {/* 🔴 UPDATED: Delivery Details & Return Details Rows */}
+        {/* 🔴 UPDATED: Delivery Details & Return Details Rows with WORKING PINCODE */}
         <div className="px-4 py-6 border-t border-gray-100">
           <h3 className="font-bold text-gray-900 mb-1 text-sm">Check delivery date</h3>
           <p className="text-xs text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
           <div className="flex gap-2 mb-4">
-            <input type="text" placeholder="Pincode" className="border border-gray-300 rounded px-3 py-2 text-xs w-36 outline-none focus:border-black" />
-            <button className="bg-white border border-gray-300 rounded px-4 py-2 text-xs font-medium hover:bg-gray-50 transition-colors text-gray-700">Check</button>
+            <input 
+              type="text" 
+              value={pincodeInput} 
+              onChange={(e) => {
+                setPincodeInput(e.target.value);
+                setDeliveryAvailable(null); // Reset message on typing
+              }}
+              placeholder="Pincode" 
+              className="border border-gray-300 rounded px-3 py-2 text-xs w-36 outline-none focus:border-black" 
+            />
+            <button 
+              onClick={checkDeliveryAvailability} // 👈 Button click ab kaam karega
+              disabled={checkingPincode} 
+              className="bg-white border border-gray-300 rounded px-4 py-2 text-xs font-medium hover:bg-gray-50 transition-colors text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {checkingPincode ? '...' : 'Check'}
+            </button>
           </div>
+
+          {/* Delivery Status Messages */}
+          {deliveryAvailable === false && (
+            <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-3 mb-4">
+              <span className="text-red-500 text-lg shrink-0">🚫</span>
+              <div>
+                <h4 className="text-xs font-bold text-red-800">We do not deliver to this area</h4>
+                <p className="text-[11px] text-red-600 mt-0.5">
+                  Currently, we are unable to deliver to <strong>{pincodeInput}</strong>. Please enter a different pincode.
+                </p>
+              </div>
+            </div>
+          )}
+          {deliveryAvailable === true && (
+            <div className="mt-3 flex items-center gap-2 mb-4">
+              <span className="text-green-600 text-lg">✓</span>
+              <p className="text-sm font-semibold text-green-600">We deliver to this location!</p>
+            </div>
+          )}
+
           <div className="space-y-3">
             <div className="flex justify-between items-center text-xs">
               <div className="flex items-center gap-2 text-gray-700"><RotateCcw className="w-4 h-4" /><span>14-day return and size exchange</span></div>
@@ -344,15 +402,50 @@ export default function ProductDetails() {
             {!product.inStock && <div className="w-full md:w-auto bg-red-100 text-red-700 px-12 py-4 rounded-full font-bold uppercase tracking-wide text-center border border-red-200">Out of Stock</div>}
             {product.inStock && <button onClick={handleAddToCart} className="w-full md:w-auto bg-black text-white px-12 py-4 rounded-full font-bold uppercase tracking-wide hover:bg-gray-800 transition shadow-lg">Add to Cart</button>}
 
-            {/* 🔴 DESKTOP: DELIVERY, RETURN MODALS TRIGGERS */}
+            {/* 🔴 DESKTOP: DELIVERY, RETURN MODALS TRIGGERS WITH WORKING PINCODE */}
             <div className="mt-8 border-t pt-6">
               <h3 className="font-bold text-gray-900 mb-1">Check delivery date</h3>
               <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
               <div className="flex gap-2 mb-4">
-                <input type="text" placeholder="Pincode" className="border border-gray-300 rounded px-3 py-2 text-sm w-40 outline-none focus:border-black" />
-                <button className="bg-white border border-gray-300 rounded px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-700">Check</button>
+                <input 
+                  type="text" 
+                  value={pincodeInput} 
+                  onChange={(e) => {
+                    setPincodeInput(e.target.value);
+                    setDeliveryAvailable(null);
+                  }}
+                  placeholder="Pincode" 
+                  className="border border-gray-300 rounded px-3 py-2 text-sm w-40 outline-none focus:border-black" 
+                />
+                <button 
+                  onClick={checkDeliveryAvailability} // 👈 Button click ab kaam karega
+                  disabled={checkingPincode}
+                  className="bg-white border border-gray-300 rounded px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {checkingPincode ? '...' : 'Check'}
+                </button>
               </div>
-              <div className="space-y-3">
+
+              {/* Delivery Status Messages */}
+              {deliveryAvailable === false && (
+                <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3 max-w-[400px]">
+                  <span className="text-red-500 text-xl shrink-0">🚫</span>
+                  <div>
+                    <h4 className="text-sm font-bold text-red-800">We do not deliver to this area</h4>
+                    <p className="text-xs text-red-600 mt-1">
+                      Currently, we are unable to deliver to <strong>{pincodeInput}</strong>. Please enter a different pincode.
+                    </p>
+                  </div>
+                </div>
+              )}
+              {deliveryAvailable === true && (
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="text-green-600 text-lg">✓</span>
+                  <p className="text-sm font-semibold text-green-600">We deliver to this location!</p>
+                </div>
+              )}
+
+              <div className="mt-5 space-y-3">
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex items-center gap-2 text-gray-700"><RotateCcw className="w-4 h-4" /><span>14-day return and size exchange</span></div>
                   <button onClick={() => setIsReturnModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium text-xs">Know More</button>
