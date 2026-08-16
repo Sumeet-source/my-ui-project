@@ -71,8 +71,10 @@ export default function Home() {
       {/* --- SINGLE STATIC VIDEO BANNER --- */}
       <section className="relative w-full min-h-[60dvh] md:min-h-[85vh] max-h-[900px] overflow-hidden bg-black">
         
-        {/* 🟢 ADDED TRANSPARENT OVERLAY TO HIDE BOTTOM-RIGHT EXTENSIONS (LIKE KING AI) */}
-        <div className="absolute bottom-0 right-0 z-20 w-24 h-16 bg-transparent pointer-events-auto"></div>
+        {/* 🟢 NEW OVERLAY TO HIDE EXTENSION (Made Full Cover & Highest z-index) */}
+        <div className="absolute bottom-0 right-0 z-[9999] w-full h-[200px] bg-transparent pointer-events-auto" 
+             style={{ pointerEvents: 'auto', touchAction: 'auto' }}>
+        </div>
 
         <video 
           className="w-full h-full object-cover" 
