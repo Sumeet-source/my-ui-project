@@ -95,8 +95,8 @@ export default function Men() {
       
       {/* Sticky Filter Bar */}
       <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center -mx-4 md:-mx-10 px-4 md:px-10">
-        {/* 👇 YAHAN pl-2 KAR DIYA HAI (Double padding) */}
-        <span className="text-sm font-semibold text-gray-900 pl-2">
+        {/* 👇 YAHAN pl-5 KAR DIYA HAI (Aur zyada left space) */}
+        <span className="text-sm font-semibold text-gray-900 pl-5">
           Men
         </span>
         <button 
