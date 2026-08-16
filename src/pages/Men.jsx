@@ -93,24 +93,12 @@ export default function Men() {
   };
 
   // ===========================
-  // UPDATED UI
+  // CLEAN UI (No Title, No Tabs)
   // ===========================
   return (
     <div className="px-4 md:px-10 bg-white min-h-screen pb-10">
       
-      {/* 1. Title Section */}
-      <div className="pt-4 pb-2">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Men's</h1>
-      </div>
-
-      {/* 2. Tabs Section */}
-      <div className="flex gap-6 border-b border-gray-200 pb-3 mb-4">
-        <span className="text-sm font-bold border-b-2 border-black pb-3 cursor-pointer">Clothing</span>
-        <span className="text-sm text-gray-500 hover:text-black pb-3 cursor-pointer">Shoes</span>
-        <span className="text-sm text-gray-500 hover:text-black pb-3 cursor-pointer">Accessories</span>
-      </div>
-
-      {/* 3. Sticky Filter Bar (NOW FULL WIDTH - Added -mx-4 md:-mx-10) */}
+      {/* 1. Sticky Filter Bar (Directly at the top, full width) */}
       <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center -mx-4 md:-mx-10 px-4 md:px-10">
         <span className="text-sm font-semibold text-gray-900">
           Men
