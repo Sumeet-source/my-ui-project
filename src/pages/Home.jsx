@@ -159,7 +159,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🟢 SHOP BY SPORT (TEXT BELOW IMAGE - BLACK COLOR) --- */}
+      {/* --- 🟢 SHOP BY SPORT (TEXT BELOW IMAGE - SAME SIZE RECTANGLES) --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black">Shop By Sport</h2>
@@ -186,7 +186,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 🟢 NIKE-STYLE SLIDER (TEXT STRICTLY BELOW IMAGE) */}
+        {/* 🟢 NIKE-STYLE SLIDER (FIXED 4:3 ASPECT RATIO FOR ALL CARDS) */}
         <div ref={sportRef} className="flex overflow-x-auto gap-6 scroll-smooth hide-scrollbar pb-4">
           {loadingSport ? (
             <p className="text-gray-500 text-sm">Loading {selectedSport} products...</p>
@@ -197,7 +197,7 @@ export default function Home() {
                 key={product._id} 
                 className="min-w-[300px] md:min-w-[400px] flex flex-col gap-2 group cursor-pointer"
               >
-                {/* CARD IMAGE (Rectangle) */}
+                {/* 🟢 CARD IMAGE WITH FIXED 4:3 RECTANGULAR ASPECT */}
                 <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-100 rounded-xl group-hover:shadow-lg transition">
                   <img 
                     src={product.images?.[0] || product.imageUrl} 
@@ -209,7 +209,7 @@ export default function Home() {
                   />
                 </div>
                 
-                {/* 🟢 FIX: TEXT IS VISIBLE BLACK AND BELOW THE IMAGE */}
+                {/* 🟢 TEXT BELOW IMAGE (BLACK COLOR) */}
                 <div className="px-1 pt-1">
                   <h3 className="text-base md:text-lg font-bold text-black leading-tight">
                     {product.title}
