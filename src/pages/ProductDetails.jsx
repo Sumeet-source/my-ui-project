@@ -152,14 +152,15 @@ export default function ProductDetails() {
     });
   };
 
-  const handleWishlistToggle = (e) => {
+    // 🟢 OPTIMIZED: useCallback prevents unnecessary re-renders
+  const handleWishlistToggle = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation(); 
     if (!user) { showToast("Please login to add to wishlist", "error"); return; }
     if (isInWishlist(product._id)) removeFromWishlist(product._id);
     else addToWishlist(product._id);
-  };
+  }, [user, product._id, isInWishlist, addToWishlist, removeFromWishlist, showToast]);
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
