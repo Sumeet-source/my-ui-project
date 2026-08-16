@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import FilterBottomSheet from '../components/FilterBottomSheet';
+// 👇 Imported official filter icon from lucide-react to avoid linter errors
+import { Filter } from 'lucide-react';
 
 export default function Men() {
   const [products, setProducts] = useState([]);
@@ -90,10 +92,10 @@ export default function Men() {
   };
 
   return (
-    <div className="px-4 md:px-10 bg-white min-h-screen pb-10">
+    <div className="px-0 md:px-8 bg-white min-h-screen pb-10">
       
-      {/* Sticky Filter Bar */}
-      <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center -mx-4 md:-mx-10 px-4 md:px-10">
+      {/* Sticky Filter Bar (Zero side padding) */}
+      <div className="sticky top-0 z-40 bg-white py-3 border-b border-gray-100 shadow-sm flex justify-between items-center px-3 md:px-8">
         <span className="text-sm font-semibold text-gray-900">
           Men
         </span>
@@ -101,9 +103,8 @@ export default function Men() {
           onClick={() => setIsFilterOpen(true)} 
           className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-          </svg>
+          {/* 👇 Ab yahan red line kabhi nahi aayegi kyunki humne lucide-react ka official icon use kiya hai */}
+          <Filter className="w-4 h-4" />
           Filter
         </button>
       </div>
@@ -112,7 +113,6 @@ export default function Men() {
         <p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>
       ) : (
         <div className="mt-6">
-          {/* 👇 YAHAN GAP ZERO KAR DIYA HAI (gap-0) AUR CARD PAR PADDING DAAL DI HAI */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-0 md:gap-0">
             {filteredProducts.length === 0 ? (
               <p className="col-span-full text-center py-20 text-gray-500 text-sm">No products match your filters.</p>
@@ -141,7 +141,7 @@ export default function Men() {
                     </button>
                   </div>
 
-                  {/* Product Details - Ab padding bahar se aa rahi hai, andar se px-0.5 hata diya */}
+                  {/* Product Details */}
                   <div className="flex flex-col gap-1">
                     <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-snug">
                       {product.title}
