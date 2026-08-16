@@ -87,21 +87,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🟢 FEATURED DOUBLE BANNER (Gap removed, Edge to Edge) --- */}
-      <section className="w-full py-6 md:py-12">
-        <h2 className="text-xl md:text-2xl font-bold text-black px-4 md:px-10 mb-4">Featured</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full">
-          <div className="relative group overflow-hidden rounded-none">
-            <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=800&q=80" alt="Training Apparel" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80"></div>
-            <div className="absolute bottom-6 left-6 text-white z-10">
-              <p className="text-xs font-medium uppercase tracking-wider text-gray-300">Training Apparel</p>
-              <h3 className="text-xl md:text-3xl font-bold mt-1">All Work, No Sweat</h3>
-              <Link to="/women" className="inline-block mt-3 bg-white text-black px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition">Shop</Link>
-            </div>
+      {/* --- 🟢 FIXED FEATURED BANNER (Gap 0, Exact Same Height, First Banner Text Removed) --- */}
+      <section className="w-full py-0">
+        <h2 className="text-xl md:text-2xl font-bold text-black px-4 md:px-10 py-6 md:py-12 mb-0">Featured</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 w-full">
+          
+          {/* Banner 1: Clean Image, NO TEXT OVERLAY */}
+          <div className="relative group overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=1000&q=80" alt="Training Apparel" className="w-full h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105" />
+            {/* 🟢 NO OVERLAY, NO TEXT. Sirf ek clean image */}
           </div>
-          <div className="relative group overflow-hidden rounded-none">
-            <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=800&q=80" alt="Studio Fleece" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+
+          {/* Banner 2: Studio Fleece (Text ekdum same style mein rakha hai) */}
+          <div className="relative group overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1000&q=80" alt="Studio Fleece" className="w-full h-[400px] md:h-[550px] object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80"></div>
             <div className="absolute bottom-6 left-6 text-white z-10">
               <p className="text-xs font-medium uppercase tracking-wider text-gray-300">Studio Fleece</p>
@@ -165,7 +164,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🟢 TRENDING SLIDER (Text overlay hata diya, Niche text shift kar diya) --- */}
+      {/* --- 🟢 TRENDING SLIDER (Text below image) --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black">Trending</h2>
@@ -184,7 +183,6 @@ export default function Home() {
                 <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
                   <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" />
                 </div>
-                {/* 🟢 Text portion shifted below image, NO OVERLAY */}
                 <div className="flex flex-col gap-0.5 px-1">
                   <p className="font-bold text-sm text-black">{product.title}</p>
                   <p className="text-xs text-gray-500">{product.category}</p>
