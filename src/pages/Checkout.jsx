@@ -401,8 +401,8 @@ export default function ProductDetails() {
 
             {/* 🔴 DESKTOP: DELIVERY, RETURN MODALS TRIGGERS (With Pincode Check) */}
             <div className="mt-8 border-t pt-6">
-              <h3 className="font-bold text-gray-900 mb-1">Check delivery date</h3>
-              <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
+              <h3 className="font-bold text-gray-900 mb-1">Check delivery locaton</h3>
+              <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery location/charges</p>
               
               <div className="flex gap-2 mb-2">
                 <input
