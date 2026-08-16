@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axiosClient from '../api/axiosClient'; // 👈 APNA API IMPORT
-import ProductCard from '../components/ProductCard'; // 👈 APNA COMPONENT IMPORT
+import axiosClient from '../api/axiosClient';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -14,6 +13,7 @@ export default function Home() {
   // 🟢 CAROUSEL REFS
   const bestsellerRef = useRef(null);
   const sportRef = useRef(null);
+  const trendingRef = useRef(null); // 🟢 ADDED FOR TRENDING
 
   // 🟢 SCROLL FUNCTIONS
   const scrollBestsellerLeft = () => {
@@ -28,13 +28,17 @@ export default function Home() {
   const scrollSportRight = () => {
     if (sportRef.current) sportRef.current.scrollBy({ left: 280, behavior: 'smooth' });
   };
+  const scrollTrendingLeft = () => {
+    if (trendingRef.current) trendingRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+  };
+  const scrollTrendingRight = () => {
+    if (trendingRef.current) trendingRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+  };
 
-  // 🟢 🟢 🟢 FETCH REAL PRODUCTS FROM BACKEND
+  // 🟢 FETCH REAL PRODUCTS FROM BACKEND
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // 🔴 इस लाइन को अपने बैकएंड API से बदलो!
-        // Example: const res = await axiosClient.get('/api/products?limit=8');
         const res = await axiosClient.get('/api/products'); 
         let data = res.data;
         if (Array.isArray(data)) data = data;
@@ -51,10 +55,9 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  // Slice products for specific sections
-  // 🔴 यहाँ 'Men' या 'Women' फ़िल्टर लगाकर real-time data ला सकते हो
+  // Slice products for sections
   const bestsellers = allProducts.slice(0, 4);
-  const trendingProduct = allProducts.length > 0 ? allProducts[0] : null; // Just a demo logic
+  const trendingProducts = allProducts.slice(4, 9); // Trending mei next 5 products
 
   return (
     <div className="min-h-screen bg-white pb-16">
@@ -89,7 +92,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- FEATURED DOUBLE BANNER (Mobile: 1 Col) --- */}
+      {/* --- FEATURED DOUBLE BANNER --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-12">
         <h2 className="text-xl md:text-2xl font-bold text-black mb-4">Featured</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -128,7 +131,7 @@ export default function Home() {
             <p className="text-gray-500 text-sm">Loading bestsellers...</p>
           ) : bestsellers.length > 0 ? (
             bestsellers.map((product) => (
-              <div key={product._id} className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer">
+              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer">
                 <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-lg">
                   <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 </div>
@@ -137,7 +140,7 @@ export default function Home() {
                   <p className="text-xs text-gray-500">{product.category}</p>
                   <p className="font-bold text-sm text-black mt-0.5">₹{product.price}</p>
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <p className="text-gray-400 text-sm">No products found.</p>
@@ -167,47 +170,35 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- TRENDING (Nike style 3 cards) --- */}
-      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10">
-        <h2 className="text-xl md:text-2xl font-bold text-black mb-4">Trending</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          {/* Trending 1: Real Product (Left) */}
-          <div className="relative h-[350px] md:h-[550px] overflow-hidden group cursor-pointer bg-gray-50 rounded-lg">
-            {loadingProducts ? (
-              <div className="flex items-center justify-center h-full text-gray-400">Loading...</div>
-            ) : trendingProduct ? (
-              <>
-                <img src={trendingProduct.images?.[0] || trendingProduct.imageUrl} alt={trendingProduct.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" />
-                <div className="absolute bottom-6 left-6 z-10">
+      {/* --- 🟢 TRENDING SLIDER (With Real Products & Redirect Links) --- */}
+      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-black">Trending</h2>
+          <div className="flex gap-2">
+            <button onClick={scrollTrendingLeft} className="bg-white shadow border border-gray-200 rounded-full p-1.5 md:p-2 hover:bg-gray-50 transition"><svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg></button>
+            <button onClick={scrollTrendingRight} className="bg-white shadow border border-gray-200 rounded-full p-1.5 md:p-2 hover:bg-gray-50 transition"><svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg></button>
+          </div>
+        </div>
+
+        <div ref={trendingRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4">
+          {loadingProducts ? (
+            <p className="text-gray-500 text-sm">Loading trending...</p>
+          ) : trendingProducts.length > 0 ? (
+            trendingProducts.map((product) => (
+              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[280px] relative h-[350px] md:h-[450px] overflow-hidden group cursor-pointer rounded-lg bg-gray-50">
+                <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" />
+                <div className="absolute bottom-6 left-6 z-10 pr-4">
                   <p className="text-xs font-bold uppercase tracking-wider text-gray-600">Just In</p>
-                  <h3 className="text-lg md:text-xl font-bold text-black mt-1">{trendingProduct.title}</h3>
-                  <Link to={`/product/${trendingProduct._id}`} className="inline-block mt-3 bg-white text-black px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider border border-gray-200 hover:bg-gray-100 transition">Shop</Link>
+                  <h3 className="text-lg md:text-xl font-bold text-black mt-1 line-clamp-2">{product.title}</h3>
+                  <div className="inline-block mt-2 bg-white text-black px-4 py-1.5 md:px-5 md:py-2 rounded-full text-xs font-bold uppercase tracking-wider border border-gray-200 hover:bg-gray-100 transition">
+                    Shop
+                  </div>
                 </div>
-              </>
-            ) : (
-              <p className="text-center text-gray-400 mt-10">No Product</p>
-            )}
-          </div>
-          {/* Trending 2: Lifestyle (Middle) */}
-          <div className="relative h-[350px] md:h-[550px] overflow-hidden group cursor-pointer rounded-lg">
-            <img src="https://images.unsplash.com/photo-1560272563-c67281a2cb65?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Lifestyle" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-            <div className="absolute bottom-6 left-6 text-white z-10">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-300">Inter Milan Home Kit</p>
-              <h3 className="text-xl md:text-2xl font-bold text-white mt-1">Nerazzurri Pride</h3>
-              <Link to="/men" className="inline-block mt-3 bg-white text-black px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition">Shop Football</Link>
-            </div>
-          </div>
-          {/* Trending 3: Kids (Right) */}
-          <div className="relative h-[350px] md:h-[550px] overflow-hidden group cursor-pointer rounded-lg">
-            <img src="https://images.unsplash.com/photo-1546527868-ccb7ee7dfa6a?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Kids" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-            <div className="absolute bottom-6 left-6 text-white z-10">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-300">Kids' Jordan</p>
-              <h3 className="text-xl md:text-2xl font-bold text-white mt-1">All-Day Play</h3>
-              <Link to="/men" className="inline-block mt-3 bg-white text-black px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition">Shop Jordan</Link>
-            </div>
-          </div>
+              </Link>
+            ))
+          ) : (
+            <p className="text-gray-400 text-sm">No trending products found.</p>
+          )}
         </div>
       </section>
 
@@ -236,7 +227,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🟢 BETTER ON THE APP BANNER --- */}
+      {/* --- BETTER ON THE APP BANNER --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-8">
         <div className="bg-[#F5F0E1] w-full p-6 md:p-8 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 border border-[#E8DEC5]">
           <div className="flex items-center gap-4">
