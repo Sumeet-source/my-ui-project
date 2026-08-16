@@ -264,8 +264,8 @@ export default function ProductDetails() {
         </div>
 
         <div className="px-4 py-6 border-t border-gray-100">
-          <h3 className="font-bold text-gray-900 mb-1 text-sm">Check delivery date</h3>
-          <p className="text-xs text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
+          <h3 className="font-bold text-gray-900 mb-1 text-sm">Check delivery location</h3>
+          <p className="text-xs text-gray-500 mb-3">Enter pincode to know exact delivery location/charges</p>
           <div className="flex gap-2 mb-4">
             <input 
               type="text" 
