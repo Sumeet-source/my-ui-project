@@ -4,14 +4,12 @@ import axiosClient from '../api/axiosClient';
 
 // 🟢 UPDATED: Sub-Category Mapping with Sportswear as a main Category
 const SUB_CATEGORY_MAP = {
-  Men: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
-  Women: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
-  Shoes: ['Sneakers', 'Running Shoes', 'Casual Shoes', 'Formal Shoes', 'Loafers', 'Boots', 'Sandals'],
-  Accessories: ['Watches', 'Sunglasses', 'Belts', 'Wallets', 'Caps & Hats', 'Backpacks', 'Socks', 'Ties', 'Cufflinks'],
-  // 🟢 NEW: Sportswear is now a main category with sports as sub-categories
+  Men: ['T-Shirt', 'Polo', 'Shirt', 'Jean', 'Trouser', 'Jacket', 'Sweatshirt', 'Hoodie', 'Short', 'Track Pant'],
+  Women: ['T-Shirt', 'Top', 'Dress', 'Jean', 'Trouser', 'Jacket', 'Sweatshirt', 'Hoodie', 'Short', 'Legging'],
+  Shoes: ['Sneaker', 'Running Shoe', 'Casual Shoe', 'Formal Shoe', 'Loafer', 'Boot', 'Sandal'],
+  Accessories: ['Watch', 'Sunglass', 'Belt', 'Wallet', 'Cap & Hat', 'Backpack', 'Sock', 'Tie', 'Cufflink'],
   Sportswear: ['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga']
 };
-
 export default function AdminDashboard() {
   const { showToast } = useToast();
   const [products, setProducts] = useState([]);
