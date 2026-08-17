@@ -242,7 +242,7 @@ export default function ProductDetails() {
           <h1 className="text-xl font-bold text-gray-900 leading-tight mb-1">{product.title}</h1>
           <p className="text-sm text-gray-500 mb-3">{product.category}</p>
           
-          {/* 🟢 PRICE + INCLUSIVE TAX (Gap ke saath) */}
+          {/* PRICE + INCLUSIVE TAX */}
           <div className="mt-2">
             <span className="text-xl font-bold text-gray-900">₹{product.price}</span>
             <div className="mt-1 text-xs text-gray-500">Inclusive of all taxes</div>
@@ -255,7 +255,7 @@ export default function ProductDetails() {
             </div>
           )}
 
-          {/* 🟢 NIKE STYLE GRID SIZE SELECTOR */}
+          {/* NIKE STYLE GRID SIZE SELECTOR */}
           <div className="mt-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-sm font-bold text-gray-900">Select Size</h3>
@@ -280,7 +280,7 @@ export default function ProductDetails() {
             </div>
           </div>
 
-          {/* 🟢 NIKE STYLE ROUNDED BUTTONS */}
+          {/* NIKE STYLE ROUNDED BUTTONS */}
           <div className="mt-6 space-y-3">
             {!product.inStock ? (
               <div className="w-full bg-red-50 text-red-600 py-4 rounded-full text-center font-bold text-sm border border-red-200">Out of Stock</div>
@@ -307,17 +307,20 @@ export default function ProductDetails() {
             )}
           </div>
 
-          <div className="mt-6">
-            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{product.description}</p>
+          {/* 🟢 NIKE STYLE DESCRIPTION FONT */}
+          <div className="mt-6 text-sm text-gray-600 leading-relaxed tracking-wide">
+            <p className="whitespace-pre-line">{product.description}</p>
           </div>
         </div>
 
-        {/* 🟢 NIKE STYLE ACCORDIONS */}
+        {/* NIKE STYLE ACCORDIONS */}
         <div className="px-4 border-t border-gray-100">
+          
+          {/* CHECK DELIVERY + 14-DAY & FREE DELIVERY ROWS */}
           <div className="py-4 border-b border-gray-100">
             <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
             <p className="text-xs text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
-            <div className="flex gap-2 mb-3">
+            <div className="flex gap-2 mb-4">
               <input 
                 type="text" 
                 value={pincodeInput} 
@@ -335,8 +338,27 @@ export default function ProductDetails() {
             </div>
             {deliveryAvailable === true && <p className="text-xs text-green-600 font-medium">✓ We deliver to this location!</p>}
             {deliveryAvailable === false && <p className="text-xs text-red-500 font-medium">🚫 We do not deliver to this area.</p>}
+
+            {/* 🟢 MISSING LINES RESTORED */}
+            <div className="space-y-2 mt-4">
+              <div className="flex justify-between items-center text-xs">
+                <div className="flex items-center gap-2 text-gray-700">
+                  <RotateCcw className="w-4 h-4" />
+                  <span>14-day return and size exchange</span>
+                </div>
+                <button onClick={() => setIsReturnModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium">Know More</button>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <div className="flex items-center gap-2 text-gray-700">
+                  <Truck className="w-4 h-4" />
+                  <span>Free delivery available</span>
+                </div>
+                <button onClick={() => setIsDeliveryModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium">Know More</button>
+              </div>
+            </div>
           </div>
 
+          {/* VENDOR DETAILS */}
           <details className="group border-b border-gray-100 py-4">
             <summary className="flex justify-between items-center cursor-pointer list-none">
               <span className="font-semibold text-gray-900 text-sm">Vendor Details</span>
@@ -349,6 +371,7 @@ export default function ProductDetails() {
             </div>
           </details>
 
+          {/* RETURN POLICY */}
           <details className="group border-b border-gray-100 py-4">
             <summary className="flex justify-between items-center cursor-pointer list-none">
               <span className="font-semibold text-gray-900 text-sm">Return And Exchange Policy</span>
@@ -362,7 +385,7 @@ export default function ProductDetails() {
           </details>
         </div>
 
-        {/* 🟢 NIKE STYLE "More From" SECTION */}
+        {/* NIKE STYLE "More From" SECTION */}
         <div className="px-4 mt-6">
           <h2 className="text-base font-bold text-gray-900 mb-4">More From {product.category}</h2>
           <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-4 snap-x snap-mandatory">
@@ -402,7 +425,6 @@ export default function ProductDetails() {
             <h1 className="text-3xl font-bold text-gray-900 leading-tight">{product.title}</h1>
             <p className="text-sm text-gray-500">{product.category}</p>
             
-            {/* 🟢 PRICE + INCLUSIVE TAX (Gap ke saath) */}
             <div className="mt-2">
               <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
               <div className="mt-1 text-xs text-gray-500">Inclusive of all taxes</div>
@@ -442,9 +464,9 @@ export default function ProductDetails() {
               )}
             </div>
 
-            {/* Description */}
-            <div className="mt-4 max-w-md">
-              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{product.description}</p>
+            {/* 🟢 NIKE STYLE DESCRIPTION FONT */}
+            <div className="mt-4 max-w-md text-sm text-gray-600 leading-relaxed tracking-wide">
+              <p className="whitespace-pre-line">{product.description}</p>
             </div>
 
             {/* Desktop Accordions */}
@@ -458,6 +480,24 @@ export default function ProductDetails() {
                 </div>
                 {deliveryAvailable === true && <p className="text-xs text-green-600 font-medium mt-2">✓ We deliver to this location!</p>}
                 {deliveryAvailable === false && <p className="text-xs text-red-500 font-medium mt-2">🚫 We do not deliver to this area.</p>}
+
+                {/* 🟢 MISSING LINES RESTORED (Desktop) */}
+                <div className="space-y-2 mt-4">
+                  <div className="flex justify-between items-center text-sm">
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <RotateCcw className="w-4 h-4" />
+                      <span>14-day return and size exchange</span>
+                    </div>
+                    <button onClick={() => setIsReturnModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium text-xs">Know More</button>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <Truck className="w-4 h-4" />
+                      <span>Free delivery available</span>
+                    </div>
+                    <button onClick={() => setIsDeliveryModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium text-xs">Know More</button>
+                  </div>
+                </div>
               </div>
 
               <details className="group border-b border-gray-200 py-4">
@@ -466,8 +506,8 @@ export default function ProductDetails() {
                   <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
                 </summary>
                 <div className="mt-3 space-y-1 text-sm text-gray-600">
-                  <div><span className="text-gray-500">Sold By: </span>Nykasa Fashion Ltd</div>
-                  <div><span className="text-gray-500">Country of Origin: </span>Vietnam</div>
+                  <div><span className="text-gray-500">Sold By: </span>Forge Fashion Ltd</div>
+                  <div><span className="text-gray-500">Country of Origin: </span>India</div>
                   <div><span className="text-gray-500">Manufacturer: </span>FORGE</div>
                 </div>
               </details>
@@ -490,18 +530,15 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      {/* 🟢 NIKE-STYLE LIGHTBOX (Image Slider with Thumbnails) */}
+      {/* NIKE-STYLE LIGHTBOX */}
       {isLightboxOpen && (
         <div className="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center">
-          {/* Close Button */}
           <button 
             onClick={() => setIsLightboxOpen(false)} 
             className="absolute top-4 right-4 z-50 p-2 text-black hover:bg-gray-100 rounded-full transition"
           >
             <X className="w-6 h-6" />
           </button>
-
-          {/* Main Image */}
           <div className="flex-1 w-full flex items-center justify-center px-4 py-8">
             <img 
               src={images[mainImageIndex]} 
@@ -510,8 +547,6 @@ export default function ProductDetails() {
               onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image'; }} 
             />
           </div>
-
-          {/* Thumbnail Strip */}
           <div className="w-full max-w-3xl px-4 pb-8 overflow-x-auto">
             <div className="flex gap-2 justify-center">
               {images.map((img, idx) => (
