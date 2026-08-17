@@ -17,31 +17,44 @@ export default function Shoes() {
   const subCategoryFromUrl = searchParams.get('subCategory');
   const [currentFilters, setCurrentFilters] = useState({});
 
+  // 🟢 FIX: Cleanest fetch function using filters directly
   const fetchShoesProducts = async (page = 1, reset = false, filters = {}) => {
-    if (reset) { setLoading(true); setProducts([]); setCurrentPage(1); }
+    if (reset) {
+      setLoading(true);
+      setProducts([]);
+      setCurrentPage(1);
+    }
+
     try {
-      let params = { page: page, limit: 8, category: 'Shoes' };
+      let params = { page: page, limit: 8 };
+      params.category = 'Shoes';
       if (filters.subCategory) params.subCategory = filters.subCategory;
-      
-      // 🟢 FIX: Sort logic should match backend expectations
-      if (filters.sort) {
-        if (filters.sort === 'price-low') params.sort = 'price_asc';
-        else if (filters.sort === 'price-high') params.sort = 'price_desc';
-        else if (filters.sort === 'newest') params.sort = 'newest';
-      }
-      
-      // 🟢 FIX: Backend expects 'maxPrice', not 'price'
-      if (filters.maxPrice && filters.maxPrice < 20000) {
-        params.maxPrice = filters.maxPrice;
-      }
+      if (filters.sort) params.sort = filters.sort;
+      if (filters.maxPrice !== undefined) params.maxPrice = filters.maxPrice;
 
       const res = await axiosClient.get('/api/products', { params });
       const { products: newProducts, totalCount: newTotalCount, currentPage: pageReturned, totalPages } = res.data;
-      if (reset) { setProducts(newProducts || []); setFilteredProducts(newProducts || []); setTotalCount(newTotalCount || 0); }
-      else { setProducts(prev => [...prev, ...(newProducts || [])]); setFilteredProducts(prev => [...prev, ...(newProducts || [])]); }
-      setCurrentPage(pageReturned || 1); setHasMore(pageReturned < totalPages);
-    } catch (error) { console.error('Error fetching shoes products:', error); if (reset) { setProducts([]); setFilteredProducts([]); setTotalCount(0); } }
-    finally { setLoading(false); setLoadingMore(false); }
+      if (reset) {
+        setProducts(newProducts || []);
+        setFilteredProducts(newProducts || []);
+        setTotalCount(newTotalCount || 0);
+      } else {
+        setProducts(prev => [...prev, ...(newProducts || [])]);
+        setFilteredProducts(prev => [...prev, ...(newProducts || [])]);
+      }
+      setCurrentPage(pageReturned || 1);
+      setHasMore(pageReturned < totalPages);
+    } catch (error) {
+      console.error('Error fetching shoes products:', error);
+      if (reset) {
+        setProducts([]);
+        setFilteredProducts([]);
+        setTotalCount(0);
+      }
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
   };
 
   useEffect(() => {
@@ -56,31 +69,17 @@ export default function Shoes() {
     fetchShoesProducts(1, true, newFilters);
   }, [subCategoryFromUrl]);
 
-  const handleLoadMore = () => { setLoadingMore(true); fetchShoesProducts(currentPage + 1, false, currentFilters); };
+  const handleLoadMore = () => {
+    setLoadingMore(true);
+    fetchShoesProducts(currentPage + 1, false, currentFilters);
+  };
 
-  // 🟢 FIX: Apply Filters with correct backend params (maxPrice)
-    const applyFilters = (filters) => {
+  // 🟢 FIX: applyFilters now correctly calls fetchShoesProducts
+  const applyFilters = (filters) => {
     setCurrentFilters(filters);
     setFilteredProducts([]);
     setHasMore(true);
-    
-    // 🟢 FIX: Ensure subCategory is passed correctly
-    let params = { page: 1, limit: 8 };
-    
-    if (filters.category) params.category = filters.category;
-    if (filters.subCategory) params.subCategory = filters.subCategory;
-    
-    if (filters.sort) {
-      if (filters.sort === 'price-low') params.sort = 'price_asc';
-      else if (filters.sort === 'price-high') params.sort = 'price_desc';
-      else if (filters.sort === 'newest') params.sort = 'newest';
-    }
-    
-    if (filters.maxPrice && filters.maxPrice < 20000) {
-      params.maxPrice = filters.maxPrice;
-    }
-
-    fetchProducts(1, true, params);
+    fetchShoesProducts(1, true, filters);
   };
 
   const clearFilters = () => {

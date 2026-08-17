@@ -16,9 +16,9 @@ export default function Men() {
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // 🟢 FIX: Local state to store current filters
   const [currentFilters, setCurrentFilters] = useState({});
 
+  // 🟢 FIX: Cleanest fetch function using filters directly
   const fetchMenProducts = async (page = 1, reset = false, filters = {}) => {
     if (reset) {
       setLoading(true);
@@ -28,27 +28,10 @@ export default function Men() {
 
     try {
       let params = { page: page, limit: 8 };
-
-      // Category logic
-      if (filters.category === 'Shoes' || filters.category === 'Accessories') {
-        params.category = filters.category;
-        if (filters.subCategory) params.subCategory = filters.subCategory;
-      } else {
-        params.category = 'Men';
-        if (filters.subCategory) params.subCategory = filters.subCategory;
-      }
-
-      // 🟢 FIX: Sort logic should match backend expectations
-      if (filters.sort) {
-        if (filters.sort === 'price-low') params.sort = 'price_asc';
-        else if (filters.sort === 'price-high') params.sort = 'price_desc';
-        else if (filters.sort === 'newest') params.sort = 'newest';
-      }
-
-      // 🟢 FIX: Backend expects 'maxPrice', not 'price'
-      if (filters.maxPrice && filters.maxPrice < 20000) {
-        params.maxPrice = filters.maxPrice;
-      }
+      params.category = filters.category || 'Men';
+      if (filters.subCategory) params.subCategory = filters.subCategory;
+      if (filters.sort) params.sort = filters.sort;
+      if (filters.maxPrice !== undefined) params.maxPrice = filters.maxPrice;
 
       const res = await axiosClient.get('/api/products', { params });
       
@@ -87,30 +70,14 @@ export default function Men() {
     fetchMenProducts(currentPage + 1, false, currentFilters);
   };
 
-  // 🟢 UPDATED: Apply Filters directly to backend with correct param names
-    const applyFilters = (filters) => {
+  // 🟢 FIX: applyFilters now correctly calls fetchMenProducts with fresh params
+  const applyFilters = (filters) => {
     setCurrentFilters(filters);
     setFilteredProducts([]);
     setHasMore(true);
-    
-    // 🟢 FIX: Ensure subCategory is passed correctly
-    let params = { page: 1, limit: 8 };
-    
-    if (filters.category) params.category = filters.category;
-    if (filters.subCategory) params.subCategory = filters.subCategory;
-    
-    if (filters.sort) {
-      if (filters.sort === 'price-low') params.sort = 'price_asc';
-      else if (filters.sort === 'price-high') params.sort = 'price_desc';
-      else if (filters.sort === 'newest') params.sort = 'newest';
-    }
-    
-    if (filters.maxPrice && filters.maxPrice < 20000) {
-      params.maxPrice = filters.maxPrice;
-    }
-
-    fetchProducts(1, true, params);
+    fetchMenProducts(1, true, filters);
   };
+
   const clearFilters = () => {
     setCurrentFilters({});
     setFilteredProducts([]);
