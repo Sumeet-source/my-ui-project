@@ -73,8 +73,6 @@ export default function ProductDetails() {
     }
   };
 
-    
-
   const fetchReviews = async () => {
     try {
       const res = await axiosClient.get(`/api/reviews/product/${id}`);
@@ -182,7 +180,7 @@ export default function ProductDetails() {
   const images = product.images?.length > 0 ? product.images : [product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'];
 
   return (
-    <div className="bg-white min-h-screen pb-20">
+    <div className="bg-white min-h-screen pb-20 font-sans">
       
       {/* 🟢 REVAMPED SIZE GUIDE MODAL (Inches/CM toggle with Chest, Waist, Hip) */}
       {isSizeChartOpen && (
@@ -263,7 +261,6 @@ export default function ProductDetails() {
         </div>
         <div className="px-4 py-4">
           <div className="flex items-baseline gap-3 mb-2">
-            {/* 🟢 FIXED MOBILE PRICE SECTION */}
             <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
             {product.discountPercent > 0 && (
               <>
@@ -289,7 +286,6 @@ export default function ProductDetails() {
           <div className="mt-6">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-sm font-bold text-gray-900">SELECT SIZE</h3>
-              {/* 🟢 NOW SHOW FOR CLOTHING ONLY (Except Shoes) */}
               {!isShoeProduct && (
                 <button onClick={() => setIsSizeChartOpen(true)} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">
                   Size Guide
@@ -321,30 +317,32 @@ export default function ProductDetails() {
           <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
         </div>
 
+        {/* 🔴 UPDATED: Delivery Details with Checkout-style Pincode Logic */}
         <div className="px-4 py-6 border-t border-gray-100">
           <h3 className="font-bold text-gray-900 mb-1 text-sm">Check delivery date</h3>
-          <p className="text-xs text-gray-500 mb-3">Enter pincode to know exact delivery location & charges</p>
-          <div className="flex gap-2 mb-4">
-            <input 
-              type="text" 
-              value={pincodeInput} 
+          <p className="text-xs text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
+          
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              value={pincodeInput}
               onChange={(e) => {
                 setPincodeInput(e.target.value);
-                setDeliveryAvailable(null);
+                setDeliveryAvailable(null); // Reset message when typing
               }}
-              placeholder="Pincode" 
-              className="border border-gray-300 rounded px-3 py-2 text-xs w-36 outline-none focus:border-black" 
+              placeholder="Pincode"
+              className="border border-gray-300 rounded px-3 py-2 text-xs w-36 outline-none focus:border-black"
             />
-            <button 
+            <button
               onClick={checkDeliveryAvailability}
-              disabled={checkingPincode} 
-              className="bg-white border border-gray-300 rounded px-4 py-2 text-xs font-medium hover:bg-gray-50 transition-colors text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={checkingPincode || pincodeInput.length !== 6}
+              className="bg-white border border-gray-300 rounded px-4 py-2 text-xs font-medium hover:bg-gray-50 transition-colors text-gray-700 disabled:opacity-50"
             >
               {checkingPincode ? '...' : 'Check'}
             </button>
           </div>
           {deliveryAvailable === false && (
-            <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-3 mb-4">
+            <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-3">
               <span className="text-red-500 text-lg shrink-0">🚫</span>
               <div>
                 <h4 className="text-xs font-bold text-red-800">We do not deliver to this area</h4>
@@ -355,7 +353,7 @@ export default function ProductDetails() {
             </div>
           )}
           {deliveryAvailable === true && (
-            <div className="mt-3 flex items-center gap-2 mb-4">
+            <div className="mt-3 flex items-center gap-2">
               <span className="text-green-600 text-lg">✓</span>
               <p className="text-sm font-semibold text-green-600">We deliver to this location!</p>
             </div>
@@ -372,6 +370,7 @@ export default function ProductDetails() {
           </div>
         </div>
 
+        {/* You Might Also Like */}
         {displayRelated.length > 0 ? (
           <div className="px-4 py-6 border-t border-gray-100">
             <h2 className="text-base font-bold text-gray-900 mb-4">You Might Also Like</h2>
@@ -385,6 +384,7 @@ export default function ProductDetails() {
           </div>
         ) : null}
         
+        {/* Reviews */}
         <div className="px-4 py-4 border-t border-gray-100 bg-gray-50">
           <h3 className="text-sm font-bold text-gray-900 mb-4">Ratings & Reviews</h3>
           <div className="space-y-4 mb-6">
@@ -444,7 +444,6 @@ export default function ProductDetails() {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-600">Select Size</h3>
-                {/* 🟢 NOW SHOW FOR CLOTHING ONLY (Except Shoes) */}
                 {!isShoeProduct && (
                   <button onClick={() => setIsSizeChartOpen(true)} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">Size Guide</button>
                 )}
