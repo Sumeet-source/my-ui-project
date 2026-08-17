@@ -20,6 +20,7 @@ export default function AdminDashboard() {
   
   const [uploading, setUploading] = useState(false);
 
+  // 🟢 State mein 'sport' add kar diya
   const [formData, setFormData] = useState({
     title: '', 
     price: '', 
@@ -27,6 +28,7 @@ export default function AdminDashboard() {
     images: [], 
     category: 'Men', 
     subCategory: '', 
+    sport: 'Running', // 🟢 NEW field
     inStock: true
   });
 
@@ -39,6 +41,7 @@ export default function AdminDashboard() {
     images: [], 
     category: 'Men', 
     subCategory: '', 
+    sport: 'Running', // 🟢 NEW field
     inStock: true
   });
 
@@ -171,7 +174,7 @@ export default function AdminDashboard() {
       await axiosClient.post('/api/products', dataToSend);
       showToast('Product added successfully!', 'success');
       fetchProducts();
-      setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', inStock: true });
+      setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', sport: 'Running', inStock: true });
     } catch (error) { showToast('Failed to add product', 'error'); }
   };
 
@@ -184,6 +187,7 @@ export default function AdminDashboard() {
       images: product.images || [], 
       category: product.category, 
       subCategory: product.subCategory || '', 
+      sport: product.sport || 'Running', // 🟢 Load sport field
       inStock: product.inStock
     });
     setIsEditModalOpen(true);
@@ -365,6 +369,20 @@ export default function AdminDashboard() {
                     </select>
                   </div>
                 )}
+                
+                {/* 🟢 NEW: Sport Dropdown Added Here */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Sport (For Shop By Sport)</label>
+                  <select name="sport" value={formData.sport} onChange={handleChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
+                    <option value="Running">Running</option>
+                    <option value="Training">Training</option>
+                    <option value="Sportswear">Sportswear</option>
+                    <option value="Basketball">Basketball</option>
+                    <option value="Football">Football</option>
+                    <option value="Yoga">Yoga</option>
+                  </select>
+                </div>
+
                 <button type="submit" disabled={uploading} className={`w-full h-10 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                   {uploading ? 'Uploading Images...' : 'Add Product'}
                 </button>
