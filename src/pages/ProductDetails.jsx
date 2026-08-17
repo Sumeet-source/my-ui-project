@@ -262,7 +262,7 @@ export default function ProductDetails() {
         <div className="px-4 py-4">
           <div className="flex items-baseline gap-3 mb-2">
             <span className="text-2xl font-bold text-gray-900">${product.price}</span>
-            <span className="text-sm line-through text-gray-500">${(product.price * 1.4).toFixed(2)}</span>
+            <span className="text-sm line-through text-gray-500">₹{(product.price * 1.4).toFixed(2)}</span>
             <span className="text-sm font-medium text-green-600">(40% OFF)</span>
           </div>
           <div className="flex items-center gap-2 mb-1">
@@ -424,7 +424,7 @@ export default function ProductDetails() {
           <div className="flex-1 space-y-6">
             <h1 className="text-4xl font-bold text-gray-900">{product.title}</h1>
             <div className="flex items-center gap-4">
-              <span className="text-3xl font-bold text-gray-700">${product.price}</span>
+              <span className="text-3xl font-bold text-gray-700">₹{product.price}</span>
               <div className="flex items-center gap-1">
                 <span className="text-yellow-400 text-lg">{renderStars(averageRating)}</span>
                 <span className="text-sm text-gray-500 ml-1">({reviews.length} reviews)</span>
