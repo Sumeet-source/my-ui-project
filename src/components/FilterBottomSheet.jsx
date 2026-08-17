@@ -5,7 +5,6 @@ const CATEGORIES = {
   Women: ['T-Shirt', 'Top', 'Dress', 'Jean', 'Trouser', 'Jacket', 'Sweatshirt', 'Hoodie', 'Short', 'Legging'],
   Shoes: ['Sneaker', 'Running Shoe', 'Casual Shoe', 'Formal Shoe', 'Loafer', 'Boot', 'Sandal'],
   Accessories: ['Watch', 'Sunglass', 'Belt', 'Wallet', 'Cap & Hat', 'Backpack', 'Sock', 'Tie', 'Cufflink'],
-  // 🟢 NEW: Outlet ab Men/Women/Shoes sab ki sub-categories dikhayega
   Outlet: [
     'T-Shirt', 'Polo', 'Shirt', 'Jean', 'Trouser', 'Jacket', 
     'Sweatshirt', 'Hoodie', 'Short', 'Track Pant',
@@ -115,7 +114,7 @@ export default function FilterBottomSheet({
             </select>
           </div>
 
-          {/* 🟢 FIX: Agar defaultCategory 'Outlet' hai, toh Category dropdown mat dikhao */}
+          {/* 🟢 Agar defaultCategory 'Outlet' hai, toh Category dropdown mat dikhao */}
           {!isDefaultCategoryValid && defaultCategory !== 'Outlet' && (
             <div className="space-y-2">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Category</p>
@@ -132,45 +131,37 @@ export default function FilterBottomSheet({
             </div>
           )}
           
-          {/* 🟢 Outlet ke liye Sub-Category direct dikhao */}
-          {isDefaultCategoryValid && defaultCategory === 'Outlet' && (
-            <div className="space-y-2 mt-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Sub-Category (For Outlet)</p>
-              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORIES.Shoes.map((sub) => {
-                    const isSelected = localFilters.subCategory === sub;
-                    return (
-                      <button key={sub} onClick={() => handleChange('subCategory', isSelected ? '' : sub)} className={`px-3 py-1 rounded-full text-xs font-medium transition border ${isSelected ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
-                        {isSelected && '✓ '}{sub}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
+          {/* 🟢 Unified Sub-Category block (Men, Women, Shoes, Outlet sab ke liye) */}
+          {(() => {
+            let categoryToUse = null;
+            if (isDefaultCategoryValid) {
+              categoryToUse = defaultCategory;
+            } else if (localFilters.category && CATEGORIES[localFilters.category]) {
+              categoryToUse = localFilters.category;
+            }
 
-          {/* 🟢 Baaki pages ke liye normal Sub-Category display */}
-          {((!isDefaultCategoryValid && localFilters.category && CATEGORIES[localFilters.category]) || (isDefaultCategoryValid && defaultCategory !== 'Outlet' && CATEGORIES[defaultCategory])) && (
-            <div className="space-y-2 mt-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                {isDefaultCategoryValid ? `${defaultCategory} Sub-Categories` : 'Sub-Category (Optional)'}
-              </p>
-              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="flex flex-wrap gap-2">
-                  {(isDefaultCategoryValid ? CATEGORIES[defaultCategory] : CATEGORIES[localFilters.category]).map((sub) => {
-                    const isSelected = localFilters.subCategory === sub;
-                    return (
-                      <button key={sub} onClick={() => handleChange('subCategory', isSelected ? '' : sub)} className={`px-3 py-1 rounded-full text-xs font-medium transition border ${isSelected ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
-                        {isSelected && '✓ '}{sub}
-                      </button>
-                    );
-                  })}
+            if (!categoryToUse) return null;
+
+            return (
+              <div className="space-y-2 mt-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                  {isDefaultCategoryValid ? `${defaultCategory} Sub-Categories` : 'Sub-Category (Optional)'}
+                </p>
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex flex-wrap gap-2">
+                    {CATEGORIES[categoryToUse].map((sub) => {
+                      const isSelected = localFilters.subCategory === sub;
+                      return (
+                        <button key={sub} onClick={() => handleChange('subCategory', isSelected ? '' : sub)} className={`px-3 py-1 rounded-full text-xs font-medium transition border ${isSelected ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
+                          {isSelected && '✓ '}{sub}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Price</p>
