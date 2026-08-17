@@ -343,8 +343,8 @@ export default function ProductDetails() {
               <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
             </summary>
             <div className="mt-3 space-y-1 text-sm text-gray-600">
-              <div><span className="text-gray-500">Sold By: </span>Nykasa Fashion Ltd</div>
-              <div><span className="text-gray-500">Country of Origin: </span>Vietnam</div>
+              <div><span className="text-gray-500">Sold By: </span>Forge Fashion Ltd</div>
+              <div><span className="text-gray-500">Country of Origin: </span>India</div>
               {/* 🟢 REPLACED Nike with FORGE */}
               <div><span className="text-gray-500">Manufacturer: </span>FORGE</div>
             </div>
@@ -459,8 +459,8 @@ export default function ProductDetails() {
                   <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
                 </summary>
                 <div className="mt-3 space-y-1 text-sm text-gray-600">
-                  <div><span className="text-gray-500">Sold By: </span>Nykasa Fashion Ltd</div>
-                  <div><span className="text-gray-500">Country of Origin: </span>Vietnam</div>
+                  <div><span className="text-gray-500">Sold By: </span>Forge Fashion Ltd</div>
+                  <div><span className="text-gray-500">Country of Origin: </span>India</div>
                   {/* 🟢 REPLACED Nike with FORGE */}
                   <div><span className="text-gray-500">Manufacturer: </span>FORGE</div>
                 </div>
