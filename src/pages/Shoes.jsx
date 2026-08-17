@@ -59,12 +59,28 @@ export default function Shoes() {
   const handleLoadMore = () => { setLoadingMore(true); fetchShoesProducts(currentPage + 1, false, currentFilters); };
 
   // 🟢 FIX: Apply Filters with correct backend params (maxPrice)
-  const applyFilters = (filters) => {
-    const mergedFilters = { ...currentFilters, ...filters };
-    setCurrentFilters(mergedFilters);
+    const applyFilters = (filters) => {
+    setCurrentFilters(filters);
     setFilteredProducts([]);
     setHasMore(true);
-    fetchShoesProducts(1, true, mergedFilters);
+    
+    // 🟢 FIX: Ensure subCategory is passed correctly
+    let params = { page: 1, limit: 8 };
+    
+    if (filters.category) params.category = filters.category;
+    if (filters.subCategory) params.subCategory = filters.subCategory;
+    
+    if (filters.sort) {
+      if (filters.sort === 'price-low') params.sort = 'price_asc';
+      else if (filters.sort === 'price-high') params.sort = 'price_desc';
+      else if (filters.sort === 'newest') params.sort = 'newest';
+    }
+    
+    if (filters.maxPrice && filters.maxPrice < 20000) {
+      params.maxPrice = filters.maxPrice;
+    }
+
+    fetchProducts(1, true, params);
   };
 
   const clearFilters = () => {

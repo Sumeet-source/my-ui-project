@@ -50,12 +50,28 @@ export default function Outlet() {
   const handleLoadMore = () => { setLoadingMore(true); fetchOutletProducts(currentPage + 1, false, currentFilters); };
   
   // 🟢 UPDATED: Apply Filters directly to backend with correct param names
-  const applyFilters = (filters) => {
+    const applyFilters = (filters) => {
     setCurrentFilters(filters);
     setFilteredProducts([]);
     setHasMore(true);
-    // Pass filters directly, they already have correct backend param names (maxPrice)
-    fetchOutletProducts(1, true, filters);
+    
+    // 🟢 FIX: Ensure subCategory is passed correctly
+    let params = { page: 1, limit: 8 };
+    
+    if (filters.category) params.category = filters.category;
+    if (filters.subCategory) params.subCategory = filters.subCategory;
+    
+    if (filters.sort) {
+      if (filters.sort === 'price-low') params.sort = 'price_asc';
+      else if (filters.sort === 'price-high') params.sort = 'price_desc';
+      else if (filters.sort === 'newest') params.sort = 'newest';
+    }
+    
+    if (filters.maxPrice && filters.maxPrice < 20000) {
+      params.maxPrice = filters.maxPrice;
+    }
+
+    fetchProducts(1, true, params);
   };
 
   const clearFilters = () => {
