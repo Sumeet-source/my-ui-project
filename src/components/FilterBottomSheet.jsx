@@ -6,6 +6,7 @@ const CATEGORIES = {
   Shoes: ['Sneaker', 'Running Shoe', 'Casual Shoe', 'Formal Shoe', 'Loafer', 'Boot', 'Sandal'],
   Accessories: ['Watch', 'Sunglass', 'Belt', 'Wallet', 'Cap & Hat', 'Backpack', 'Sock', 'Tie', 'Cufflink']
 };
+
 export default function FilterBottomSheet({ 
   isOpen, 
   onClose, 
@@ -21,7 +22,7 @@ export default function FilterBottomSheet({
     sort: 'featured',
     category: isDefaultCategoryValid ? defaultCategory : '', 
     subCategory: '',
-    maxPrice: 20000, // 🟢 Key fix: price -> maxPrice
+    maxPrice: 20000, 
   });
 
   const getFilteredCount = () => {
@@ -63,7 +64,6 @@ export default function FilterBottomSheet({
     onClear();
   };
 
-  // 🟢 Fix: Sort aur maxPrice backend format mein map kiya
   const handleApply = () => {
     const sortMap = {
       'price-low': 'price_asc',
@@ -107,7 +107,8 @@ export default function FilterBottomSheet({
             </select>
           </div>
 
-          {!isDefaultCategoryValid && (
+          {/* 🟢 FIX: Agar defaultCategory 'Outlet' hai, toh Category dropdown mat dikhao */}
+          {!isDefaultCategoryValid && defaultCategory !== 'Outlet' && (
             <div className="space-y-2">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Category</p>
               <div className="flex flex-wrap gap-2 mb-2">
@@ -122,8 +123,28 @@ export default function FilterBottomSheet({
               </div>
             </div>
           )}
+          
+          {/* 🟢 Outlet ke liye Sub-Category direct dikhao */}
+          {isDefaultCategoryValid && defaultCategory === 'Outlet' && (
+            <div className="space-y-2 mt-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Sub-Category (For Outlet)</p>
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex flex-wrap gap-2">
+                  {CATEGORIES.Shoes.map((sub) => {
+                    const isSelected = localFilters.subCategory === sub;
+                    return (
+                      <button key={sub} onClick={() => handleChange('subCategory', isSelected ? '' : sub)} className={`px-3 py-1 rounded-full text-xs font-medium transition border ${isSelected ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'}`}>
+                        {isSelected && '✓ '}{sub}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
 
-          {((!isDefaultCategoryValid && localFilters.category && CATEGORIES[localFilters.category]) || (isDefaultCategoryValid && CATEGORIES[defaultCategory])) && (
+          {/* 🟢 Baaki pages ke liye normal Sub-Category display */}
+          {((!isDefaultCategoryValid && localFilters.category && CATEGORIES[localFilters.category]) || (isDefaultCategoryValid && defaultCategory !== 'Outlet' && CATEGORIES[defaultCategory])) && (
             <div className="space-y-2 mt-4">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
                 {isDefaultCategoryValid ? `${defaultCategory} Sub-Categories` : 'Sub-Category (Optional)'}
