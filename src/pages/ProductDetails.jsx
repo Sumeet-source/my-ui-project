@@ -261,9 +261,18 @@ export default function ProductDetails() {
         </div>
         <div className="px-4 py-4">
           <div className="flex items-baseline gap-3 mb-2">
+            {/* 🟢 FIXED MOBILE PRICE SECTION */}
             <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
-            <span className="text-sm line-through text-gray-500">₹{(product.price * 1.4).toFixed(2)}</span>
-            <span className="text-sm font-medium text-green-600">(40% OFF)</span>
+            {product.discountPercent > 0 && (
+              <>
+                <span className="text-sm line-through text-gray-500">
+                  ₹{(product.price * (1 + product.discountPercent / 100)).toFixed(2)}
+                </span>
+                <span className="text-sm font-medium text-green-600">
+                  ({product.discountPercent}% OFF)
+                </span>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-2 mb-1">
             <div className="flex items-center gap-1 bg-green-600 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">

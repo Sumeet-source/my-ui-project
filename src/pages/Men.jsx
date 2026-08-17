@@ -86,10 +86,28 @@ export default function Men() {
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                     </button>
                   </div>
-                  <div className="flex flex-col gap-1 px-1 md:px-1.5 pb-1.5">
-                    <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-snug">{product.title}</p>
-                    <p className="text-sm font-bold text-black">₹{product.price}</p>
-                  </div>
+                                  <div className="flex flex-col gap-1 px-1 md:px-1.5 pb-1.5">
+                  <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-snug">
+                    {product.title}
+                  </p>
+                  
+                  {/* 🟢 YEH LINE ADD KARO (CATEGORY) */}
+                  <p className="text-xs text-gray-500">
+                    {product.category}
+                  </p>
+
+                  {/* 🟢 DISCOUNT LOGIC */}
+                  {product.discountPercent > 0 && (
+                    <span className="text-xs line-through text-gray-400">
+                      ₹{(product.price * (1 + product.discountPercent / 100)).toFixed(2)}
+                    </span>
+                  )}
+
+                  {/* 🟢 PRICE */}
+                  <p className="text-sm font-bold text-black">
+                    ₹{product.price}
+                  </p>
+                </div>
                 </Link>
               ))
             )}
