@@ -309,7 +309,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900">Price ($)</label>
+                    <label className="block text-sm font-semibold text-gray-900">Price (₹)</label>
                     <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="49.99" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required />
                   </div>
                   <div>
@@ -494,7 +494,7 @@ export default function AdminDashboard() {
               <h2 className="text-xl font-bold mb-4">Edit Product</h2>
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div><label className="block text-sm font-semibold">Title</label><input type="text" name="title" value={editFormData.title} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
-                <div><label className="block text-sm font-semibold">Price ($)</label><input type="number" name="price" value={editFormData.price} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
+                <div><label className="block text-sm font-semibold">Price (₹)</label><input type="number" name="price" value={editFormData.price} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
                 <div>
                   <label className="block text-sm font-semibold">Images</label>
                   <div className="flex items-center gap-2 mt-1">

@@ -52,7 +52,7 @@ export default function ProductCard({ id, title, price, image, badge }) {
       </div>
       <div className="mt-3">
         <p className="text-sm font-semibold text-gray-900">{title}</p>
-        <p className="text-sm text-gray-500">${price}</p>
+        <p className="text-sm text-gray-500">₹{price}</p>
       </div>
     </div>
   );
