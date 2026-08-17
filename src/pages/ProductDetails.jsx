@@ -242,14 +242,14 @@ export default function ProductDetails() {
           <h1 className="text-xl font-bold text-gray-900 leading-tight mb-1">{product.title}</h1>
           <p className="text-sm text-gray-500 mb-3">{product.category}</p>
           
-          <div className="flex items-baseline gap-2 mb-2">
+          {/* 🟢 PRICE + INCLUSIVE TAX (Gap ke saath) */}
+          <div className="mt-2">
             <span className="text-xl font-bold text-gray-900">₹{product.price}</span>
-            <span className="text-xs text-gray-500">Inclusive of all taxes</span>
+            <div className="mt-1 text-xs text-gray-500">Inclusive of all taxes</div>
           </div>
 
           {product.discountPercent > 0 && (
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-lg font-bold text-gray-900">₹{product.price}</span>
+            <div className="flex items-center gap-2 mt-2">
               <span className="text-sm line-through text-gray-400">₹{(product.price * (1 + product.discountPercent / 100)).toFixed(2)}</span>
               <span className="text-sm font-medium text-green-600">({product.discountPercent}% OFF)</span>
             </div>
@@ -343,9 +343,8 @@ export default function ProductDetails() {
               <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
             </summary>
             <div className="mt-3 space-y-1 text-sm text-gray-600">
-              <div><span className="text-gray-500">Sold By: </span>Forge Fashion Ltd</div>
-              <div><span className="text-gray-500">Country of Origin: </span>India</div>
-              {/* 🟢 REPLACED Nike with FORGE */}
+              <div><span className="text-gray-500">Sold By: </span>Nykasa Fashion Ltd</div>
+              <div><span className="text-gray-500">Country of Origin: </span>Vietnam</div>
               <div><span className="text-gray-500">Manufacturer: </span>FORGE</div>
             </div>
           </details>
@@ -356,7 +355,6 @@ export default function ProductDetails() {
               <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
             </summary>
             <div className="mt-3 space-y-2 text-sm text-gray-600 leading-relaxed">
-              {/* 🟢 REPLACED Nike with FORGE */}
               <p>1. Most FORGE products are eligible for returns or exchanges within 14 days of delivery.</p>
               <p>2. Items must be unused, unworn, and returned in original condition.</p>
               <p>3. Refunds are initiated within 5–7 working days after pickup.</p>
@@ -403,10 +401,19 @@ export default function ProductDetails() {
             <span className="text-xs font-bold text-red-600 uppercase tracking-wide">Just In</span>
             <h1 className="text-3xl font-bold text-gray-900 leading-tight">{product.title}</h1>
             <p className="text-sm text-gray-500">{product.category}</p>
-            <div className="flex items-baseline gap-2">
+            
+            {/* 🟢 PRICE + INCLUSIVE TAX (Gap ke saath) */}
+            <div className="mt-2">
               <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
-              <span className="text-sm text-gray-500 ml-2">Inclusive of all taxes</span>
+              <div className="mt-1 text-xs text-gray-500">Inclusive of all taxes</div>
             </div>
+
+            {product.discountPercent > 0 && (
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-sm line-through text-gray-400">₹{(product.price * (1 + product.discountPercent / 100)).toFixed(2)}</span>
+                <span className="text-sm font-medium text-green-600">({product.discountPercent}% OFF)</span>
+              </div>
+            )}
 
             {/* Size Selector */}
             <div className="mt-4">
@@ -459,9 +466,8 @@ export default function ProductDetails() {
                   <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
                 </summary>
                 <div className="mt-3 space-y-1 text-sm text-gray-600">
-                  <div><span className="text-gray-500">Sold By: </span>Forge Fashion Ltd</div>
-                  <div><span className="text-gray-500">Country of Origin: </span>India</div>
-                  {/* 🟢 REPLACED Nike with FORGE */}
+                  <div><span className="text-gray-500">Sold By: </span>Nykasa Fashion Ltd</div>
+                  <div><span className="text-gray-500">Country of Origin: </span>Vietnam</div>
                   <div><span className="text-gray-500">Manufacturer: </span>FORGE</div>
                 </div>
               </details>
@@ -472,7 +478,6 @@ export default function ProductDetails() {
                   <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
                 </summary>
                 <div className="mt-3 space-y-2 text-sm text-gray-600 leading-relaxed">
-                  {/* 🟢 REPLACED Nike with FORGE */}
                   <p>1. Most FORGE products are eligible for returns or exchanges within 14 days of delivery.</p>
                   <p>2. Items must be unused, unworn, and returned in original condition.</p>
                   <p>3. Refunds are initiated within 5–7 working days after pickup.</p>
@@ -484,6 +489,51 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
+
+      {/* 🟢 NIKE-STYLE LIGHTBOX (Image Slider with Thumbnails) */}
+      {isLightboxOpen && (
+        <div className="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center">
+          {/* Close Button */}
+          <button 
+            onClick={() => setIsLightboxOpen(false)} 
+            className="absolute top-4 right-4 z-50 p-2 text-black hover:bg-gray-100 rounded-full transition"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* Main Image */}
+          <div className="flex-1 w-full flex items-center justify-center px-4 py-8">
+            <img 
+              src={images[mainImageIndex]} 
+              alt={`${product.title} - Main View`} 
+              className="max-w-full max-h-[70vh] object-contain" 
+              onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image'; }} 
+            />
+          </div>
+
+          {/* Thumbnail Strip */}
+          <div className="w-full max-w-3xl px-4 pb-8 overflow-x-auto">
+            <div className="flex gap-2 justify-center">
+              {images.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setMainImageIndex(idx)}
+                  className={`w-16 h-16 rounded border-2 overflow-hidden flex-shrink-0 transition ${
+                    mainImageIndex === idx ? 'border-black' : 'border-gray-200 hover:border-gray-400'
+                  }`}
+                >
+                  <img 
+                    src={img} 
+                    alt={`Thumbnail ${idx + 1}`} 
+                    className="w-full h-full object-cover" 
+                    onError={(e) => { e.target.src = 'https://placehold.co/100x100/333/fff?text=Image'; }} 
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
