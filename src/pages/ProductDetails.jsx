@@ -457,9 +457,9 @@ export default function ProductDetails() {
                   <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
                 </summary>
                 <div className="mt-3 space-y-1 text-sm text-gray-600">
-                  <div><span className="text-gray-500">Sold By: </span>Nykasa Fashion Ltd</div>
-                  <div><span className="text-gray-500">Country of Origin: </span>Vietnam</div>
-                  <div><span className="text-gray-500">Manufacturer: </span>Nike</div>
+                  <div><span className="text-gray-500">Sold By: </span>Forge Fashion Ltd</div>
+                  <div><span className="text-gray-500">Country of Origin: </span>India</div>
+                  <div><span className="text-gray-500">Manufacturer: </span>Forge</div>
                 </div>
               </details>
 
@@ -469,7 +469,7 @@ export default function ProductDetails() {
                   <span className="transition-transform group-open:rotate-180"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg></span>
                 </summary>
                 <div className="mt-3 space-y-2 text-sm text-gray-600 leading-relaxed">
-                  <p>1. Most Nike products are eligible for returns or exchanges within 14 days of delivery.</p>
+                  <p>1. Most Forge products are eligible for returns or exchanges within 14 days of delivery.</p>
                   <p>2. Items must be unused, unworn, and returned in original condition.</p>
                   <p>3. Refunds are initiated within 5–7 working days after pickup.</p>
                 </div>
