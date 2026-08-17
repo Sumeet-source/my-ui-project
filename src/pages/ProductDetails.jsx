@@ -179,6 +179,7 @@ export default function ProductDetails() {
   return (
     <div className="bg-white min-h-screen pb-20 font-sans">
       
+      {/* ================= SIZE CHART MODAL ================= */}
       {isSizeChartOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -216,6 +217,69 @@ export default function ProductDetails() {
               </table>
             </div>
             <p className="text-xs text-gray-500 mt-4 text-center">*This is a standard guide. Sizes may vary slightly by brand.</p>
+          </div>
+        </div>
+      )}
+
+      {/* ================= DELIVERY MODAL ================= */}
+      {isDeliveryModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button 
+              onClick={() => setIsDeliveryModalOpen(false)} 
+              className="absolute top-4 right-4 p-2 text-black hover:bg-gray-100 rounded-full transition"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="flex items-center gap-2 mb-4">
+              <Truck className="w-6 h-6 text-gray-800" />
+              <h2 className="text-xl font-bold text-gray-900">Delivery Details</h2>
+            </div>
+            <div className="space-y-4 text-sm text-gray-600 leading-relaxed">
+              <p>We offer free shipping on all orders across India, with no minimum order value and no additional delivery, platform, or hidden charges.</p>
+              <p>Orders are typically processed within 3-5 business days. Delivery timelines may vary based on location, product availability, and other factors. If your order includes multiple items, they may be shipped separately.</p>
+              <p>Estimated delivery dates shown at checkout are indicative and may be impacted by factors beyond our control, such as extreme weather, public holidays, or logistical constraints. While we aim to meet these timelines, delays may occur, and we'll keep you informed if your order is affected.</p>
+              
+              <div className="border-t border-gray-200 my-4 pt-4">
+                <h3 className="font-bold text-gray-800 mb-2 uppercase tracking-wide">CANCELLATION POLICY</h3>
+                <p>You can cancel your order directly from the My Orders section before the item is shipped. Once an order has been processed and shipped, cancellation is not possible. In such cases, you can initiate a return after delivery through our returns process.</p>
+                <p className="mt-2">For cancelled orders, refunds are processed within 5 business days from the date of cancellation.</p>
+                <p className="mt-2">If you need any assistance, our Customer Service team is always here for you at <a href="mailto:support@forge.com" className="text-blue-600 underline">support@forge.com</a>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= RETURN & EXCHANGE MODAL ================= */}
+      {isReturnModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button 
+              onClick={() => setIsReturnModalOpen(false)} 
+              className="absolute top-4 right-4 p-2 text-black hover:bg-gray-100 rounded-full transition"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="flex items-center gap-2 mb-4">
+              <svg className="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h8" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 14h4" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h2" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 12l2-2 2 2" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18 10v4" />
+              </svg>
+              <h2 className="text-xl font-bold text-gray-900">Return & Exchange</h2>
+            </div>
+            <div className="space-y-3 text-sm text-gray-600 leading-relaxed">
+              <p><span className="font-medium text-gray-800">1.</span> Most Forge products are eligible for returns or exchanges and can be requested within 14 days of delivery from the My Orders section on our website. Requests after this window will not be accepted. For select high-heat products, eligibility may vary and will be specified on the product page.</p>
+              <p><span className="font-medium text-gray-800">2.</span> Items must be unused, unworn, unwashed, and returned in original condition with all tags, packaging, brand box, invoice, and accessories intact. Products showing signs of use or alteration will not be eligible.</p>
+              <p><span className="font-medium text-gray-800">3.</span> If you receive a defective or incorrect product, please contact Customer Service immediately with product images at <a href="mailto:support@forge.com" className="text-blue-600 underline">support@forge.com</a>.</p>
+              <p><span className="font-medium text-gray-800">4.</span> Once a request is placed, our logistics partner will arrange a free pickup within the return window. Size exchanges can be requested via My Orders or by emailing <a href="mailto:support@forge.com" className="text-blue-600 underline">support@forge.com</a>; if the requested size is unavailable, a return will be offered instead.</p>
+              <p><span className="font-medium text-gray-800">5.</span> For approved returns, refunds are initiated within 5–7 working days after pickup.</p>
+              <p className="mt-3">If you need any additional help, our Customer Service team is always here for you at <a href="mailto:support@forge.com" className="text-blue-600 underline">support@forge.com</a>.</p>
+            </div>
           </div>
         </div>
       )}
@@ -571,4 +635,5 @@ export default function ProductDetails() {
       )}
     </div>
   );
+  
 }
