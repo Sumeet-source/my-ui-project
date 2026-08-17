@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { useToast } from '../context/ToastContext';
 import axiosClient from '../api/axiosClient';
 
-// 🟢 UPDATED: Sub-Category Mapping with Sports
+// 🟢 UPDATED: Sub-Category Mapping with Sportswear as a main Category
 const SUB_CATEGORY_MAP = {
   Men: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
   Women: ['T-Shirts', 'Polos', 'Shirts', 'Jeans', 'Trousers', 'Jackets', 'Sweatshirts', 'Hoodies', 'Shorts', 'Track Pants'],
   Shoes: ['Sneakers', 'Running Shoes', 'Casual Shoes', 'Formal Shoes', 'Loafers', 'Boots', 'Sandals'],
   Accessories: ['Watches', 'Sunglasses', 'Belts', 'Wallets', 'Caps & Hats', 'Backpacks', 'Socks', 'Ties', 'Cufflinks'],
+  // 🟢 NEW: Sportswear is now a main category with sports as sub-categories
   Sportswear: ['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga']
 };
 
@@ -19,7 +20,6 @@ export default function AdminDashboard() {
   
   const [uploading, setUploading] = useState(false);
 
-  // 🟢 UPDATED: State mein 'sport' add kiya
   const [formData, setFormData] = useState({
     title: '', 
     price: '', 
@@ -27,7 +27,6 @@ export default function AdminDashboard() {
     images: [], 
     category: 'Men', 
     subCategory: '', 
-    sport: 'Sportswear', // 🟢 NEW field
     inStock: true
   });
 
@@ -40,7 +39,6 @@ export default function AdminDashboard() {
     images: [], 
     category: 'Men', 
     subCategory: '', 
-    sport: 'Sportswear', // 🟢 NEW field
     inStock: true
   });
 
@@ -93,9 +91,8 @@ export default function AdminDashboard() {
     }
   };
 
-    const fetchProducts = async () => {
+  const fetchProducts = async () => {
     try {
-      // 🟢 FIX: limit ko 1000 set kiya taaki saare products ek baar mein fetch ho jayein
       const res = await axiosClient.get('/api/products', { params: { limit: 1000 } });
       let data = res.data;
       if (Array.isArray(data)) data = data;
@@ -120,7 +117,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // 🟢 NEW: Multiple Images Upload Handler
   const handleMultiImageUpload = async (e, setter, field = 'images') => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
@@ -146,7 +142,6 @@ export default function AdminDashboard() {
     if (uploadedUrls.length > 0) showToast(`${uploadedUrls.length} images uploaded successfully!`, 'success');
   };
 
-  // 🟢 NEW: Remove a single image from the list
   const removeImage = (indexToRemove, setter, field = 'images') => {
     setter(prev => ({
       ...prev,
@@ -169,18 +164,14 @@ export default function AdminDashboard() {
     if (formData.images.length === 0) { showToast('Please upload at least one product image!', 'warning'); return; }
     
     try {
-      // 🟢 FIX: Backend compatibility ke liye `imageUrl` fallback bhi bhej rahe hain
       const dataToSend = { 
         ...formData, 
-        imageUrl: formData.images[0] || '',
-        // 🟢 IMPORTANT: Ensure 'sport' value is sent correctly
-        sport: formData.sport || 'Sportswear' 
+        imageUrl: formData.images[0] || '' 
       };
       await axiosClient.post('/api/products', dataToSend);
       showToast('Product added successfully!', 'success');
       fetchProducts();
-      // 🟢 Reset karte waqt sport ko 'Sportswear' par set karo
-      setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', sport: 'Sportswear', inStock: true });
+      setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', inStock: true });
     } catch (error) { showToast('Failed to add product', 'error'); }
   };
 
@@ -193,7 +184,6 @@ export default function AdminDashboard() {
       images: product.images || [], 
       category: product.category, 
       subCategory: product.subCategory || '', 
-      sport: product.sport || 'Sportswear', // 🟢 Load sport field
       inStock: product.inStock
     });
     setIsEditModalOpen(true);
@@ -216,8 +206,7 @@ export default function AdminDashboard() {
     try {
       const dataToSend = { 
         ...editFormData, 
-        imageUrl: editFormData.images[0] || '',
-        sport: editFormData.sport || 'Sportswear' 
+        imageUrl: editFormData.images[0] || '' 
       };
       await axiosClient.put(`/api/products/${editingProductId}`, dataToSend);
       showToast('Product updated successfully!', 'success');
@@ -331,7 +320,6 @@ export default function AdminDashboard() {
                       />
                       {uploading && <span className="text-sm text-gray-500 animate-pulse">Uploading...</span>}
                     </div>
-                    {/* 🟢 Image Previews */}
                     <div className="flex flex-wrap gap-2 mt-2">
                       {formData.images.map((url, idx) => (
                         <div key={idx} className="relative w-20 h-20 group">
@@ -356,7 +344,11 @@ export default function AdminDashboard() {
                   <div>
                     <label className="block text-sm font-semibold text-gray-900">Category</label>
                     <select name="category" value={formData.category} onChange={handleChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
-                      <option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Accessories">Accessories</option>
+                      <option value="Men">Men</option>
+                      <option value="Women">Women</option>
+                      <option value="Shoes">Shoes</option>
+                      <option value="Accessories">Accessories</option>
+                      <option value="Sportswear">Sportswear</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-2 mt-6">
@@ -373,20 +365,6 @@ export default function AdminDashboard() {
                     </select>
                   </div>
                 )}
-                
-                {/* 🟢 NEW: Sport Select Dropdown */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">Sport (For Shop By Sport)</label>
-                  <select name="sport" value={formData.sport} onChange={handleChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
-                    <option value="Running">Running</option>
-                    <option value="Training">Training</option>
-                    <option value="Sportswear">Sportswear</option>
-                    <option value="Basketball">Basketball</option>
-                    <option value="Football">Football</option>
-                    <option value="Yoga">Yoga</option>
-                  </select>
-                </div>
-
                 <button type="submit" disabled={uploading} className={`w-full h-10 flex items-center justify-center font-semibold text-white bg-black hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                   {uploading ? 'Uploading Images...' : 'Add Product'}
                 </button>
@@ -499,8 +477,6 @@ export default function AdminDashboard() {
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div><label className="block text-sm font-semibold">Title</label><input type="text" name="title" value={editFormData.title} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
                 <div><label className="block text-sm font-semibold">Price ($)</label><input type="number" name="price" value={editFormData.price} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required /></div>
-                
-                {/* 🟢 Edit Modal Multi-Image Uploader */}
                 <div>
                   <label className="block text-sm font-semibold">Images</label>
                   <div className="flex items-center gap-2 mt-1">
@@ -513,7 +489,6 @@ export default function AdminDashboard() {
                     />
                     {uploading && <span className="text-sm text-gray-500 animate-pulse">Uploading...</span>}
                   </div>
-                  {/* 🟢 Edit Modal Previews */}
                   <div className="flex flex-wrap gap-2 mt-2">
                     {editFormData.images.map((url, idx) => (
                       <div key={idx} className="relative w-20 h-20 group">
@@ -532,26 +507,12 @@ export default function AdminDashboard() {
 
                 <div><label className="block text-sm font-semibold">Description</label><textarea name="description" value={editFormData.description} onChange={handleEditChange} className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20" /></div>
                 <div className="flex items-center gap-6">
-                  <div><label className="block text-sm font-semibold">Category</label><select name="category" value={editFormData.category} onChange={handleEditChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Accessories">Accessories</option></select></div>
+                  <div><label className="block text-sm font-semibold">Category</label><select name="category" value={editFormData.category} onChange={handleEditChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Accessories">Accessories</option><option value="Sportswear">Sportswear</option></select></div>
                   <div className="flex items-center gap-2 mt-6"><input type="checkbox" name="inStock" checked={editFormData.inStock} onChange={handleEditChange} className="h-5 w-5 accent-black" /><label className="text-sm font-medium">In Stock</label></div>
                 </div>
                 {editFormData.category && SUB_CATEGORY_MAP[editFormData.category] && (
                   <div><label className="block text-sm font-semibold text-gray-900">Sub-Category</label><select name="subCategory" value={editFormData.subCategory} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="">Select Sub-Category</option>{SUB_CATEGORY_MAP[editFormData.category].map((sub) => <option key={sub} value={sub}>{sub}</option>)}</select></div>
                 )}
-                
-                {/* 🟢 NEW: Sport Select Dropdown in Edit Modal */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900">Sport (For Shop By Sport)</label>
-                  <select name="sport" value={editFormData.sport} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
-                    <option value="Running">Running</option>
-                    <option value="Training">Training</option>
-                    <option value="Sportswear">Sportswear</option>
-                    <option value="Basketball">Basketball</option>
-                    <option value="Football">Football</option>
-                    <option value="Yoga">Yoga</option>
-                  </select>
-                </div>
-
                 <div className="flex gap-3 pt-2">
                   <button type="submit" disabled={uploading} className={`flex-1 h-10 bg-black text-white font-semibold rounded hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     {uploading ? 'Uploading...' : 'Update Product'}
