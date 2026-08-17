@@ -39,7 +39,8 @@ export default function FilterBottomSheet({
       result = result.filter(p => p.category === localFilters.category);
     }
 
-    if (localFilters.subCategory) {
+    // 🟢 FIX: Sirf tab subCategory filter lagao jab wo select kiya gaya ho
+    if (localFilters.subCategory && localFilters.subCategory !== '') {
       result = result.filter(p => p.subCategory === localFilters.subCategory);
     }
 
@@ -81,7 +82,8 @@ export default function FilterBottomSheet({
 
     const finalFilters = {
       category: isDefaultCategoryValid ? defaultCategory : localFilters.category,
-      subCategory: localFilters.subCategory,
+      // 🟢 FIX: Sirf tab subCategory bhejo jab wo select kiya gaya ho
+      subCategory: localFilters.subCategory && localFilters.subCategory !== '' ? localFilters.subCategory : undefined,
       sort: sortMap[localFilters.sort] || 'featured',
       maxPrice: localFilters.maxPrice < 20000 ? localFilters.maxPrice : undefined,
     };
@@ -114,7 +116,6 @@ export default function FilterBottomSheet({
             </select>
           </div>
 
-          {/* 🟢 Agar defaultCategory 'Outlet' hai, toh Category dropdown mat dikhao */}
           {!isDefaultCategoryValid && defaultCategory !== 'Outlet' && (
             <div className="space-y-2">
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Category</p>
@@ -131,7 +132,7 @@ export default function FilterBottomSheet({
             </div>
           )}
           
-          {/* 🟢 Unified Sub-Category block (Men, Women, Shoes, Outlet sab ke liye) */}
+          {/* Unified Sub-Category block (Men, Women, Shoes, Outlet sab ke liye) */}
           {(() => {
             let categoryToUse = null;
             if (isDefaultCategoryValid) {
