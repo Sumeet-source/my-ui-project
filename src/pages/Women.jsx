@@ -13,6 +13,9 @@ export default function Women() {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  
+  // 🟢 FIX: Local state to store current filters
+  const [currentFilters, setCurrentFilters] = useState({});
 
   const fetchWomenProducts = async (page = 1, reset = false, filters = {}) => {
     if (reset) { setLoading(true); setProducts([]); setCurrentPage(1); }
@@ -25,12 +28,19 @@ export default function Women() {
         params.category = 'Women';
         if (filters.subCategory) params.subCategory = filters.subCategory;
       }
+      
+      // 🟢 FIX: Sort logic should match backend expectations
       if (filters.sort) {
         if (filters.sort === 'price-low') params.sort = 'price_asc';
         else if (filters.sort === 'price-high') params.sort = 'price_desc';
         else if (filters.sort === 'newest') params.sort = 'newest';
       }
-      if (filters.price && filters.price < 200) params.maxPrice = filters.price;
+
+      // 🟢 FIX: Backend expects 'maxPrice', not 'price'
+      if (filters.maxPrice && filters.maxPrice < 20000) {
+        params.maxPrice = filters.maxPrice;
+      }
+
       const res = await axiosClient.get('/api/products', { params });
       const { products: newProducts, totalCount: newTotalCount, currentPage: pageReturned, totalPages } = res.data;
       if (reset) { setProducts(newProducts || []); setFilteredProducts(newProducts || []); setTotalCount(newTotalCount || 0); }
@@ -41,9 +51,24 @@ export default function Women() {
   };
 
   useEffect(() => { fetchWomenProducts(1, true); }, []);
-  const handleLoadMore = () => { setLoadingMore(true); fetchWomenProducts(currentPage + 1); };
-  const applyFilters = (filters) => { setFilteredProducts([]); setHasMore(true); fetchWomenProducts(1, true, filters); };
-  const clearFilters = () => { setFilteredProducts([]); setHasMore(true); fetchWomenProducts(1, true, {}); };
+  
+  const handleLoadMore = () => { setLoadingMore(true); fetchWomenProducts(currentPage + 1, false, currentFilters); };
+  
+  // 🟢 UPDATED: Apply Filters directly to backend with correct param names
+  const applyFilters = (filters) => {
+    setCurrentFilters(filters);
+    setFilteredProducts([]);
+    setHasMore(true);
+    // Pass filters directly, they already have correct backend param names (maxPrice)
+    fetchWomenProducts(1, true, filters);
+  };
+
+  const clearFilters = () => {
+    setCurrentFilters({});
+    setFilteredProducts([]);
+    setHasMore(true);
+    fetchWomenProducts(1, true, {});
+  };
 
   return (
     <div className="px-0 md:px-8 bg-white min-h-screen pb-10">
@@ -66,28 +91,22 @@ export default function Women() {
                     <img src={product.images?.[0] || 'https://placehold.co/600x600/333/fff?text=Product+Image'} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out" onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }} />
                     <button className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm hover:bg-gray-50 hover:scale-105 transition-all duration-200 z-10"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg></button>
                   </div>
-                                  <div className="flex flex-col gap-1 px-1 md:px-1.5 pb-1.5">
-                  <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-snug">
-                    {product.title}
-                  </p>
-                  
-                  {/* 🟢 YEH LINE ADD KARO (CATEGORY) */}
-                  <p className="text-xs text-gray-500">
-                    {product.category}
-                  </p>
-
-                  {/* 🟢 DISCOUNT LOGIC */}
-                  {product.discountPercent > 0 && (
-                    <span className="text-xs line-through text-gray-400">
-                      ₹{(product.price * (1 + product.discountPercent / 100)).toFixed(2)}
-                    </span>
-                  )}
-
-                  {/* 🟢 PRICE */}
-                  <p className="text-sm font-bold text-black">
-                    ₹{product.price}
-                  </p>
-                </div>
+                  <div className="flex flex-col gap-1 px-1 md:px-1.5 pb-1.5">
+                    <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-snug">
+                      {product.title}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {product.category}
+                    </p>
+                    {product.discountPercent > 0 && (
+                      <span className="text-xs line-through text-gray-400">
+                        ₹{(product.price * (1 + product.discountPercent / 100)).toFixed(2)}
+                      </span>
+                    )}
+                    <p className="text-sm font-bold text-black">
+                      ₹{product.price}
+                    </p>
+                  </div>
                 </Link>
               ))
             )}
