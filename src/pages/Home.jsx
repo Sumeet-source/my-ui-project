@@ -211,12 +211,17 @@ export default function Home() {
                 </div>
                 
                 {/* 🟢 TEXT BELOW IMAGE */}
+                               {/* 🟢 TEXT BELOW IMAGE (WITH PRICE) */}
                 <div className="px-1 pt-1">
                   <h3 className="text-base md:text-lg font-bold text-black leading-tight">
                     {product.title}
                   </h3>
                   <p className="text-xs text-gray-500 mt-0.5">
                     {product.category}
+                  </p>
+                  {/* 🟢 PRICE ADDED HERE */}
+                  <p className="font-bold text-sm text-black mt-1">
+                    ₹{product.price}
                   </p>
                 </div>
               </Link>
