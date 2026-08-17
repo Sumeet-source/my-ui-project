@@ -66,7 +66,7 @@ export default function FilterBottomSheet({
   const handleApply = () => {
     let finalFilters = {};
     
-    // 🟢 FIX: exact subCategory bhejo (remove replace(/s$/, ''))
+    // 🟢 FIX: Backend ko exact subCategory bhejo
     if (isDefaultCategoryValid) {
       finalFilters = {
         category: defaultCategory,
