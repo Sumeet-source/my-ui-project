@@ -20,7 +20,7 @@ export default function AdminDashboard() {
   
   const [uploading, setUploading] = useState(false);
 
-  // 🟢 State mein 'sport' add kar diya
+  // 🟢 State mein 'sport' aur 'discountPercent' add kar diya
   const [formData, setFormData] = useState({
     title: '', 
     price: '', 
@@ -28,7 +28,8 @@ export default function AdminDashboard() {
     images: [], 
     category: 'Men', 
     subCategory: '', 
-    sport: 'Running', // 🟢 NEW field
+    sport: 'Running',
+    discountPercent: 0, // 🟢 NEW field
     inStock: true
   });
 
@@ -41,7 +42,8 @@ export default function AdminDashboard() {
     images: [], 
     category: 'Men', 
     subCategory: '', 
-    sport: 'Running', // 🟢 NEW field
+    sport: 'Running',
+    discountPercent: 0, // 🟢 NEW field
     inStock: true
   });
 
@@ -174,7 +176,7 @@ export default function AdminDashboard() {
       await axiosClient.post('/api/products', dataToSend);
       showToast('Product added successfully!', 'success');
       fetchProducts();
-      setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', sport: 'Running', inStock: true });
+      setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', sport: 'Running', discountPercent: 0, inStock: true });
     } catch (error) { showToast('Failed to add product', 'error'); }
   };
 
@@ -187,7 +189,8 @@ export default function AdminDashboard() {
       images: product.images || [], 
       category: product.category, 
       subCategory: product.subCategory || '', 
-      sport: product.sport || 'Running', // 🟢 Load sport field
+      sport: product.sport || 'Running',
+      discountPercent: product.discountPercent || 0, // 🟢 Load discount
       inStock: product.inStock
     });
     setIsEditModalOpen(true);
@@ -370,7 +373,7 @@ export default function AdminDashboard() {
                   </div>
                 )}
                 
-                {/* 🟢 NEW: Sport Dropdown Added Here */}
+                {/* 🟢 Sport Dropdown */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900">Sport (For Shop By Sport)</label>
                   <select name="sport" value={formData.sport} onChange={handleChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
@@ -380,6 +383,21 @@ export default function AdminDashboard() {
                     <option value="Basketball">Basketball</option>
                     <option value="Football">Football</option>
                     <option value="Yoga">Yoga</option>
+                  </select>
+                </div>
+
+                {/* 🟢 Discount Dropdown Added Here */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Discount (%)</label>
+                  <select name="discountPercent" value={formData.discountPercent} onChange={handleChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
+                    <option value="0">No Discount</option>
+                    <option value="10">10% Off</option>
+                    <option value="20">20% Off</option>
+                    <option value="30">30% Off</option>
+                    <option value="40">40% Off</option>
+                    <option value="50">50% Off</option>
+                    <option value="60">60% Off</option>
+                    <option value="70">70% Off</option>
                   </select>
                 </div>
 
@@ -397,7 +415,7 @@ export default function AdminDashboard() {
                     <div key={product._id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex gap-4">
                       <img src={product.images?.[0] || product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} alt={product.title} className="w-24 h-24 object-cover rounded bg-gray-100" onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image+Error'; }} />
                       <div className="flex-1 flex flex-col justify-between">
-                        <div><h3 className="font-medium text-gray-900">{product.title}</h3><p className="text-sm text-gray-600">${product.price}</p><p className="text-xs text-gray-500 mt-1">{product.description?.slice(0, 50)}...</p></div>
+                        <div><h3 className="font-medium text-gray-900">{product.title}</h3><p className="text-sm text-gray-600">₹{product.price}</p><p className="text-xs text-gray-500 mt-1">{product.description?.slice(0, 50)}...</p></div>
                         <div className="flex items-center justify-between gap-3 mt-4"><span className="text-xs text-gray-500">{product.category}</span><div className="flex gap-2"><button onClick={() => handleEditClick(product)} className="px-3 py-1 text-sm font-semibold text-white bg-black rounded hover:bg-gray-800 transition">Edit</button><button onClick={() => handleDelete(product._id)} className="px-3 py-1 text-sm font-semibold text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition">Delete</button></div></div>
                       </div>
                     </div>
@@ -421,7 +439,7 @@ export default function AdminDashboard() {
                         <p className="text-xs text-gray-700"><span className="font-semibold">Customer:</span> {order.shippingAddress?.fullName || 'Guest'}</p>
                         <p className="text-xs text-gray-700"><span className="font-semibold">Phone:</span> {order.shippingAddress?.phone || 'N/A'}</p>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">Total: ${order.totalAmount ?? order.total ?? order.amount ?? '0.00'}</p>
+                      <p className="text-sm text-gray-600 mt-1">Total: ₹{order.totalAmount ?? order.total ?? order.amount ?? '0.00'}</p>
                       <p className="text-xs text-gray-500">Current: {order.status ?? 'Pending'}</p>
                     </div>
                     <div className="flex items-center gap-2 mt-2 sm:mt-0">
@@ -531,6 +549,35 @@ export default function AdminDashboard() {
                 {editFormData.category && SUB_CATEGORY_MAP[editFormData.category] && (
                   <div><label className="block text-sm font-semibold text-gray-900">Sub-Category</label><select name="subCategory" value={editFormData.subCategory} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="">Select Sub-Category</option>{SUB_CATEGORY_MAP[editFormData.category].map((sub) => <option key={sub} value={sub}>{sub}</option>)}</select></div>
                 )}
+                
+                {/* 🟢 Sport Dropdown in Edit Modal */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Sport (For Shop By Sport)</label>
+                  <select name="sport" value={editFormData.sport} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
+                    <option value="Running">Running</option>
+                    <option value="Training">Training</option>
+                    <option value="Sportswear">Sportswear</option>
+                    <option value="Basketball">Basketball</option>
+                    <option value="Football">Football</option>
+                    <option value="Yoga">Yoga</option>
+                  </select>
+                </div>
+
+                {/* 🟢 Discount Dropdown in Edit Modal */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Discount (%)</label>
+                  <select name="discountPercent" value={editFormData.discountPercent} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
+                    <option value="0">No Discount</option>
+                    <option value="10">10% Off</option>
+                    <option value="20">20% Off</option>
+                    <option value="30">30% Off</option>
+                    <option value="40">40% Off</option>
+                    <option value="50">50% Off</option>
+                    <option value="60">60% Off</option>
+                    <option value="70">70% Off</option>
+                  </select>
+                </div>
+
                 <div className="flex gap-3 pt-2">
                   <button type="submit" disabled={uploading} className={`flex-1 h-10 bg-black text-white font-semibold rounded hover:bg-gray-800 transition ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     {uploading ? 'Uploading...' : 'Update Product'}
