@@ -261,7 +261,7 @@ export default function ProductDetails() {
         </div>
         <div className="px-4 py-4">
           <div className="flex items-baseline gap-3 mb-2">
-            <span className="text-2xl font-bold text-gray-900">${product.price}</span>
+            <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
             <span className="text-sm line-through text-gray-500">₹{(product.price * 1.4).toFixed(2)}</span>
             <span className="text-sm font-medium text-green-600">(40% OFF)</span>
           </div>
