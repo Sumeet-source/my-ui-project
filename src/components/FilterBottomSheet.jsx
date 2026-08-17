@@ -5,8 +5,14 @@ const CATEGORIES = {
   Women: ['T-Shirt', 'Top', 'Dress', 'Jean', 'Trouser', 'Jacket', 'Sweatshirt', 'Hoodie', 'Short', 'Legging'],
   Shoes: ['Sneaker', 'Running Shoe', 'Casual Shoe', 'Formal Shoe', 'Loafer', 'Boot', 'Sandal'],
   Accessories: ['Watch', 'Sunglass', 'Belt', 'Wallet', 'Cap & Hat', 'Backpack', 'Sock', 'Tie', 'Cufflink'],
-  // 🟢 NEW: Outlet added so SubCategory shows up
-  Outlet: ['Sneaker', 'Running Shoe', 'Casual Shoe', 'Formal Shoe', 'Loafer', 'Boot', 'Sandal']
+  // 🟢 NEW: Outlet ab Men/Women/Shoes sab ki sub-categories dikhayega
+  Outlet: [
+    'T-Shirt', 'Polo', 'Shirt', 'Jean', 'Trouser', 'Jacket', 
+    'Sweatshirt', 'Hoodie', 'Short', 'Track Pant',
+    'Top', 'Dress', 'Legging',
+    'Sneaker', 'Running Shoe', 'Casual Shoe', 'Formal Shoe', 'Loafer', 'Boot', 'Sandal',
+    'Watch', 'Sunglass', 'Belt', 'Wallet', 'Cap & Hat', 'Backpack', 'Sock', 'Tie', 'Cufflink'
+  ]
 };
 
 export default function FilterBottomSheet({ 
