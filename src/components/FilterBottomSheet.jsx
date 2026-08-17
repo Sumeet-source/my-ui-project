@@ -21,7 +21,7 @@ export default function FilterBottomSheet({
     sort: 'featured',
     category: isDefaultCategoryValid ? defaultCategory : '', 
     subCategory: '',
-    price: 200,
+    price: 20000, // 🟢 Increased max price to cover all products
   });
 
   const getFilteredCount = () => {
@@ -29,12 +29,10 @@ export default function FilterBottomSheet({
     if (localFilters.sort === 'price-low') result.sort((a, b) => a.price - b.price);
     else if (localFilters.sort === 'price-high') result.sort((a, b) => b.price - a.price);
     
-    // 🟢 FINAL FIX: Frontend count mein bhi trailing 's' hata diya (Plural -> Singular)
+    // 🟢 FIX: Sub-Category exact match karo (Remove replace(/s$/, ''))
     if (localFilters.subCategory) {
-        const searchLower = localFilters.subCategory.toLowerCase().replace(/s$/, '');
         result = result.filter(p => 
-            (p.subCategory && p.subCategory.toLowerCase().includes(searchLower)) || 
-            (p.title && p.title.toLowerCase().includes(searchLower))
+            p.subCategory === localFilters.subCategory
         );
     }
 
@@ -45,7 +43,7 @@ export default function FilterBottomSheet({
   };
 
   const filteredCount = getFilteredCount();
-  const activeFilterCount = Object.values(localFilters).filter(v => v !== '' && v !== 'featured' && v !== 200).length;
+  const activeFilterCount = Object.values(localFilters).filter(v => v !== '' && v !== 'featured' && v !== 20000).length;
 
   const handleChange = (key, value) => {
     if (key === 'category') {
@@ -60,7 +58,7 @@ export default function FilterBottomSheet({
       sort: 'featured', 
       category: isDefaultCategoryValid ? defaultCategory : '', 
       subCategory: '', 
-      price: 200 
+      price: 20000 
     });
     onClear();
   };
@@ -68,19 +66,17 @@ export default function FilterBottomSheet({
   const handleApply = () => {
     let finalFilters = {};
     
-    // 🟢 Backend ko bhejne se pehle bhi trailing 's' clean kar diya
-    const cleanSub = localFilters.subCategory.replace(/s$/, '');
-    
+    // 🟢 FIX: exact subCategory bhejo (remove replace(/s$/, ''))
     if (isDefaultCategoryValid) {
       finalFilters = {
         category: defaultCategory,
-        subCategory: cleanSub,
+        subCategory: localFilters.subCategory,
         sort: localFilters.sort,
         price: localFilters.price
       };
     } else {
       finalFilters = {
-        subCategory: cleanSub,
+        subCategory: localFilters.subCategory,
         sort: localFilters.sort,
         price: localFilters.price
       };
@@ -153,11 +149,11 @@ export default function FilterBottomSheet({
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Price</p>
             <div className="space-y-4">
-              <input type="range" min="0" max="200" value={localFilters.price} onChange={(e) => handleChange('price', e.target.value)} className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" />
+              <input type="range" min="0" max="20000" value={localFilters.price} onChange={(e) => handleChange('price', e.target.value)} className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" />
               <div className="flex justify-between text-sm text-gray-600">
-                <span>$0</span>
-                <span className="font-medium text-black">Max: ${localFilters.price}</span>
-                <span>$200+</span>
+                <span>₹0</span>
+                <span className="font-medium text-black">Max: ₹{localFilters.price}</span>
+                <span>₹20000+</span>
               </div>
             </div>
           </div>
