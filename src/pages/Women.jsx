@@ -68,7 +68,7 @@ export default function Women() {
                   </div>
                   <div className="flex flex-col gap-1 px-1 md:px-1.5 pb-1.5">
                     <p className="text-sm text-gray-900 font-medium line-clamp-2 leading-snug">{product.title}</p>
-                    <p className="text-sm font-bold text-black">${product.price}</p>
+                    <p className="text-sm font-bold text-black">₹{product.price}</p>
                   </div>
                 </Link>
               ))
