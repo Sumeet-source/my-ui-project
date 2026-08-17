@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react'; // 🟢 Added useMemo
 import { useCart } from '../context/CartContext.jsx';
 import { useWishlist } from '../context/WishlistContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -82,6 +82,13 @@ export default function ProductDetails() {
       setReviews([]);
     }
   };
+
+  // 🟢 LIVE AVERAGE RATING
+  const averageRating = useMemo(() => {
+    if (reviews.length === 0) return 0;
+    const total = reviews.reduce((sum, review) => sum + review.rating, 0);
+    return (total / reviews.length).toFixed(1);
+  }, [reviews]);
 
   const handleCarouselScroll = () => {
     if (carouselRef.current) {
@@ -216,12 +223,23 @@ export default function ProductDetails() {
         {/* Details, Price, Size Selection */}
         <div className="px-4 py-4">
           <div className="flex items-baseline gap-3 mb-2">
-            <span className="text-2xl font-bold text-gray-900">${product.price}</span>
-            <span className="text-sm line-through text-gray-500">${(product.price * 1.4).toFixed(2)}</span>
-            <span className="text-sm font-medium text-green-600">(40% OFF)</span>
+            <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
+            {product.discountPercent > 0 && (
+              <>
+                <span className="text-sm line-through text-gray-500">
+                  ₹{(product.price * (1 + product.discountPercent / 100)).toFixed(2)}
+                </span>
+                <span className="text-sm font-medium text-green-600">
+                  ({product.discountPercent}% OFF)
+                </span>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-2 mb-1">
-            <div className="flex items-center gap-1 bg-green-600 text-white px-1.5 py-0.5 rounded text-[10px] font-bold"><span>4.5</span><span>★</span></div>
+            <div className="flex items-center gap-1 bg-green-600 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">
+              <span>{averageRating > 0 ? averageRating : 'New'}</span>
+              <span>★</span>
+            </div>
             <span className="text-xs text-gray-500">{reviews.length} Reviews</span>
           </div>
           <h1 className="text-base font-semibold text-gray-900 leading-snug">{product.title}</h1>
@@ -381,8 +399,8 @@ export default function ProductDetails() {
           <div className="flex-1 space-y-6">
             <h1 className="text-4xl font-bold text-gray-900">{product.title}</h1>
             <div className="flex items-center gap-4">
-              <span className="text-3xl font-bold text-gray-700">${product.price}</span>
-              <div className="flex items-center gap-1"><span className="text-yellow-400 text-lg">{renderStars(4.5)}</span><span className="text-sm text-gray-500 ml-1">({reviews.length} reviews)</span></div>
+              <span className="text-3xl font-bold text-gray-700">₹{product.price}</span>
+              <div className="flex items-center gap-1"><span className="text-yellow-400 text-lg">{renderStars(averageRating)}</span><span className="text-sm text-gray-500 ml-1">({reviews.length} reviews)</span></div>
             </div>
             {/* Size Selector */}
             <div>
