@@ -2,14 +2,17 @@ import { useState, useEffect } from 'react';
 import { useToast } from '../context/ToastContext';
 import axiosClient from '../api/axiosClient';
 
-// 🟢 UPDATED: Sub-Category Mapping with Sportswear as a main Category
+// 🟢 UPDATED: Sub-Category Mapping with Outlet added
 const SUB_CATEGORY_MAP = {
   Men: ['T-Shirt', 'Polo', 'Shirt', 'Jean', 'Trouser', 'Jacket', 'Sweatshirt', 'Hoodie', 'Short', 'Track Pant'],
   Women: ['T-Shirt', 'Top', 'Dress', 'Jean', 'Trouser', 'Jacket', 'Sweatshirt', 'Hoodie', 'Short', 'Legging'],
   Shoes: ['Sneaker', 'Running Shoe', 'Casual Shoe', 'Formal Shoe', 'Loafer', 'Boot', 'Sandal'],
   Accessories: ['Watch', 'Sunglass', 'Belt', 'Wallet', 'Cap & Hat', 'Backpack', 'Sock', 'Tie', 'Cufflink'],
-  Sportswear: ['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga']
+  Sportswear: ['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga'],
+  // 🟢 NEW: Outlet sub-categories (can be any products)
+  Outlet: ['T-Shirt', 'Polo', 'Shirt', 'Jacket', 'Hoodie', 'Sneaker', 'Running Shoe', 'Boot', 'Watch', 'Backpack']
 };
+
 export default function AdminDashboard() {
   const { showToast } = useToast();
   const [products, setProducts] = useState([]);
@@ -354,6 +357,8 @@ export default function AdminDashboard() {
                       <option value="Shoes">Shoes</option>
                       <option value="Accessories">Accessories</option>
                       <option value="Sportswear">Sportswear</option>
+                      {/* 🟢 YEH LINE ADD KARO */}
+                      <option value="Outlet">Outlet</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-2 mt-6">
@@ -541,7 +546,7 @@ export default function AdminDashboard() {
 
                 <div><label className="block text-sm font-semibold">Description</label><textarea name="description" value={editFormData.description} onChange={handleEditChange} className="mt-1 w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-black h-20" /></div>
                 <div className="flex items-center gap-6">
-                  <div><label className="block text-sm font-semibold">Category</label><select name="category" value={editFormData.category} onChange={handleEditChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Accessories">Accessories</option><option value="Sportswear">Sportswear</option></select></div>
+                  <div><label className="block text-sm font-semibold">Category</label><select name="category" value={editFormData.category} onChange={handleEditChange} className="mt-1 h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="Men">Men</option><option value="Women">Women</option><option value="Shoes">Shoes</option><option value="Accessories">Accessories</option><option value="Sportswear">Sportswear</option><option value="Outlet">Outlet</option></select></div>
                   <div className="flex items-center gap-2 mt-6"><input type="checkbox" name="inStock" checked={editFormData.inStock} onChange={handleEditChange} className="h-5 w-5 accent-black" /><label className="text-sm font-medium">In Stock</label></div>
                 </div>
                 {editFormData.category && SUB_CATEGORY_MAP[editFormData.category] && (
