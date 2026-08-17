@@ -73,6 +73,13 @@ export default function ProductDetails() {
     }
   };
 
+    const { id } = useParams();
+  
+  // 🟢 ADD THIS SAFETY CHECK
+  if (!id) {
+    return <div className="text-center py-20 text-xl text-gray-600">Invalid Product ID</div>;
+  }
+
   const fetchReviews = async () => {
     try {
       const res = await axiosClient.get(`/api/reviews/product/${id}`);
