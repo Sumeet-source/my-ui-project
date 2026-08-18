@@ -16,7 +16,7 @@ export default function ProductDetails() {
   const { user } = useAuth();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
    const navigate = useNavigate(); // 🟢 YEH LINE ADD KARO
-  const { id } = useParams();
+  
 
   const [product, setProduct] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
