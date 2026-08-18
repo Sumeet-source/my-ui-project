@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useToast } from '../context/ToastContext.jsx'; // 🟢 Toast import kiya
 import ForgeLogo from './ForgeLogo';
 
 // 🟢 MOBILE SCRAMBLE DECODE ANIMATION COMPONENT
@@ -50,10 +51,13 @@ export default function Navbar() {
   const [searchInput, setSearchInput] = useState('');
   const inputRef = useRef(null);
   
-  const { cart } = useCart();
+  // 🟢 FIX 1: clearCart ko destructure kiya
+  const { cart, clearCart } = useCart(); 
   const { user, logout } = useAuth();
+  const { showToast } = useToast(); // 🟢 FIX 2: showToast declare kiya
+  
   const [searchParams, setSearchParams] = useSearchParams();
-  const location = useLocation(); // 🟢 Already imported
+  const location = useLocation();
   const navigate = useNavigate();
 
   const searchTerm = searchParams.get('search') || '';
@@ -82,9 +86,12 @@ export default function Navbar() {
     });
   };
 
+  // 🟢 FIX 3: handleLogout function sahi kiya
   const handleLogout = () => {
-    logout();
+    clearCart(); 
+    logout(); 
     navigate('/');
+    showToast('Logged out successfully!', 'success');
   };
 
   const handleSearchClear = () => {
