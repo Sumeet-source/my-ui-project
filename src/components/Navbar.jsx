@@ -155,17 +155,18 @@ export default function Navbar() {
 
         {/* LOGO SECTION */}
       
-              
-        <div className="flex items-center ml-0 shrink-0 flex-1 md:flex-none">
-          {/* Desktop Logo */}
+               
+        <div className="flex items-center flex-1 justify-center md:justify-start md:flex-none">
+          {/* Desktop Logo (Left aligned on desktop) */}
           <div className="hidden md:block">
             <ForgeLogo />
           </div>
-          {/* 🟢 FIX: Mobile bhi same CSS class 'forge-logo' use karega */}
+          {/* Mobile Logo (Center aligned on mobile because of flex-1 justify-center) */}
           <Link to="/" className="block md:hidden">
             <ScrambleLogo text="FORGE" className="forge-logo" />
           </Link>
-        </div>
+        </div>     
+
         {/* Mobile Right Icons */}
         <div className="flex items-center gap-4 md:hidden">
           <button onClick={() => setIsSearchOpen(true)} className="text-black">
