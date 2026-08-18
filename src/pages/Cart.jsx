@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'; // 🟢 STEP 1: useEffect import kiya
+import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 
 export default function Cart() {
-  const { cart,addToCart, removeFromCart, updateQuantity, getTotalPrice, clearCart, discount, applyDiscount, clearDiscount } = useCart(); 
+  const { cart, addToCart, removeFromCart, updateQuantity, getTotalPrice, clearCart, discount, applyDiscount, clearDiscount } = useCart(); 
   const { user } = useAuth();
   const { showToast } = useToast();
   const [orderPlaced, setOrderPlaced] = useState(false);
@@ -24,7 +24,14 @@ export default function Cart() {
       localStorage.removeItem('pendingCartItem'); // Clean up
       showToast("Item added to your cart!", "success");
     }
-  }, []); // 🟢 Sirf ek baar run hoga jab page load ho
+  }, []); 
+
+  // 🟢 STEP 3: Safety Check - Agar user logout hai toh cart clear karo
+  useEffect(() => {
+    if (!user) {
+      clearCart(); // 🟢 YEH LINE ADD KARI HAI
+    }
+  }, [user, clearCart]);
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
