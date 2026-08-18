@@ -97,8 +97,20 @@ export default function Cart() {
           <div className={!user ? 'flex-1' : ''}>
             <p className="text-gray-900 font-medium text-lg">You have no items in your bag.</p>
             <p className="text-gray-500 mt-1 text-sm">Don't know where to start? Here's the gear everyone's after.</p>
-            <button type="button" onClick={() => navigate('/men')} className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition">Shop Best Sellers</button>
-            <button type="button" onClick={() => navigate('/')} className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</button>
+            <button 
+  type="button" 
+  onClick={() => { 
+    console.log("🟢 1. Button Clicked!"); 
+    console.log("🟢 2. Navigate function:", navigate); 
+    console.log("🟢 3. About to navigate to /men");
+    navigate('/men'); 
+  }} 
+  className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition"
+>
+  Shop Best Sellers
+</button>
+
+<button type="button" onClick={() => navigate('/')} className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</button>
           </div>
           {!user && <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[250px]"></div>}
         </div>
