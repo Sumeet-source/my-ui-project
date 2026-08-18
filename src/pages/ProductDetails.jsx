@@ -164,10 +164,10 @@ export default function ProductDetails() {
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!user) { showToast("Please login to write a review", "error"); return; }
-    if (!newReview.user || !newReview.comment) { showToast("Please fill in your name and comment.", "error"); return; }
+    if (!newReview.comment) { showToast("Please write a comment.", "error"); return; }
     try {
       await axiosClient.post('/api/reviews', { user: user.id, product: product._id, rating: newReview.rating, comment: newReview.comment });
-      setNewReview({ user: '', comment: '', rating: 5 });
+      setNewReview({ comment: '', rating: 5 });
       fetchReviews();
       showToast("Review submitted successfully!", "success");
     } catch (error) { showToast("Failed to submit review. Try again.", "error"); }
@@ -177,10 +177,9 @@ export default function ProductDetails() {
   const images = product.images?.length > 0 ? product.images : [product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'];
 
   return (
-    // Using font-helvetica for Nike-like font family
     <div className="bg-white min-h-screen pb-20 font-helvetica">
       
-      {/* ================= SIZE CHART MODAL (Dynamic for Shoes vs Clothing) ================= */}
+      {/* ================= SIZE CHART MODAL ================= */}
       {isSizeChartOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -194,7 +193,6 @@ export default function ProductDetails() {
               {isShoeProduct ? "Below are product's physical dimensions" : "Below are body measurements this product fits"}
             </p>
             
-            {/* Unit Toggle (Only for Shoes) */}
             {isShoeProduct && (
               <div className="flex gap-2 mb-4">
                 <button onClick={() => setSizeUnit('in')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${sizeUnit === 'in' ? 'bg-black text-white border border-black' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>in</button>
@@ -204,7 +202,6 @@ export default function ProductDetails() {
 
             <div className="overflow-x-auto">
               {isShoeProduct ? (
-                /* ============ NIKE STYLE SHOE SIZE CHART ============ */
                 <table className="w-full text-sm text-center border-collapse">
                   <thead>
                     <tr className="bg-gray-100">
@@ -238,7 +235,6 @@ export default function ProductDetails() {
                   </tbody>
                 </table>
               ) : (
-                /* ============ CLOTHING SIZE CHART (Chest/Waist/Hip) ============ */
                 <table className="w-full text-sm text-center border-collapse">
                   <thead><tr className="bg-gray-100"><th className="p-2 border border-gray-200 font-semibold">Size</th><th className="p-2 border border-gray-200 font-semibold">Chest</th><th className="p-2 border border-gray-200 font-semibold">Waist</th><th className="p-2 border border-gray-200 font-semibold">Hip</th></tr></thead>
                   <tbody>
@@ -272,12 +268,7 @@ export default function ProductDetails() {
       {isDeliveryModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button 
-              onClick={() => setIsDeliveryModalOpen(false)} 
-              className="absolute top-4 right-4 p-2 text-black hover:bg-gray-100 rounded-full transition"
-            >
-              <X className="w-6 h-6" />
-            </button>
+            <button onClick={() => setIsDeliveryModalOpen(false)} className="absolute top-4 right-4 p-2 text-black hover:bg-gray-100 rounded-full transition"><X className="w-6 h-6" /></button>
             <div className="flex items-center gap-2 mb-4">
               <Truck className="w-6 h-6 text-gray-800" />
               <h2 className="text-xl font-bold text-gray-900">Delivery Details</h2>
@@ -286,7 +277,6 @@ export default function ProductDetails() {
               <p>We offer free shipping on all orders across India, with no minimum order value and no additional delivery, platform, or hidden charges.</p>
               <p>Orders are typically processed within 3-5 business days. Delivery timelines may vary based on location, product availability, and other factors. If your order includes multiple items, they may be shipped separately.</p>
               <p>Estimated delivery dates shown at checkout are indicative and may be impacted by factors beyond our control, such as extreme weather, public holidays, or logistical constraints. While we aim to meet these timelines, delays may occur, and we'll keep you informed if your order is affected.</p>
-              
               <div className="border-t border-gray-200 my-4 pt-4">
                 <h3 className="font-bold text-gray-800 mb-2 uppercase tracking-wide">CANCELLATION POLICY</h3>
                 <p>You can cancel your order directly from the My Orders section before the item is shipped. Once an order has been processed and shipped, cancellation is not possible. In such cases, you can initiate a return after delivery through our returns process.</p>
@@ -302,21 +292,9 @@ export default function ProductDetails() {
       {isReturnModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button 
-              onClick={() => setIsReturnModalOpen(false)} 
-              className="absolute top-4 right-4 p-2 text-black hover:bg-gray-100 rounded-full transition"
-            >
-              <X className="w-6 h-6" />
-            </button>
+            <button onClick={() => setIsReturnModalOpen(false)} className="absolute top-4 right-4 p-2 text-black hover:bg-gray-100 rounded-full transition"><X className="w-6 h-6" /></button>
             <div className="flex items-center gap-2 mb-4">
-              <svg className="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
-                <rect x="2" y="4" width="20" height="16" rx="2" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h8" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 14h4" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h2" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 12l2-2 2 2" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M18 10v4" />
-              </svg>
+              <svg className="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><rect x="2" y="4" width="20" height="16" rx="2" /><path strokeLinecap="round" strokeLinejoin="round" d="M8 10h8" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 14h4" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 18h2" /><path strokeLinecap="round" strokeLinejoin="round" d="M16 12l2-2 2 2" /><path strokeLinecap="round" strokeLinejoin="round" d="M18 10v4" /></svg>
               <h2 className="text-xl font-bold text-gray-900">Return & Exchange</h2>
             </div>
             <div className="space-y-3 text-sm text-gray-600 leading-relaxed">
@@ -346,14 +324,20 @@ export default function ProductDetails() {
           </div>
         </div>
         <div className="px-4 py-4">
-          {/* 🟢 JUST IN BADGE */}
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-bold text-red-600 uppercase tracking-wide">Just In</span>
           </div>
           <h1 className="text-xl font-bold text-gray-900 leading-tight mb-1">{product.title}</h1>
           <p className="text-sm text-gray-500 mb-3">{product.category}</p>
           
-          {/* PRICE + INCLUSIVE TAX */}
+          {/* 🟢 RATING */}
+          <div className="flex items-center gap-1 mt-1">
+            <div className="flex text-yellow-400 text-sm">
+              {renderStars(averageRating)}
+            </div>
+            <span className="text-xs text-gray-600 ml-1">{averageRating > 0 ? averageRating : '0'} ({reviews.length} Reviews)</span>
+          </div>
+
           <div className="mt-2">
             <span className="text-xl font-bold text-gray-900">₹{product.price}</span>
             <div className="mt-1 text-xs text-gray-500">Inclusive of all taxes</div>
@@ -366,7 +350,6 @@ export default function ProductDetails() {
             </div>
           )}
 
-          {/* NIKE STYLE GRID SIZE SELECTOR */}
           <div className="mt-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-sm font-bold text-gray-900">Select Size</h3>
@@ -374,39 +357,18 @@ export default function ProductDetails() {
             </div>
             <div className="grid grid-cols-2 gap-2">
               {sizeOptions.map((size) => (
-                <button 
-                  key={size} 
-                  onClick={() => setSelectedSize(size)} 
-                  className={`py-3 border rounded-sm text-sm font-semibold transition ${
-                    selectedSize === size 
-                      ? 'border-black bg-black text-white' 
-                      : 'border-gray-300 text-gray-900 hover:border-black'
-                  }`}
-                >
-                  {size}
-                </button>
+                <button key={size} onClick={() => setSelectedSize(size)} className={`py-3 border rounded-sm text-sm font-semibold transition ${selectedSize === size ? 'border-black bg-black text-white' : 'border-gray-300 text-gray-900 hover:border-black'}`}>{size}</button>
               ))}
             </div>
           </div>
 
-          {/* NIKE STYLE ROUNDED BUTTONS */}
           <div className="mt-6 space-y-3">
             {!product.inStock ? (
               <div className="w-full bg-red-50 text-red-600 py-4 rounded-full text-center font-bold text-sm border border-red-200">Out of Stock</div>
             ) : (
               <>
-                <button 
-                  onClick={handleAddToCart} 
-                  className="w-full bg-black text-white py-4 rounded-full font-bold text-sm tracking-wide hover:bg-gray-800 transition"
-                >
-                  Add to Bag
-                </button>
-                <button 
-                  onClick={handleWishlistToggle} 
-                  className={`w-full py-4 rounded-full border border-gray-200 font-bold text-sm flex items-center justify-center gap-2 transition ${
-                    isInWishlist(product._id) ? 'bg-gray-100 border-black' : 'bg-white hover:bg-gray-50'
-                  }`}
-                >
+                <button onClick={handleAddToCart} className="w-full bg-black text-white py-4 rounded-full font-bold text-sm tracking-wide hover:bg-gray-800 transition">Add to Bag</button>
+                <button onClick={handleWishlistToggle} className={`w-full py-4 rounded-full border border-gray-200 font-bold text-sm flex items-center justify-center gap-2 transition ${isInWishlist(product._id) ? 'bg-gray-100 border-black' : 'bg-white hover:bg-gray-50'}`}>
                   <span>Favourite</span>
                   <svg className={`w-5 h-5 ${isInWishlist(product._id) ? 'fill-red-500 text-red-500' : 'fill-none'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -416,40 +378,22 @@ export default function ProductDetails() {
             )}
           </div>
 
-          {/* 🟢 NIKE STYLE DESCRIPTION FONT - Color Black (text-black) */}
           <div className="mt-6 text-sm text-black leading-relaxed tracking-wide">
             <p className="whitespace-pre-line">{product.description}</p>
           </div>
         </div>
 
-        {/* NIKE STYLE ACCORDIONS */}
         <div className="px-4 border-t border-gray-100">
-          
-          {/* CHECK DELIVERY + 14-DAY & FREE DELIVERY ROWS */}
           <div className="py-4 border-b border-gray-100">
             <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
-            {/* 🟢 FIX: Subtext font size is text-sm (same as heading) but faded (text-gray-500) */}
             <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
             <div className="flex gap-2 mb-4">
-              <input 
-                type="text" 
-                value={pincodeInput} 
-                onChange={(e) => setPincodeInput(e.target.value)} 
-                placeholder="Pincode" 
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full outline-none focus:border-black placeholder:text-gray-400"
-              />
-              <button 
-                onClick={checkDeliveryAvailability}
-                disabled={checkingPincode}
-                className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-600 disabled:opacity-50"
-              >
-                {checkingPincode ? '...' : 'Check'}
-              </button>
+              <input type="text" value={pincodeInput} onChange={(e) => setPincodeInput(e.target.value)} placeholder="Pincode" className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full outline-none focus:border-black placeholder:text-gray-400" />
+              <button onClick={checkDeliveryAvailability} disabled={checkingPincode} className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-600 disabled:opacity-50">{checkingPincode ? '...' : 'Check'}</button>
             </div>
             {deliveryAvailable === true && <p className="text-xs text-green-600 font-medium">✓ We deliver to this location!</p>}
             {deliveryAvailable === false && <p className="text-xs text-red-500 font-medium">🚫 We do not deliver to this area.</p>}
 
-            {/* 🟢 FIX: Lines and Know More buttons are now text-sm with Black color (text-black) */}
             <div className="space-y-2 mt-4">
               <div className="flex justify-between items-center text-sm">
                 <div className="flex items-center gap-2 text-black">
@@ -468,7 +412,6 @@ export default function ProductDetails() {
             </div>
           </div>
 
-          {/* VENDOR DETAILS */}
           <details className="group border-b border-gray-100 py-4">
             <summary className="flex justify-between items-center cursor-pointer list-none">
               <span className="font-semibold text-gray-900 text-sm">Vendor Details</span>
@@ -481,7 +424,6 @@ export default function ProductDetails() {
             </div>
           </details>
 
-          {/* RETURN POLICY */}
           <details className="group border-b border-gray-100 py-4">
             <summary className="flex justify-between items-center cursor-pointer list-none">
               <span className="font-semibold text-gray-900 text-sm">Return And Exchange Policy</span>
@@ -495,7 +437,60 @@ export default function ProductDetails() {
           </details>
         </div>
 
-        {/* NIKE STYLE "More From" SECTION */}
+        {/* 🟢 MOBILE REVIEW FORM */}
+        <div className="px-4 mt-8 border-t border-gray-200 pt-6">
+          <h3 className="text-base font-bold text-gray-900 mb-4">Write a Review</h3>
+          <form onSubmit={handleReviewSubmit} className="space-y-3">
+            <div>
+              <label className="text-xs font-medium text-gray-700">Rating</label>
+              <div className="flex gap-1 mt-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setNewReview({ ...newReview, rating: star })}
+                    className="text-xl focus:outline-none"
+                  >
+                    <span className={star <= newReview.rating ? "text-yellow-400" : "text-gray-300"}>★</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-700">Comment</label>
+              <textarea
+                value={newReview.comment}
+                onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                placeholder="Share your experience with this product..."
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:border-black placeholder:text-gray-400 mt-1"
+                rows="3"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-black text-white py-3 rounded-full font-bold text-sm tracking-wide hover:bg-gray-800 transition"
+            >
+              Submit Review
+            </button>
+          </form>
+          <div className="mt-6">
+            <h4 className="font-semibold text-gray-900 text-sm mb-3">All Reviews ({reviews.length})</h4>
+            {reviews.length > 0 ? (
+              reviews.map((review, index) => (
+                <div key={index} className="border-b border-gray-100 py-3 last:border-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs text-gray-900 font-semibold">User #{review.user?.slice(-4) || 'Guest'}</span>
+                    <div className="flex text-yellow-400 text-xs">{renderStars(review.rating)}</div>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No reviews yet. Be the first to review!</p>
+            )}
+          </div>
+        </div>
+
         <div className="px-4 mt-6">
           <h2 className="text-base font-bold text-gray-900 mb-4">More From {product.category}</h2>
           <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-4 snap-x snap-mandatory">
@@ -507,7 +502,6 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
-
 
       {/* ================= DESKTOP LAYOUT ================= */}
       <div className="hidden md:block max-w-6xl mx-auto px-8 py-12">
@@ -535,6 +529,14 @@ export default function ProductDetails() {
             <h1 className="text-3xl font-bold text-gray-900 leading-tight">{product.title}</h1>
             <p className="text-sm text-gray-500">{product.category}</p>
             
+            {/* 🟢 RATING */}
+            <div className="flex items-center gap-1 mt-1">
+              <div className="flex text-yellow-400 text-sm">
+                {renderStars(averageRating)}
+              </div>
+              <span className="text-xs text-gray-600 ml-1">{averageRating > 0 ? averageRating : '0'} ({reviews.length} Reviews)</span>
+            </div>
+            
             <div className="mt-2">
               <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
               <div className="mt-1 text-xs text-gray-500">Inclusive of all taxes</div>
@@ -547,7 +549,6 @@ export default function ProductDetails() {
               </div>
             )}
 
-            {/* Size Selector */}
             <div className="mt-4">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="text-sm font-bold text-gray-900">Select Size</h3>
@@ -560,7 +561,6 @@ export default function ProductDetails() {
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="mt-6 space-y-3 max-w-md">
               {!product.inStock && <div className="w-full bg-red-50 text-red-600 py-4 rounded-full text-center font-bold text-sm border border-red-200">Out of Stock</div>}
               {product.inStock && (
@@ -574,16 +574,13 @@ export default function ProductDetails() {
               )}
             </div>
 
-            {/* 🟢 NIKE STYLE DESCRIPTION FONT - Color Black (text-black) */}
             <div className="mt-4 max-w-md text-sm text-black leading-relaxed tracking-wide">
               <p className="whitespace-pre-line">{product.description}</p>
             </div>
 
-            {/* Desktop Accordions */}
             <div className="mt-8 border-t border-gray-200 pt-6 max-w-md">
               <div className="py-4 border-b border-gray-200">
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
-                {/* 🟢 FIX: Subtext font size is text-sm (same as heading) but faded (text-gray-500) */}
                 <p className="text-sm text-gray-500 mb-2">Enter pincode to know exact delivery dates/charges</p>
                 <div className="flex gap-2">
                   <input type="text" value={pincodeInput} onChange={(e) => setPincodeInput(e.target.value)} placeholder="Pincode" className="border border-gray-300 rounded-md px-3 py-2 text-sm w-40 outline-none focus:border-black placeholder:text-gray-400" />
@@ -592,7 +589,6 @@ export default function ProductDetails() {
                 {deliveryAvailable === true && <p className="text-xs text-green-600 font-medium mt-2">✓ We deliver to this location!</p>}
                 {deliveryAvailable === false && <p className="text-xs text-red-500 font-medium mt-2">🚫 We do not deliver to this area.</p>}
 
-                {/* 🟢 FIX: Lines and Know More buttons are now text-sm with Black color (text-black) */}
                 <div className="space-y-2 mt-4">
                   <div className="flex justify-between items-center text-sm">
                     <div className="flex items-center gap-2 text-black">
@@ -639,41 +635,86 @@ export default function ProductDetails() {
             <Link to="/" className="block text-gray-500 hover:text-black underline mt-4 text-sm">Continue Shopping</Link>
           </div>
         </div>
+
+        {/* 🟢 DESKTOP REVIEW SECTION (Sidebar ke neeche) */}
+        <div className="max-w-2xl mt-16 border-t border-gray-200 pt-10">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-gray-900">Reviews ({reviews.length})</h3>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span className="font-medium text-gray-900">{averageRating > 0 ? averageRating : '0'}</span>
+              <div className="flex text-yellow-400">{renderStars(averageRating)}</div>
+            </div>
+          </div>
+
+          {/* Review Form */}
+          <div className="bg-gray-50 p-6 rounded-xl mb-8 border border-gray-200">
+            <h4 className="font-bold text-gray-900 text-sm mb-3">Write a Review</h4>
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-gray-700">Rating</label>
+                <div className="flex gap-1 mt-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setNewReview({ ...newReview, rating: star })}
+                      className="text-2xl focus:outline-none"
+                    >
+                      <span className={star <= newReview.rating ? "text-yellow-400" : "text-gray-300"}>★</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-700">Comment</label>
+                <textarea
+                  value={newReview.comment}
+                  onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                  placeholder="Share your experience with this product..."
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:border-black placeholder:text-gray-400 mt-1 bg-white"
+                  rows="3"
+                />
+              </div>
+              <button
+                type="submit"
+                className="bg-black text-white px-6 py-2.5 rounded-full font-bold text-sm tracking-wide hover:bg-gray-800 transition"
+              >
+                Submit Review
+              </button>
+            </form>
+          </div>
+
+          {/* List of Reviews */}
+          <div className="space-y-4">
+            {reviews.length > 0 ? (
+              reviews.map((review, index) => (
+                <div key={index} className="border-b border-gray-100 pb-4 last:border-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm text-gray-900 font-semibold">User #{review.user?.slice(-4) || 'Guest'}</span>
+                    <div className="flex text-yellow-400 text-sm">{renderStars(review.rating)}</div>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">No reviews yet. Be the first to review!</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* NIKE-STYLE LIGHTBOX */}
       {isLightboxOpen && (
         <div className="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center">
-          <button 
-            onClick={() => setIsLightboxOpen(false)} 
-            className="absolute top-4 right-4 z-50 p-2 text-black hover:bg-gray-100 rounded-full transition"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          <button onClick={() => setIsLightboxOpen(false)} className="absolute top-4 right-4 z-50 p-2 text-black hover:bg-gray-100 rounded-full transition"><X className="w-6 h-6" /></button>
           <div className="flex-1 w-full flex items-center justify-center px-4 py-8">
-            <img 
-              src={images[mainImageIndex]} 
-              alt={`${product.title} - Main View`} 
-              className="max-w-full max-h-[70vh] object-contain" 
-              onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image'; }} 
-            />
+            <img src={images[mainImageIndex]} alt={`${product.title} - Main View`} className="max-w-full max-h-[70vh] object-contain" onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image'; }} />
           </div>
           <div className="w-full max-w-3xl px-4 pb-8 overflow-x-auto">
             <div className="flex gap-2 justify-center">
               {images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setMainImageIndex(idx)}
-                  className={`w-16 h-16 rounded border-2 overflow-hidden flex-shrink-0 transition ${
-                    mainImageIndex === idx ? 'border-black' : 'border-gray-200 hover:border-gray-400'
-                  }`}
-                >
-                  <img 
-                    src={img} 
-                    alt={`Thumbnail ${idx + 1}`} 
-                    className="w-full h-full object-cover" 
-                    onError={(e) => { e.target.src = 'https://placehold.co/100x100/333/fff?text=Image'; }} 
-                  />
+                <button key={idx} onClick={() => setMainImageIndex(idx)} className={`w-16 h-16 rounded border-2 overflow-hidden flex-shrink-0 transition ${mainImageIndex === idx ? 'border-black' : 'border-gray-200 hover:border-gray-400'}`}>
+                  <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://placehold.co/100x100/333/fff?text=Image'; }} />
                 </button>
               ))}
             </div>
@@ -682,5 +723,4 @@ export default function ProductDetails() {
       )}
     </div>
   );
-  
 }
