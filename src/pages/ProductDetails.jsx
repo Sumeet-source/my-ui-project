@@ -179,42 +179,88 @@ export default function ProductDetails() {
   return (
     <div className="bg-white min-h-screen pb-20 font-sans">
       
-      {/* ================= SIZE CHART MODAL ================= */}
+      {/* ================= SIZE CHART MODAL (Dynamic for Shoes vs Clothing) ================= */}
       {isSizeChartOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onClick={() => setIsSizeChartOpen(false)} className="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl">&times;</button>
+            
             <div className="flex items-center gap-2 mb-1">
               <h2 className="text-xl font-bold text-gray-900">Size Guide</h2>
             </div>
-            <p className="text-sm text-gray-500 mb-4">Below are body measurements this product fits</p>
-            <div className="flex gap-2 mb-4">
-              <button onClick={() => setSizeUnit('in')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${sizeUnit === 'in' ? 'bg-black text-white border border-black' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>in</button>
-              <button onClick={() => setSizeUnit('cm')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${sizeUnit === 'cm' ? 'bg-black text-white border border-black' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>cm</button>
-            </div>
+            <p className="text-xs text-gray-500 mb-4">{product.title}</p>
+            <p className="text-sm text-gray-500 mb-4">
+              {isShoeProduct ? "Below are product's physical dimensions" : "Below are body measurements this product fits"}
+            </p>
+            
+            {/* Unit Toggle (Only for Shoes) */}
+            {isShoeProduct && (
+              <div className="flex gap-2 mb-4">
+                <button onClick={() => setSizeUnit('in')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${sizeUnit === 'in' ? 'bg-black text-white border border-black' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>in</button>
+                <button onClick={() => setSizeUnit('cm')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${sizeUnit === 'cm' ? 'bg-black text-white border border-black' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>cm</button>
+              </div>
+            )}
+
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-center border-collapse">
-                <thead><tr className="bg-gray-100"><th className="p-2 border border-gray-200 font-semibold">Size</th><th className="p-2 border border-gray-200 font-semibold">Chest</th><th className="p-2 border border-gray-200 font-semibold">Waist</th><th className="p-2 border border-gray-200 font-semibold">Hip</th></tr></thead>
-                <tbody>
-                  {sizeUnit === 'in' ? (
-                    <>
-                      <tr><td className="p-2 border border-gray-200 font-medium">S</td><td className="p-2 border border-gray-200">33-35.5"</td><td className="p-2 border border-gray-200">28.5-31"</td><td className="p-2 border border-gray-200">34-36"</td></tr>
-                      <tr><td className="p-2 border border-gray-200 font-medium">M</td><td className="p-2 border border-gray-200">36-38"</td><td className="p-2 border border-gray-200">31-33.5"</td><td className="p-2 border border-gray-200">36-38"</td></tr>
-                      <tr><td className="p-2 border border-gray-200 font-medium">L</td><td className="p-2 border border-gray-200">38-40.5"</td><td className="p-2 border border-gray-200">33.5-36"</td><td className="p-2 border border-gray-200">38-40"</td></tr>
-                      <tr><td className="p-2 border border-gray-200 font-medium">XL</td><td className="p-2 border border-gray-200">40.5-43"</td><td className="p-2 border border-gray-200">36-38"</td><td className="p-2 border border-gray-200">40-42"</td></tr>
-                      <tr><td className="p-2 border border-gray-200 font-medium">2XL</td><td className="p-2 border border-gray-200">43-45.5"</td><td className="p-2 border border-gray-200">38-41"</td><td className="p-2 border border-gray-200">42-44"</td></tr>
-                    </>
-                  ) : (
-                    <>
-                      <tr><td className="p-2 border border-gray-200 font-medium">S</td><td className="p-2 border border-gray-200">84-90</td><td className="p-2 border border-gray-200">72-79</td><td className="p-2 border border-gray-200">86-91</td></tr>
-                      <tr><td className="p-2 border border-gray-200 font-medium">M</td><td className="p-2 border border-gray-200">91-96</td><td className="p-2 border border-gray-200">79-85</td><td className="p-2 border border-gray-200">91-96</td></tr>
-                      <tr><td className="p-2 border border-gray-200 font-medium">L</td><td className="p-2 border border-gray-200">96-103</td><td className="p-2 border border-gray-200">85-91</td><td className="p-2 border border-gray-200">96-101</td></tr>
-                      <tr><td className="p-2 border border-gray-200 font-medium">XL</td><td className="p-2 border border-gray-200">103-109</td><td className="p-2 border border-gray-200">91-96</td><td className="p-2 border border-gray-200">101-106</td></tr>
-                      <tr><td className="p-2 border border-gray-200 font-medium">2XL</td><td className="p-2 border border-gray-200">109-115</td><td className="p-2 border border-gray-200">96-104</td><td className="p-2 border border-gray-200">106-111</td></tr>
-                    </>
-                  )}
-                </tbody>
-              </table>
+              {isShoeProduct ? (
+                /* ============ NIKE STYLE SHOE SIZE CHART ============ */
+                <table className="w-full text-sm text-center border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="p-2 border border-gray-200 font-semibold">Size</th>
+                      <th className="p-2 border border-gray-200 font-semibold">Product<br/>Foot Length</th>
+                      <th className="p-2 border border-gray-200 font-semibold">Product<br/>US Size</th>
+                      <th className="p-2 border border-gray-200 font-semibold">Product<br/>EU Size</th>
+                      <th className="p-2 border border-gray-200 font-semibold">Product<br/>CM/JP</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sizeUnit === 'in' ? (
+                      <>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 6 (EU 40)</td><td className="p-2 border border-gray-200">9.6"</td><td className="p-2 border border-gray-200">7</td><td className="p-2 border border-gray-200">40</td><td className="p-2 border border-gray-200">25</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 7</td><td className="p-2 border border-gray-200">10"</td><td className="p-2 border border-gray-200">8</td><td className="p-2 border border-gray-200">41</td><td className="p-2 border border-gray-200">26</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 8</td><td className="p-2 border border-gray-200">10.3"</td><td className="p-2 border border-gray-200">9</td><td className="p-2 border border-gray-200">42.5</td><td className="p-2 border border-gray-200">27</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 9</td><td className="p-2 border border-gray-200">10.7"</td><td className="p-2 border border-gray-200">10</td><td className="p-2 border border-gray-200">44</td><td className="p-2 border border-gray-200">28</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 10</td><td className="p-2 border border-gray-200">11"</td><td className="p-2 border border-gray-200">11</td><td className="p-2 border border-gray-200">45</td><td className="p-2 border border-gray-200">29</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 11</td><td className="p-2 border border-gray-200">11.3"</td><td className="p-2 border border-gray-200">12</td><td className="p-2 border border-gray-200">46</td><td className="p-2 border border-gray-200">30</td></tr>
+                      </>
+                    ) : (
+                      <>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 6 (EU 40)</td><td className="p-2 border border-gray-200">24.4</td><td className="p-2 border border-gray-200">7</td><td className="p-2 border border-gray-200">40</td><td className="p-2 border border-gray-200">25</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 7</td><td className="p-2 border border-gray-200">25.4</td><td className="p-2 border border-gray-200">8</td><td className="p-2 border border-gray-200">41</td><td className="p-2 border border-gray-200">26</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 8</td><td className="p-2 border border-gray-200">26.2</td><td className="p-2 border border-gray-200">9</td><td className="p-2 border border-gray-200">42.5</td><td className="p-2 border border-gray-200">27</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 9</td><td className="p-2 border border-gray-200">27.2</td><td className="p-2 border border-gray-200">10</td><td className="p-2 border border-gray-200">44</td><td className="p-2 border border-gray-200">28</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 10</td><td className="p-2 border border-gray-200">27.9</td><td className="p-2 border border-gray-200">11</td><td className="p-2 border border-gray-200">45</td><td className="p-2 border border-gray-200">29</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">UK 11</td><td className="p-2 border border-gray-200">28.7</td><td className="p-2 border border-gray-200">12</td><td className="p-2 border border-gray-200">46</td><td className="p-2 border border-gray-200">30</td></tr>
+                      </>
+                    )}
+                  </tbody>
+                </table>
+              ) : (
+                /* ============ CLOTHING SIZE CHART (Chest/Waist/Hip) ============ */
+                <table className="w-full text-sm text-center border-collapse">
+                  <thead><tr className="bg-gray-100"><th className="p-2 border border-gray-200 font-semibold">Size</th><th className="p-2 border border-gray-200 font-semibold">Chest</th><th className="p-2 border border-gray-200 font-semibold">Waist</th><th className="p-2 border border-gray-200 font-semibold">Hip</th></tr></thead>
+                  <tbody>
+                    {sizeUnit === 'in' ? (
+                      <>
+                        <tr><td className="p-2 border border-gray-200 font-medium">S</td><td className="p-2 border border-gray-200">33-35.5"</td><td className="p-2 border border-gray-200">28.5-31"</td><td className="p-2 border border-gray-200">34-36"</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">M</td><td className="p-2 border border-gray-200">36-38"</td><td className="p-2 border border-gray-200">31-33.5"</td><td className="p-2 border border-gray-200">36-38"</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">L</td><td className="p-2 border border-gray-200">38-40.5"</td><td className="p-2 border border-gray-200">33.5-36"</td><td className="p-2 border border-gray-200">38-40"</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">XL</td><td className="p-2 border border-gray-200">40.5-43"</td><td className="p-2 border border-gray-200">36-38"</td><td className="p-2 border border-gray-200">40-42"</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">2XL</td><td className="p-2 border border-gray-200">43-45.5"</td><td className="p-2 border border-gray-200">38-41"</td><td className="p-2 border border-gray-200">42-44"</td></tr>
+                      </>
+                    ) : (
+                      <>
+                        <tr><td className="p-2 border border-gray-200 font-medium">S</td><td className="p-2 border border-gray-200">84-90</td><td className="p-2 border border-gray-200">72-79</td><td className="p-2 border border-gray-200">86-91</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">M</td><td className="p-2 border border-gray-200">91-96</td><td className="p-2 border border-gray-200">79-85</td><td className="p-2 border border-gray-200">91-96</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">L</td><td className="p-2 border border-gray-200">96-103</td><td className="p-2 border border-gray-200">85-91</td><td className="p-2 border border-gray-200">96-101</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">XL</td><td className="p-2 border border-gray-200">103-109</td><td className="p-2 border border-gray-200">91-96</td><td className="p-2 border border-gray-200">101-106</td></tr>
+                        <tr><td className="p-2 border border-gray-200 font-medium">2XL</td><td className="p-2 border border-gray-200">109-115</td><td className="p-2 border border-gray-200">96-104</td><td className="p-2 border border-gray-200">106-111</td></tr>
+                      </>
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
             <p className="text-xs text-gray-500 mt-4 text-center">*This is a standard guide. Sizes may vary slightly by brand.</p>
           </div>
@@ -323,9 +369,8 @@ export default function ProductDetails() {
           <div className="mt-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-sm font-bold text-gray-900">Select Size</h3>
-              {!isShoeProduct && (
-                <button onClick={() => setIsSizeChartOpen(true)} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">Size Guide</button>
-              )}
+              {/* 🟢 FIX: Always show Size Guide button regardless of product type */}
+              <button onClick={() => setIsSizeChartOpen(true)} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">Size Guide</button>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {sizeOptions.map((size) => (
@@ -505,7 +550,8 @@ export default function ProductDetails() {
             <div className="mt-4">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="text-sm font-bold text-gray-900">Select Size</h3>
-                {!isShoeProduct && <button onClick={() => setIsSizeChartOpen(true)} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">Size Guide</button>}
+                {/* 🟢 FIX: Always show Size Guide button regardless of product type */}
+                <button onClick={() => setIsSizeChartOpen(true)} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">Size Guide</button>
               </div>
               <div className="grid grid-cols-3 gap-2 max-w-md">
                 {sizeOptions.map((size) => (
