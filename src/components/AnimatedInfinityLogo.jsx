@@ -117,39 +117,38 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
         >
           <defs>
             <linearGradient id="emberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              {/* 🟢 Color ko #4A4A4A (Medium Gray / Light Black) kar diya */}
               <stop offset="0%" stopColor="#4A4A4A" />
               <stop offset="100%" stopColor="#4A4A4A" />
             </linearGradient>
           </defs>
 
-          {/* faint base track (slightly darker gray) */}
+          {/* faint base track */}
           <path
             d={INFINITY_PATH}
             fill="none"
             stroke="#2A2B2E"
-            strokeWidth="6" // 🟢 Patla kiya (8 se 6)
+            strokeWidth="6"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
 
-          {/* animated draw-in stroke (Thin & Light Gray) */}
+          {/* animated draw-in stroke */}
           <path
             ref={pathRef}
             d={INFINITY_PATH}
             fill="none"
             stroke="url(#emberGradient)"
-            strokeWidth="6" // 🟢 Patla kiya (8 se 6)
+            strokeWidth="6"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
 
-          {/* continuous flowing spark trail (Patla aur same color) */}
+          {/* 🟢 FIX: continuous flowing spark trail ko PURE WHITE (#FFFFFF) kar diya */}
           <path
             d={INFINITY_PATH}
             fill="none"
-            stroke="#555555" 
-            strokeWidth="2" // 🟢 Patla kiya (2.8 se 2)
+            stroke="#FFFFFF" 
+            strokeWidth="2"
             strokeLinecap="round"
             strokeDasharray="9 15"
             className={drawn ? "flow-path" : ""}
