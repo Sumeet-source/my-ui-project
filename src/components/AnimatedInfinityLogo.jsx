@@ -62,7 +62,7 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "transparent", // 🟢 Dark background hata diya
+        background: "transparent",
         cursor: "pointer",
         ...style,
       }}
@@ -90,7 +90,7 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
           .flow-path { animation: none !important; }
         }
         .infinity-logo-root:focus-visible {
-          outline: 2px solid #FF7A3D;
+          outline: 2px solid #000000;
           outline-offset: 14px;
           border-radius: 4px;
         }
@@ -111,20 +111,19 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
           style={{
             width: "100%",
             height: "100%",
-            filter: drawn
-              ? "drop-shadow(0 0 14px rgba(255,86,34,0.55)) drop-shadow(0 0 30px rgba(255,86,34,0.22))"
-              : "none",
+            filter: "none", // 🟢 Orange glow hata diya
             transition: "filter 0.7s ease",
           }}
         >
           <defs>
             <linearGradient id="emberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FF7A3D" />
-              <stop offset="100%" stopColor="#E62B2B" />
+              {/* 🟢 Gradient ko pure black kar diya */}
+              <stop offset="0%" stopColor="#000000" />
+              <stop offset="100%" stopColor="#000000" />
             </linearGradient>
           </defs>
 
-          {/* faint base track */}
+          {/* faint base track (dark gray) */}
           <path
             d={INFINITY_PATH}
             fill="none"
@@ -134,7 +133,7 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
             strokeLinejoin="round"
           />
 
-          {/* animated draw-in stroke */}
+          {/* animated draw-in stroke (Pure Black) */}
           <path
             ref={pathRef}
             d={INFINITY_PATH}
@@ -145,11 +144,11 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
             strokeLinejoin="round"
           />
 
-          {/* continuous flowing spark trail */}
+          {/* continuous flowing spark trail (Black) */}
           <path
             d={INFINITY_PATH}
             fill="none"
-            stroke="#FFD166"
+            stroke="#000000" // 🟢 Yellow spark trail ko black kar diya
             strokeWidth="2.8"
             strokeLinecap="round"
             strokeDasharray="9 15"
