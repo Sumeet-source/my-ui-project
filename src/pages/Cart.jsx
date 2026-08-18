@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // 🟢 STEP 1: useNavigate import kiya
+import { Link } from 'react-router-dom'; // 🟢 REMOVED: useNavigate import
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import axiosClient from '../api/axiosClient';
 
 export default function Cart() {
-  const navigate = useNavigate(); // 🟢 STEP 2: navigate declare kiya
   const { cart, addToCart, removeFromCart, updateQuantity, getTotalPrice, clearCart, discount, applyDiscount, clearDiscount } = useCart(); 
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -16,18 +15,18 @@ export default function Cart() {
   const [couponCode, setCouponCode] = useState('');
   const [applyingCoupon, setApplyingCoupon] = useState(false);
 
-  // 🟢 STEP 2: Login ke baad pending item restore karo
+  // 🟢 Login ke baad pending item restore karo
   useEffect(() => {
     const pendingItem = localStorage.getItem('pendingCartItem');
     if (pendingItem) {
       const item = JSON.parse(pendingItem);
       addToCart(item);
-      localStorage.removeItem('pendingCartItem'); // Clean up
+      localStorage.removeItem('pendingCartItem');
       showToast("Item added to your cart!", "success");
     }
   }, []); 
 
-  // 🟢 STEP 3: Safety Check - Agar user logout hai toh cart clear karo
+  // 🟢 Safety Check - Agar user logout hai toh cart clear karo
   useEffect(() => {
     if (!user) {
       clearCart();
@@ -70,9 +69,9 @@ export default function Cart() {
             <div className="flex-1">
               <p className="text-green-700 text-sm font-medium mb-4">Create an account to get exclusive benefits.</p>
               <div className="flex flex-col sm:flex-row gap-4">
-                {/* 🟢 FIX: onClick navigation added */}
-                <Link to="/signup" onClick={() => navigate('/signup')} className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Register</Link>
-                <Link to="/login" onClick={() => navigate('/login')} className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Login</Link>
+                {/* 🟢 FIX: onClick HATAYA, sirf `to` use kiya */}
+                <Link to="/signup" className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Register</Link>
+                <Link to="/login" className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Login</Link>
               </div>
             </div>
             <div className="flex-1 md:border-l md:border-gray-200 md:pl-6 flex flex-col justify-center gap-3 text-sm text-gray-600">
@@ -96,10 +95,10 @@ export default function Cart() {
           <div className={!user ? 'flex-1' : ''}>
             <p className="text-gray-900 font-medium text-lg">You have no items in your bag.</p>
             <p className="text-gray-500 mt-1 text-sm">Don't know where to start? Here's the gear everyone's after.</p>
-            {/* 🟢 FIX: onClick navigation added */}
-            <Link to="/men" onClick={() => navigate('/men')} className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition">Shop Best Sellers</Link>
-            {/* 🟢 FIX: onClick navigation added */}
-            <Link to="/" onClick={() => navigate('/')} className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</Link>
+            {/* 🟢 FIX: onClick HATAYA, sirf `to` use kiya */}
+            <Link to="/men" className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition">Shop Best Sellers</Link>
+            {/* 🟢 FIX: onClick HATAYA, sirf `to` use kiya */}
+            <Link to="/" className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</Link>
           </div>
           {!user && <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[250px]"></div>}
         </div>
