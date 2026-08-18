@@ -90,7 +90,7 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
           .flow-path { animation: none !important; }
         }
         .infinity-logo-root:focus-visible {
-          outline: 2px solid #1A1A1A;
+          outline: 2px solid #4A4A4A;
           outline-offset: 14px;
           border-radius: 4px;
         }
@@ -117,39 +117,39 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
         >
           <defs>
             <linearGradient id="emberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              {/* 🟢 Pure black ko #1A1A1A (dark gray/faded black) kar diya */}
-              <stop offset="0%" stopColor="#1A1A1A" />
-              <stop offset="100%" stopColor="#1A1A1A" />
+              {/* 🟢 Color ko #4A4A4A (Medium Gray / Light Black) kar diya */}
+              <stop offset="0%" stopColor="#4A4A4A" />
+              <stop offset="100%" stopColor="#4A4A4A" />
             </linearGradient>
           </defs>
 
-          {/* faint base track (dark gray) */}
+          {/* faint base track (slightly darker gray) */}
           <path
             d={INFINITY_PATH}
             fill="none"
             stroke="#2A2B2E"
-            strokeWidth="8"
+            strokeWidth="6" // 🟢 Patla kiya (8 se 6)
             strokeLinecap="round"
             strokeLinejoin="round"
           />
 
-          {/* animated draw-in stroke (Faded Black / Dark Charcoal) */}
+          {/* animated draw-in stroke (Thin & Light Gray) */}
           <path
             ref={pathRef}
             d={INFINITY_PATH}
             fill="none"
             stroke="url(#emberGradient)"
-            strokeWidth="8"
+            strokeWidth="6" // 🟢 Patla kiya (8 se 6)
             strokeLinecap="round"
             strokeLinejoin="round"
           />
 
-          {/* continuous flowing spark trail (Gray to show the flow clearly) */}
+          {/* continuous flowing spark trail (Patla aur same color) */}
           <path
             d={INFINITY_PATH}
             fill="none"
             stroke="#555555" 
-            strokeWidth="2.8"
+            strokeWidth="2" // 🟢 Patla kiya (2.8 se 2)
             strokeLinecap="round"
             strokeDasharray="9 15"
             className={drawn ? "flow-path" : ""}
