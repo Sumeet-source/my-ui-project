@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react'; // useMemo hata diya (ab reviews nahi hain)
 import { useCart } from '../context/CartContext.jsx';
 import { useWishlist } from '../context/WishlistContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -7,16 +7,14 @@ import { useAuth } from '../context/AuthContext.jsx';
 import axiosClient from '../api/axiosClient';
 import ProductCard from '../components/ProductCard';
 import { Truck, RotateCcw, X } from 'lucide-react';
- // 🟢 YEH ADD KARO
 
 export default function ProductDetails() {
   const { id } = useParams();
+  const navigate = useNavigate(); 
   const { addToCart, openAddedToBag } = useCart(); 
   const { showToast } = useToast();
   const { user } = useAuth();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-   const navigate = useNavigate(); // 🟢 YEH LINE ADD KARO
-  
 
   const [product, setProduct] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
@@ -124,34 +122,31 @@ export default function ProductDetails() {
   const sizeOptions = isShoeProduct ? shoeSizes : clothingSizes;
 
   const handleAddToCart = () => {
-  if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
-  if (!selectedSize) { showToast("Please select a size!", "error"); return; }
-  
-  // 🟢 Check: Agar user login nahi hai
-  if (!user) {
-    const itemToAdd = { 
-      ...product, 
-      id: product._id, 
-      size: selectedSize, 
-      image: product.images?.[0] || product.imageUrl,
-      quantity: 1 
-    };
+    if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
+    if (!selectedSize) { showToast("Please select a size!", "error"); return; }
     
-    localStorage.setItem('pendingCartItem', JSON.stringify(itemToAdd));
-    showToast("Please login to add items to cart!", "warning");
-    navigate('/login?redirect=/cart'); // 🟢 Ab ye sahi chalega
-    return;
-  }
+    if (!user) {
+      const itemToAdd = { 
+        ...product, 
+        id: product._id, 
+        size: selectedSize, 
+        image: product.images?.[0] || product.imageUrl,
+        quantity: 1 
+      };
+      localStorage.setItem('pendingCartItem', JSON.stringify(itemToAdd));
+      showToast("Please login to add items to cart!", "warning");
+      navigate('/login?redirect=/cart');
+      return;
+    }
 
-  // 🟢 Agar user login hai
-  addToCart({ ...product, id: product._id, size: selectedSize, image: product.images?.[0] || product.imageUrl });
-  openAddedToBag({ 
-    title: product.title, 
-    price: product.price, 
-    size: selectedSize, 
-    image: product.images?.[0] || product.imageUrl 
-  });
-};
+    addToCart({ ...product, id: product._id, size: selectedSize, image: product.images?.[0] || product.imageUrl });
+    openAddedToBag({ 
+      title: product.title, 
+      price: product.price, 
+      size: selectedSize, 
+      image: product.images?.[0] || product.imageUrl 
+    });
+  };
 
   const handleWishlistToggle = (e) => {
     e.preventDefault();
@@ -303,7 +298,16 @@ export default function ProductDetails() {
           <div ref={carouselRef} onScroll={handleCarouselScroll} className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
             {images.map((img, idx) => (
               <div key={idx} className="min-w-full snap-center flex justify-center items-center">
-                <img src={img} alt={`${product.title} ${idx + 1}`} className="w-full h-[450px] object-cover cursor-pointer" onClick={() => setIsLightboxOpen(true)} onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image'; }} />
+                {/* 🟢 FIX: Mobile ki pehli image ko high priority do */}
+                <img 
+                  src={img} 
+                  alt={`${product.title} ${idx + 1}`} 
+                  loading={idx === 0 ? "eager" : "lazy"} 
+                  fetchpriority={idx === 0 ? "high" : "auto"}
+                  className="w-full h-[450px] object-cover cursor-pointer" 
+                  onClick={() => setIsLightboxOpen(true)} 
+                  onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image'; }} 
+                />
               </div>
             ))}
           </div>
@@ -318,8 +322,6 @@ export default function ProductDetails() {
           <h1 className="text-xl font-bold text-gray-900 leading-tight mb-1">{product.title}</h1>
           <p className="text-sm text-gray-500 mb-3">{product.category}</p>
           
-          {/* 🟢 REMOVED: Rating and Reviews Section */}
-
           <div className="mt-2">
             <span className="text-xl font-bold text-gray-900">₹{product.price}</span>
             <div className="mt-1 text-xs text-gray-500">Inclusive of all taxes</div>
@@ -424,7 +426,7 @@ export default function ProductDetails() {
           <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-4 snap-x snap-mandatory">
             {displayRelated.map((item) => (
               <div key={item._id} className="min-w-[160px] snap-start">
-                <ProductCard id={item._id} title={item.title} price={item.price} image={item.images?.[0] || item.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} rating={4.5} reviewsCount={0} inStock={item.inStock} />
+                <ProductCard id={item._id} title={item.title} price={item.price} image={item.images?.[0] || item.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} inStock={item.inStock} />
               </div>
             ))}
           </div>
@@ -436,7 +438,14 @@ export default function ProductDetails() {
         <div className="flex flex-col md:flex-row gap-12 mb-12">
           <div className="flex-1 relative group">
             <div className="cursor-pointer relative overflow-hidden rounded-lg bg-gray-100 aspect-square" onClick={() => setIsLightboxOpen(true)}>
-              <img src={product.images?.[mainImageIndex] || product.imageUrl} alt={product.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              {/* 🟢 FIX: Desktop main image ko high priority do */}
+              <img 
+                src={product.images?.[mainImageIndex] || product.imageUrl} 
+                alt={product.title} 
+                loading="eager" 
+                fetchpriority="high"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+              />
               <button onClick={handleWishlistToggle} className="absolute top-4 right-4 p-3 bg-white rounded-full hover:bg-white hover:scale-110 transition duration-200 z-20 shadow-md">
                 <svg className={`w-6 h-6 ${isInWishlist(product._id) ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
               </button>
@@ -445,7 +454,13 @@ export default function ProductDetails() {
               <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
                 {product.images.map((img, idx) => (
                   <button key={idx} onClick={() => setMainImageIndex(idx)} className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition flex-shrink-0 ${mainImageIndex === idx ? 'border-black' : 'border-gray-200 hover:border-gray-400'}`}>
-                    <img src={img} alt={`${product.title} - ${idx + 1}`} className="w-full h-full object-cover" />
+                    {/* 🟢 FIX: Thumbnails lazy load karo */}
+                    <img 
+                      src={img} 
+                      alt={`${product.title} - ${idx + 1}`} 
+                      loading="lazy"
+                      className="w-full h-full object-cover" 
+                    />
                   </button>
                 ))}
               </div>
@@ -457,8 +472,6 @@ export default function ProductDetails() {
             <h1 className="text-3xl font-bold text-gray-900 leading-tight">{product.title}</h1>
             <p className="text-sm text-gray-500">{product.category}</p>
             
-            {/* 🟢 REMOVED: Rating and Reviews Section */}
-
             <div className="mt-2">
               <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
               <div className="mt-1 text-xs text-gray-500">Inclusive of all taxes</div>

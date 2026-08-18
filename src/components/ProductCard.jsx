@@ -3,7 +3,7 @@ import { useWishlist } from '../context/WishlistContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
-export default function ProductCard({ id, title, price, image, badge }) {
+export default function ProductCard({ id, title, price, image, badge, index = 0 }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -11,18 +11,14 @@ export default function ProductCard({ id, title, price, image, badge }) {
   
   const isLiked = isInWishlist(id);
 
-  // 🟢 FINAL FIX: Cloudinary image optimization helper
+  // 🟢 Cloudinary optimization helper function
   const getOptimizedImageUrl = (url) => {
     if (!url) return 'https://placehold.co/600x600/333/fff?text=Product+Image';
-
-    // Agar Cloudinary URL hai aur usme optimization parameters nahi hain
+    
     if (url.includes('cloudinary.com') && !url.includes('w_400')) {
-      // Handle URL with version number (/upload/v)
       if (url.includes('/upload/v')) {
         return url.replace('/upload/v', '/upload/w_400,f_auto,q_auto/v');
-      }
-      // Handle URL without version number (/upload/)
-      else if (url.includes('/upload/') && !url.includes('/upload/v')) {
+      } else if (url.includes('/upload/') && !url.includes('/upload/v')) {
         return url.replace('/upload/', '/upload/w_400,f_auto,q_auto/');
       }
     }
@@ -63,6 +59,7 @@ export default function ProductCard({ id, title, price, image, badge }) {
           src={getOptimizedImageUrl(image)} 
           alt={title} 
           loading="lazy" 
+          fetchpriority={index < 4 ? "high" : "auto"} // 🟢 Pehli 4 images high priority
           width="400"    
           height="400"   
           className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
