@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useState, useRef, useEffect } from 'react'; // useMemo hata diya (ab reviews nahi hain)
+import { useState, useRef, useEffect } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { useWishlist } from '../context/WishlistContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -159,15 +159,30 @@ export default function ProductDetails() {
 
   const images = product.images?.length > 0 ? product.images : [product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'];
 
+  // 🟢 NIKKE LEVEL SUPER FAST IMAGE OPTIMIZATION
+  const getCloudinaryUrl = (url, width = 400) => {
+    if (!url) return 'https://placehold.co/600x600/333/fff?text=Product+Image';
+    if (url.includes('cloudinary.com')) {
+      // Remove any existing transformations
+      let baseUrl = url;
+      if (baseUrl.includes('/upload/')) {
+        const parts = baseUrl.split('/upload/');
+        baseUrl = parts[0] + '/upload/';
+        const filePath = parts[1].replace(/^[^\/]*\//, '');
+        // Apply exact transformations
+        return `${baseUrl}w_${width},f_auto,q_auto/${filePath}`;
+      }
+    }
+    return url;
+  };
+
   return (
     <div className="bg-white min-h-screen pb-20 font-helvetica">
       
-      {/* ================= SIZE CHART MODAL ================= */}
       {isSizeChartOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onClick={() => setIsSizeChartOpen(false)} className="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl">&times;</button>
-            
             <div className="flex items-center gap-2 mb-1">
               <h2 className="text-xl font-bold text-gray-900">Size Guide</h2>
             </div>
@@ -175,14 +190,12 @@ export default function ProductDetails() {
             <p className="text-sm text-gray-500 mb-4">
               {isShoeProduct ? "Below are product's physical dimensions" : "Below are body measurements this product fits"}
             </p>
-            
             {isShoeProduct && (
               <div className="flex gap-2 mb-4">
                 <button onClick={() => setSizeUnit('in')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${sizeUnit === 'in' ? 'bg-black text-white border border-black' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>in</button>
                 <button onClick={() => setSizeUnit('cm')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${sizeUnit === 'cm' ? 'bg-black text-white border border-black' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>cm</button>
               </div>
             )}
-
             <div className="overflow-x-auto">
               {isShoeProduct ? (
                 <table className="w-full text-sm text-center border-collapse">
@@ -298,9 +311,8 @@ export default function ProductDetails() {
           <div ref={carouselRef} onScroll={handleCarouselScroll} className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
             {images.map((img, idx) => (
               <div key={idx} className="min-w-full snap-center flex justify-center items-center">
-                {/* 🟢 FIX: Mobile ki pehli image ko high priority do */}
                 <img 
-                  src={img} 
+                  src={getCloudinaryUrl(img, 600)} // 🟢 Mobile optimized
                   alt={`${product.title} ${idx + 1}`} 
                   loading={idx === 0 ? "eager" : "lazy"} 
                   fetchpriority={idx === 0 ? "high" : "auto"}
@@ -438,13 +450,13 @@ export default function ProductDetails() {
         <div className="flex flex-col md:flex-row gap-12 mb-12">
           <div className="flex-1 relative group">
             <div className="cursor-pointer relative overflow-hidden rounded-lg bg-gray-100 aspect-square" onClick={() => setIsLightboxOpen(true)}>
-              {/* 🟢 FIX: Desktop main image ko high priority do */}
               <img 
-                src={product.images?.[mainImageIndex] || product.imageUrl} 
+                src={getCloudinaryUrl(product.images?.[mainImageIndex] || product.imageUrl, 800)} // 🟢 Desktop optimized
                 alt={product.title} 
                 loading="eager" 
                 fetchpriority="high"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Product+Image'; }}
               />
               <button onClick={handleWishlistToggle} className="absolute top-4 right-4 p-3 bg-white rounded-full hover:bg-white hover:scale-110 transition duration-200 z-20 shadow-md">
                 <svg className={`w-6 h-6 ${isInWishlist(product._id) ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
@@ -454,12 +466,12 @@ export default function ProductDetails() {
               <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
                 {product.images.map((img, idx) => (
                   <button key={idx} onClick={() => setMainImageIndex(idx)} className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition flex-shrink-0 ${mainImageIndex === idx ? 'border-black' : 'border-gray-200 hover:border-gray-400'}`}>
-                    {/* 🟢 FIX: Thumbnails lazy load karo */}
                     <img 
-                      src={img} 
+                      src={getCloudinaryUrl(img, 150)} // 🟢 Thumbnail optimized
                       alt={`${product.title} - ${idx + 1}`} 
                       loading="lazy"
                       className="w-full h-full object-cover" 
+                      onError={(e) => { e.target.src = 'https://placehold.co/100x100/333/fff?text=Image'; }}
                     />
                   </button>
                 ))}
@@ -577,13 +589,13 @@ export default function ProductDetails() {
         <div className="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center">
           <button onClick={() => setIsLightboxOpen(false)} className="absolute top-4 right-4 z-50 p-2 text-black hover:bg-gray-100 rounded-full transition"><X className="w-6 h-6" /></button>
           <div className="flex-1 w-full flex items-center justify-center px-4 py-8">
-            <img src={images[mainImageIndex]} alt={`${product.title} - Main View`} className="max-w-full max-h-[70vh] object-contain" onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image'; }} />
+            <img src={getCloudinaryUrl(images[mainImageIndex], 1200)} alt={`${product.title} - Main View`} className="max-w-full max-h-[70vh] object-contain" onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Image'; }} />
           </div>
           <div className="w-full max-w-3xl px-4 pb-8 overflow-x-auto">
             <div className="flex gap-2 justify-center">
               {images.map((img, idx) => (
                 <button key={idx} onClick={() => setMainImageIndex(idx)} className={`w-16 h-16 rounded border-2 overflow-hidden flex-shrink-0 transition ${mainImageIndex === idx ? 'border-black' : 'border-gray-200 hover:border-gray-400'}`}>
-                  <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://placehold.co/100x100/333/fff?text=Image'; }} />
+                  <img src={getCloudinaryUrl(img, 150)} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" onError={(e) => { e.target.src = 'https://placehold.co/100x100/333/fff?text=Image'; }} />
                 </button>
               ))}
             </div>
