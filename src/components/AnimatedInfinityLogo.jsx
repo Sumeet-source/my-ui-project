@@ -111,13 +111,13 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
           style={{
             width: "100%",
             height: "100%",
-            filter: "none", // 🟢 Orange glow hata diya
+            filter: "none",
             transition: "filter 0.7s ease",
           }}
         >
           <defs>
             <linearGradient id="emberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              {/* 🟢 Gradient ko pure black kar diya */}
+              {/* 🟢 Main thick outline pure black */}
               <stop offset="0%" stopColor="#000000" />
               <stop offset="100%" stopColor="#000000" />
             </linearGradient>
@@ -144,11 +144,11 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
             strokeLinejoin="round"
           />
 
-          {/* continuous flowing spark trail (Black) */}
+          {/* 🟢 FIX: continuous flowing spark trail (Ab ye 555555 gray hai, taaki flow clear dikhe) */}
           <path
             d={INFINITY_PATH}
             fill="none"
-            stroke="#000000" // 🟢 Yellow spark trail ko black kar diya
+            stroke="#555555" 
             strokeWidth="2.8"
             strokeLinecap="round"
             strokeDasharray="9 15"
