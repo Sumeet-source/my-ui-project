@@ -11,16 +11,19 @@ export default function ProductCard({ id, title, price, image, badge }) {
   
   const isLiked = isInWishlist(id);
 
-  // 🟢 FIX 2: Cloudinary image optimization helper function
+  // 🟢 FINAL FIX: Cloudinary image optimization helper
   const getOptimizedImageUrl = (url) => {
     if (!url) return 'https://placehold.co/600x600/333/fff?text=Product+Image';
-    
-    if (url.includes('cloudinary.com')) {
-      if (!url.includes('f_auto') && !url.includes('q_auto') && !url.includes('w_')) {
-        const parts = url.split('/upload/');
-        if (parts.length === 2) {
-          return `${parts[0]}/upload/w_400,f_auto,q_auto/${parts[1]}`;
-        }
+
+    // Agar Cloudinary URL hai aur usme optimization parameters nahi hain
+    if (url.includes('cloudinary.com') && !url.includes('w_400')) {
+      // Handle URL with version number (/upload/v)
+      if (url.includes('/upload/v')) {
+        return url.replace('/upload/v', '/upload/w_400,f_auto,q_auto/v');
+      }
+      // Handle URL without version number (/upload/)
+      else if (url.includes('/upload/') && !url.includes('/upload/v')) {
+        return url.replace('/upload/', '/upload/w_400,f_auto,q_auto/');
       }
     }
     return url;
@@ -57,9 +60,9 @@ export default function ProductCard({ id, title, price, image, badge }) {
     <div onClick={handleCardClick} className="group cursor-pointer">
       <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
         <img 
-          src={getOptimizedImageUrl(image)} // 🟢 FIX 2: Optimized URL use ho raha hai
+          src={getOptimizedImageUrl(image)} 
           alt={title} 
-          loading="lazy" // 🟢 FIX 1: Lazy loading add kar diya
+          loading="lazy" 
           width="400"    
           height="400"   
           className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
