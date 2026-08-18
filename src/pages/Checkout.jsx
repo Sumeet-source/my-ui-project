@@ -231,7 +231,7 @@ export default function Checkout() {
 
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-1.5">Email Address (For Order Updates)</label>
-              <input type="email" name="email" value={address.email} onChange={handleChange} placeholder="dhakads458669@gmail.com" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
+              <input type="email" name="email" value={address.email} onChange={handleChange} placeholder="abc@gmail.com" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
             </div>
 
             <div>
