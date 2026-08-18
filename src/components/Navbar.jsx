@@ -154,17 +154,17 @@ export default function Navbar() {
         </div>
 
         {/* LOGO SECTION */}
-<div className="flex items-center justify-center flex-1 md:flex-none">
-  {/* 🟢 FIX: Directly render ForgeLogo. Extra Link hata diya. */}
-  <div className="hidden md:block">
-    <ForgeLogo />
-  </div>
-  <Link to="/" className="block md:hidden">
-    <span className="text-xl font-black tracking-[0.2em] text-black">
-      <ScrambleLogo text="FORGE" />
-    </span>
-  </Link>
-</div>
+      
+        <div className="flex items-center md:ml-8 lg:ml-16 shrink-0 flex-1 md:flex-none">
+          <div className="hidden md:block">
+            <ForgeLogo />
+          </div>
+          <Link to="/" className="block md:hidden">
+            <span className="text-xl font-black tracking-[0.2em] text-black">
+              <ScrambleLogo text="FORGE" />
+            </span>
+          </Link>
+        </div>
 
         {/* Mobile Right Icons */}
         <div className="flex items-center gap-4 md:hidden">

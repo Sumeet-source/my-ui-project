@@ -1,19 +1,19 @@
 /* --- FORGE LOGO STYLES --- */
 .forge-logo {
-  font-size: 1.4rem; /* 🟢 Mobile par chhota */
+  font-size: 1.4rem; /* Mobile font */
   font-weight: 300;
   letter-spacing: 0.2em;
-  color: inherit; /* 🟢 FIX: White ki jagah inherit kar diya, ab text-black se color lega */
+  color: inherit;
   line-height: 1;
   display: inline-block;
-  transform: scaleX(1.15); /* Wide look waisa hi */
+  transform: scaleX(1.15); /* Wide look */
   transform-origin: left center;
 }
 
-/* Desktop ke liye font bada */
+/* Desktop ke liye font size thoda chhota (2.4rem) */
 @media (min-width: 768px) {
   .forge-logo {
-    font-size: 2.8rem;
+    font-size: 2.4rem; /* 🟢 FIX: Chhoti font size */
     transform: scaleX(1.15);
   }
 }
