@@ -14,32 +14,32 @@ export default function Login() {
   const { showToast } = useToast();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email || !password) {
-      showToast('Please enter email and password', 'error');
-      return;
-    }
+  e.preventDefault();
+  if (!email || !password) {
+    showToast('Please enter email and password', 'error');
+    return;
+  }
 
-    setLoading(true);
-    try {
-      const result = await login(email, password);
-      if (result.success) {
-        showToast('Logged in successfully!', 'success');
-        
-        // 🟢 STEP 4 (FINAL): YEH 2 LINES ADD KARO (Redirect handle karna)
-        const params = new URLSearchParams(window.location.search);
-        const redirect = params.get('redirect') || '/';
-        navigate(redirect);
-        
-      } else {
-        showToast(result.message, 'error');
-      }
-    } catch (error) {
-      showToast('Something went wrong. Please try again.', 'error');
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const result = await login(email, password);
+    if (result.success) {
+      showToast('Logged in successfully!', 'success');
+      
+      // 🟢 YEH REDIRECT LOGIC SURELY HO
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get('redirect') || '/';
+      navigate(redirect);
+      
+    } else {
+      showToast(result.message, 'error');
     }
-  };
+  } catch (error) {
+    showToast('Something went wrong. Please try again.', 'error');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
