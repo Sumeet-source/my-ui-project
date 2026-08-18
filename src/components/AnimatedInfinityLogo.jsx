@@ -90,7 +90,7 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
           .flow-path { animation: none !important; }
         }
         .infinity-logo-root:focus-visible {
-          outline: 2px solid #000000;
+          outline: 2px solid #1A1A1A;
           outline-offset: 14px;
           border-radius: 4px;
         }
@@ -117,9 +117,9 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
         >
           <defs>
             <linearGradient id="emberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              {/* 🟢 Main thick outline pure black */}
-              <stop offset="0%" stopColor="#000000" />
-              <stop offset="100%" stopColor="#000000" />
+              {/* 🟢 Pure black ko #1A1A1A (dark gray/faded black) kar diya */}
+              <stop offset="0%" stopColor="#1A1A1A" />
+              <stop offset="100%" stopColor="#1A1A1A" />
             </linearGradient>
           </defs>
 
@@ -133,7 +133,7 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
             strokeLinejoin="round"
           />
 
-          {/* animated draw-in stroke (Pure Black) */}
+          {/* animated draw-in stroke (Faded Black / Dark Charcoal) */}
           <path
             ref={pathRef}
             d={INFINITY_PATH}
@@ -144,7 +144,7 @@ export default function AnimatedInfinityLogo({ className = "", style = {} }) {
             strokeLinejoin="round"
           />
 
-          {/* 🟢 FIX: continuous flowing spark trail (Ab ye 555555 gray hai, taaki flow clear dikhe) */}
+          {/* continuous flowing spark trail (Gray to show the flow clearly) */}
           <path
             d={INFINITY_PATH}
             fill="none"
