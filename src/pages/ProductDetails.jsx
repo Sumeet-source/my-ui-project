@@ -177,7 +177,7 @@ export default function ProductDetails() {
   const images = product.images?.length > 0 ? product.images : [product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'];
 
   return (
-    // 🟢 FIX: Replaced 'font-sans' with 'font-helvetica' (which falls back to Arial, system-ui, and finally sans-serif)
+    // Using font-helvetica for Nike-like font family
     <div className="bg-white min-h-screen pb-20 font-helvetica">
       
       {/* ================= SIZE CHART MODAL (Dynamic for Shoes vs Clothing) ================= */}
@@ -370,7 +370,6 @@ export default function ProductDetails() {
           <div className="mt-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-sm font-bold text-gray-900">Select Size</h3>
-              {/* 🟢 UPDATED: Size Guide button - same font size, weight, and color as "Select Size" */}
               <button onClick={() => setIsSizeChartOpen(true)} className="text-sm font-bold text-gray-900 hover:text-black transition cursor-pointer">Size Guide</button>
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -417,8 +416,8 @@ export default function ProductDetails() {
             )}
           </div>
 
-          {/* 🟢 NIKE STYLE DESCRIPTION FONT */}
-          <div className="mt-6 text-sm text-gray-600 leading-relaxed tracking-wide">
+          {/* 🟢 NIKE STYLE DESCRIPTION FONT - Color Black (text-black) */}
+          <div className="mt-6 text-sm text-black leading-relaxed tracking-wide">
             <p className="whitespace-pre-line">{product.description}</p>
           </div>
         </div>
@@ -429,6 +428,7 @@ export default function ProductDetails() {
           {/* CHECK DELIVERY + 14-DAY & FREE DELIVERY ROWS */}
           <div className="py-4 border-b border-gray-100">
             <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
+            {/* 🟢 FIX: Subtext is small (text-xs) and faded (text-gray-500) */}
             <p className="text-xs text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
             <div className="flex gap-2 mb-4">
               <input 
@@ -436,13 +436,11 @@ export default function ProductDetails() {
                 value={pincodeInput} 
                 onChange={(e) => setPincodeInput(e.target.value)} 
                 placeholder="Pincode" 
-                // 🟢 FIX: Made input exactly like Nike's (rounded-md, placeholder text color, border)
                 className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full outline-none focus:border-black placeholder:text-gray-400"
               />
               <button 
                 onClick={checkDeliveryAvailability}
                 disabled={checkingPincode}
-                // 🟢 FIX: Made button exactly like Nike's (slightly rounded, darker gray text)
                 className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-600 disabled:opacity-50"
               >
                 {checkingPincode ? '...' : 'Check'}
@@ -451,22 +449,21 @@ export default function ProductDetails() {
             {deliveryAvailable === true && <p className="text-xs text-green-600 font-medium">✓ We deliver to this location!</p>}
             {deliveryAvailable === false && <p className="text-xs text-red-500 font-medium">🚫 We do not deliver to this area.</p>}
 
-            {/* 🟢 MISSING LINES RESTORED */}
+            {/* 🟢 FIX: Lines and Know More buttons are now text-sm (larger size) */}
             <div className="space-y-2 mt-4">
-              <div className="flex justify-between items-center text-xs">
+              <div className="flex justify-between items-center text-sm">
                 <div className="flex items-center gap-2 text-gray-700">
                   <RotateCcw className="w-4 h-4" />
                   <span>14-day return and size exchange</span>
                 </div>
-                {/* 🟢 FIX: Made "Know More" buttons exactly like Nike's (smaller font, dark gray instead of light gray) */}
-                <button onClick={() => setIsReturnModalOpen(true)} className="text-xs text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
+                <button onClick={() => setIsReturnModalOpen(true)} className="text-sm text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
               </div>
-              <div className="flex justify-between items-center text-xs">
+              <div className="flex justify-between items-center text-sm">
                 <div className="flex items-center gap-2 text-gray-700">
                   <Truck className="w-4 h-4" />
                   <span>Free delivery available</span>
                 </div>
-                <button onClick={() => setIsDeliveryModalOpen(true)} className="text-xs text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
+                <button onClick={() => setIsDeliveryModalOpen(true)} className="text-sm text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
               </div>
             </div>
           </div>
@@ -577,8 +574,8 @@ export default function ProductDetails() {
               )}
             </div>
 
-            {/* 🟢 NIKE STYLE DESCRIPTION FONT */}
-            <div className="mt-4 max-w-md text-sm text-gray-600 leading-relaxed tracking-wide">
+            {/* 🟢 NIKE STYLE DESCRIPTION FONT - Color Black (text-black) */}
+            <div className="mt-4 max-w-md text-sm text-black leading-relaxed tracking-wide">
               <p className="whitespace-pre-line">{product.description}</p>
             </div>
 
@@ -586,6 +583,7 @@ export default function ProductDetails() {
             <div className="mt-8 border-t border-gray-200 pt-6 max-w-md">
               <div className="py-4 border-b border-gray-200">
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
+                {/* 🟢 FIX: Subtext is small (text-xs) and faded (text-gray-500) */}
                 <p className="text-xs text-gray-500 mb-2">Enter pincode to know exact delivery dates/charges</p>
                 <div className="flex gap-2">
                   <input type="text" value={pincodeInput} onChange={(e) => setPincodeInput(e.target.value)} placeholder="Pincode" className="border border-gray-300 rounded-md px-3 py-2 text-sm w-40 outline-none focus:border-black placeholder:text-gray-400" />
@@ -594,20 +592,21 @@ export default function ProductDetails() {
                 {deliveryAvailable === true && <p className="text-xs text-green-600 font-medium mt-2">✓ We deliver to this location!</p>}
                 {deliveryAvailable === false && <p className="text-xs text-red-500 font-medium mt-2">🚫 We do not deliver to this area.</p>}
 
+                {/* 🟢 FIX: Lines and Know More buttons are now text-sm (larger size) */}
                 <div className="space-y-2 mt-4">
                   <div className="flex justify-between items-center text-sm">
                     <div className="flex items-center gap-2 text-gray-700">
                       <RotateCcw className="w-4 h-4" />
                       <span>14-day return and size exchange</span>
                     </div>
-                    <button onClick={() => setIsReturnModalOpen(true)} className="text-xs text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
+                    <button onClick={() => setIsReturnModalOpen(true)} className="text-sm text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <div className="flex items-center gap-2 text-gray-700">
                       <Truck className="w-4 h-4" />
                       <span>Free delivery available</span>
                     </div>
-                    <button onClick={() => setIsDeliveryModalOpen(true)} className="text-xs text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
+                    <button onClick={() => setIsDeliveryModalOpen(true)} className="text-sm text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
                   </div>
                 </div>
               </div>
