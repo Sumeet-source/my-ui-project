@@ -369,8 +369,8 @@ export default function ProductDetails() {
           <div className="mt-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-sm font-bold text-gray-900">Select Size</h3>
-              {/* 🟢 FIX: Always show Size Guide button regardless of product type */}
-              <button onClick={() => setIsSizeChartOpen(true)} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">Size Guide</button>
+              {/* 🟢 UPDATED: Size Guide button - same font size, weight, and color as "Select Size" */}
+              <button onClick={() => setIsSizeChartOpen(true)} className="text-sm font-bold text-gray-900 hover:text-black transition cursor-pointer">Size Guide</button>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {sizeOptions.map((size) => (
@@ -550,8 +550,8 @@ export default function ProductDetails() {
             <div className="mt-4">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="text-sm font-bold text-gray-900">Select Size</h3>
-                {/* 🟢 FIX: Always show Size Guide button regardless of product type */}
-                <button onClick={() => setIsSizeChartOpen(true)} className="text-xs text-gray-500 underline hover:text-black transition cursor-pointer">Size Guide</button>
+                {/* 🟢 UPDATED: Size Guide button - same font size, weight, and color as "Select Size" */}
+                <button onClick={() => setIsSizeChartOpen(true)} className="text-sm font-bold text-gray-900 hover:text-black transition cursor-pointer">Size Guide</button>
               </div>
               <div className="grid grid-cols-3 gap-2 max-w-md">
                 {sizeOptions.map((size) => (
