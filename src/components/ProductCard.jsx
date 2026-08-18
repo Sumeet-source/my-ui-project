@@ -41,7 +41,15 @@ export default function ProductCard({ id, title, price, image, badge }) {
   return (
     <div onClick={handleCardClick} className="group cursor-pointer">
       <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
-        <img src={image || 'https://placehold.co/600x600/333/fff?text=Product+Image'} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Product+Image'; }} />
+        <img 
+          src={image || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
+          alt={title} 
+          loading="lazy" // 🟢 FIX 1: Lazy loading add kar diya
+          width="400"    // 🟢 Width specify kar di
+          height="400"   // 🟢 Height specify kar di
+          className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
+          onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Product+Image'; }} 
+        />
         
         <button type="button" onClick={handleWishlistToggle} className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white hover:scale-110 transition duration-200 z-30 shadow-sm cursor-pointer">
           <svg className={`w-5 h-5 transition duration-200 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-700 hover:text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
