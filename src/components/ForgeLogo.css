@@ -1,12 +1,12 @@
 /* --- FORGE LOGO STYLES --- */
 .forge-logo {
-  font-size: 1.4rem; /* 🟢 Mobile par aur chhota (pehle 1.8rem tha) */
+  font-size: 1.4rem; /* 🟢 Mobile par chhota */
   font-weight: 300;
   letter-spacing: 0.2em;
-  color: #ffffff;
+  color: inherit; /* 🟢 FIX: White ki jagah inherit kar diya, ab text-black se color lega */
   line-height: 1;
   display: inline-block;
-  transform: scaleX(1.15); /* Wide look waisa hi rakha */
+  transform: scaleX(1.15); /* Wide look waisa hi */
   transform-origin: left center;
 }
 
