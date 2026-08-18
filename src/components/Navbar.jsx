@@ -155,17 +155,17 @@ export default function Navbar() {
 
         {/* LOGO SECTION */}
       
-        <div className="flex items-center md:ml-8 lg:ml-16 shrink-0 flex-1 md:flex-none">
+              
+        <div className="flex items-center ml-0 shrink-0 flex-1 md:flex-none">
+          {/* Desktop Logo */}
           <div className="hidden md:block">
             <ForgeLogo />
           </div>
+          {/* 🟢 FIX: Mobile bhi same CSS class 'forge-logo' use karega */}
           <Link to="/" className="block md:hidden">
-            <span className="text-xl font-black tracking-[0.2em] text-black">
-              <ScrambleLogo text="FORGE" />
-            </span>
+            <ScrambleLogo text="FORGE" className="forge-logo" />
           </Link>
         </div>
-
         {/* Mobile Right Icons */}
         <div className="flex items-center gap-4 md:hidden">
           <button onClick={() => setIsSearchOpen(true)} className="text-black">

@@ -10,10 +10,10 @@
   transform-origin: left center;
 }
 
-/* Desktop ke liye font size thoda chhota (2.4rem) */
+/* Desktop ke liye font size 1.6rem (Chhota aur premium) */
 @media (min-width: 768px) {
   .forge-logo {
-    font-size: 2.4rem; /* 🟢 FIX: Chhoti font size */
+    font-size: 1.6rem;
     transform: scaleX(1.15);
   }
 }
