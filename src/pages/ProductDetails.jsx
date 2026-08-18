@@ -23,9 +23,6 @@ export default function ProductDetails() {
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const carouselRef = useRef(null);
 
-  const [reviews, setReviews] = useState([]);
-  // 🟢 FIX: Removed 'user' from state, backend uses logged-in user automatically
-  const [newReview, setNewReview] = useState({ comment: '', rating: 5 });
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
   const [sizeUnit, setSizeUnit] = useState('in');
 
@@ -38,7 +35,6 @@ export default function ProductDetails() {
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchProductData();
-    fetchReviews();
   }, [id]);
 
   const fetchProductData = async () => {
@@ -71,22 +67,6 @@ export default function ProductDetails() {
       setLoading(false);
     }
   };
-
-  const fetchReviews = async () => {
-    try {
-      const res = await axiosClient.get(`/api/reviews/product/${id}`);
-      setReviews(res.data);
-    } catch (error) {
-      console.error("Failed to fetch reviews", error);
-      setReviews([]);
-    }
-  };
-
-  const averageRating = useMemo(() => {
-    if (reviews.length === 0) return 0;
-    const total = reviews.reduce((sum, review) => sum + review.rating, 0);
-    return (total / reviews.length).toFixed(1);
-  }, [reviews]);
 
   const handleCarouselScroll = () => {
     if (carouselRef.current) {
@@ -162,28 +142,6 @@ export default function ProductDetails() {
     else addToWishlist(product._id);
   };
 
-  // 🟢 FIX: Corrected handleReviewSubmit to use logged-in user.id and fixed state
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
-    if (!user) { showToast("Please login to write a review", "error"); return; }
-    if (!newReview.comment) { showToast("Please write a comment.", "error"); return; }
-    try {
-      await axiosClient.post('/api/reviews', { 
-        user: user.id, 
-        product: product._id, 
-        rating: newReview.rating, 
-        comment: newReview.comment 
-      });
-      setNewReview({ comment: '', rating: 5 });
-      fetchReviews();
-      showToast("Review submitted successfully!", "success");
-    } catch (error) { 
-      console.error("Review submit error:", error);
-      showToast("Failed to submit review. Try again.", "error"); 
-    }
-  };
-
-  const renderStars = (rating) => Array.from({ length: 5 }, (_, i) => <span key={i} className={i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"}>★</span>);
   const images = product.images?.length > 0 ? product.images : [product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'];
 
   return (
@@ -340,13 +298,7 @@ export default function ProductDetails() {
           <h1 className="text-xl font-bold text-gray-900 leading-tight mb-1">{product.title}</h1>
           <p className="text-sm text-gray-500 mb-3">{product.category}</p>
           
-          {/* 🟢 RATING */}
-          <div className="flex items-center gap-1 mt-1">
-            <div className="flex text-yellow-400 text-sm">
-              {renderStars(averageRating)}
-            </div>
-            <span className="text-xs text-gray-600 ml-1">{averageRating > 0 ? averageRating : '0'} ({reviews.length} Reviews)</span>
-          </div>
+          {/* 🟢 REMOVED: Rating and Reviews Section */}
 
           <div className="mt-2">
             <span className="text-xl font-bold text-gray-900">₹{product.price}</span>
@@ -447,66 +399,12 @@ export default function ProductDetails() {
           </details>
         </div>
 
-        {/* 🟢 MOBILE REVIEW FORM */}
-        <div className="px-4 mt-8 border-t border-gray-200 pt-6">
-          <h3 className="text-base font-bold text-gray-900 mb-4">Write a Review</h3>
-          <form onSubmit={handleReviewSubmit} className="space-y-3">
-            <div>
-              <label className="text-xs font-medium text-gray-700">Rating</label>
-              <div className="flex gap-1 mt-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setNewReview({ ...newReview, rating: star })}
-                    className="text-xl focus:outline-none"
-                  >
-                    <span className={star <= newReview.rating ? "text-yellow-400" : "text-gray-300"}>★</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-700">Comment</label>
-              <textarea
-                value={newReview.comment}
-                onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                placeholder="Share your experience with this product..."
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:border-black placeholder:text-gray-400 mt-1"
-                rows="3"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-black text-white py-3 rounded-full font-bold text-sm tracking-wide hover:bg-gray-800 transition"
-            >
-              Submit Review
-            </button>
-          </form>
-          <div className="mt-6">
-            <h4 className="font-semibold text-gray-900 text-sm mb-3">All Reviews ({reviews.length})</h4>
-            {reviews.length > 0 ? (
-              reviews.map((review, index) => (
-                <div key={index} className="border-b border-gray-100 py-3 last:border-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs text-gray-900 font-semibold">User #{review.user?.slice(-4) || 'Guest'}</span>
-                    <div className="flex text-yellow-400 text-xs">{renderStars(review.rating)}</div>
-                  </div>
-                  <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No reviews yet. Be the first to review!</p>
-            )}
-          </div>
-        </div>
-
         <div className="px-4 mt-6">
           <h2 className="text-base font-bold text-gray-900 mb-4">More From {product.category}</h2>
           <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-4 snap-x snap-mandatory">
             {displayRelated.map((item) => (
               <div key={item._id} className="min-w-[160px] snap-start">
-                <ProductCard id={item._id} title={item.title} price={item.price} image={item.images?.[0] || item.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} rating={4.5} reviewsCount={reviews.length} inStock={item.inStock} />
+                <ProductCard id={item._id} title={item.title} price={item.price} image={item.images?.[0] || item.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'} rating={4.5} reviewsCount={0} inStock={item.inStock} />
               </div>
             ))}
           </div>
@@ -539,14 +437,8 @@ export default function ProductDetails() {
             <h1 className="text-3xl font-bold text-gray-900 leading-tight">{product.title}</h1>
             <p className="text-sm text-gray-500">{product.category}</p>
             
-            {/* 🟢 RATING */}
-            <div className="flex items-center gap-1 mt-1">
-              <div className="flex text-yellow-400 text-sm">
-                {renderStars(averageRating)}
-              </div>
-              <span className="text-xs text-gray-600 ml-1">{averageRating > 0 ? averageRating : '0'} ({reviews.length} Reviews)</span>
-            </div>
-            
+            {/* 🟢 REMOVED: Rating and Reviews Section */}
+
             <div className="mt-2">
               <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
               <div className="mt-1 text-xs text-gray-500">Inclusive of all taxes</div>
@@ -643,72 +535,6 @@ export default function ProductDetails() {
             </div>
 
             <Link to="/" className="block text-gray-500 hover:text-black underline mt-4 text-sm">Continue Shopping</Link>
-          </div>
-        </div>
-
-        {/* 🟢 DESKTOP REVIEW SECTION (Sidebar ke neeche) */}
-        <div className="max-w-2xl mt-16 border-t border-gray-200 pt-10">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-gray-900">Reviews ({reviews.length})</h3>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="font-medium text-gray-900">{averageRating > 0 ? averageRating : '0'}</span>
-              <div className="flex text-yellow-400">{renderStars(averageRating)}</div>
-            </div>
-          </div>
-
-          {/* Review Form */}
-          <div className="bg-gray-50 p-6 rounded-xl mb-8 border border-gray-200">
-            <h4 className="font-bold text-gray-900 text-sm mb-3">Write a Review</h4>
-            <form onSubmit={handleReviewSubmit} className="space-y-4">
-              <div>
-                <label className="text-xs font-medium text-gray-700">Rating</label>
-                <div className="flex gap-1 mt-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setNewReview({ ...newReview, rating: star })}
-                      className="text-2xl focus:outline-none"
-                    >
-                      <span className={star <= newReview.rating ? "text-yellow-400" : "text-gray-300"}>★</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-700">Comment</label>
-                <textarea
-                  value={newReview.comment}
-                  onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                  placeholder="Share your experience with this product..."
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:border-black placeholder:text-gray-400 mt-1 bg-white"
-                  rows="3"
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-black text-white px-6 py-2.5 rounded-full font-bold text-sm tracking-wide hover:bg-gray-800 transition"
-              >
-                Submit Review
-              </button>
-            </form>
-          </div>
-
-          {/* List of Reviews */}
-          <div className="space-y-4">
-            {reviews.length > 0 ? (
-              reviews.map((review, index) => (
-                <div key={index} className="border-b border-gray-100 pb-4 last:border-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm text-gray-900 font-semibold">User #{review.user?.slice(-4) || 'Guest'}</span>
-                    <div className="flex text-yellow-400 text-sm">{renderStars(review.rating)}</div>
-                  </div>
-                  <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No reviews yet. Be the first to review!</p>
-            )}
           </div>
         </div>
       </div>
