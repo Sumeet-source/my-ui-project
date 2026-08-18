@@ -428,8 +428,8 @@ export default function ProductDetails() {
           {/* CHECK DELIVERY + 14-DAY & FREE DELIVERY ROWS */}
           <div className="py-4 border-b border-gray-100">
             <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
-            {/* 🟢 FIX: Subtext is small (text-xs) and faded (text-gray-500) */}
-            <p className="text-xs text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
+            {/* 🟢 FIX: Subtext font size is text-sm (same as heading) but faded (text-gray-500) */}
+            <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
             <div className="flex gap-2 mb-4">
               <input 
                 type="text" 
@@ -449,21 +449,21 @@ export default function ProductDetails() {
             {deliveryAvailable === true && <p className="text-xs text-green-600 font-medium">✓ We deliver to this location!</p>}
             {deliveryAvailable === false && <p className="text-xs text-red-500 font-medium">🚫 We do not deliver to this area.</p>}
 
-            {/* 🟢 FIX: Lines and Know More buttons are now text-sm (larger size) */}
+            {/* 🟢 FIX: Lines and Know More buttons are now text-sm with Black color (text-black) */}
             <div className="space-y-2 mt-4">
               <div className="flex justify-between items-center text-sm">
-                <div className="flex items-center gap-2 text-gray-700">
+                <div className="flex items-center gap-2 text-black">
                   <RotateCcw className="w-4 h-4" />
                   <span>14-day return and size exchange</span>
                 </div>
-                <button onClick={() => setIsReturnModalOpen(true)} className="text-sm text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
+                <button onClick={() => setIsReturnModalOpen(true)} className="text-sm text-black underline hover:text-gray-800 cursor-pointer font-medium">Know More</button>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <div className="flex items-center gap-2 text-gray-700">
+                <div className="flex items-center gap-2 text-black">
                   <Truck className="w-4 h-4" />
                   <span>Free delivery available</span>
                 </div>
-                <button onClick={() => setIsDeliveryModalOpen(true)} className="text-sm text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
+                <button onClick={() => setIsDeliveryModalOpen(true)} className="text-sm text-black underline hover:text-gray-800 cursor-pointer font-medium">Know More</button>
               </div>
             </div>
           </div>
@@ -583,8 +583,8 @@ export default function ProductDetails() {
             <div className="mt-8 border-t border-gray-200 pt-6 max-w-md">
               <div className="py-4 border-b border-gray-200">
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
-                {/* 🟢 FIX: Subtext is small (text-xs) and faded (text-gray-500) */}
-                <p className="text-xs text-gray-500 mb-2">Enter pincode to know exact delivery dates/charges</p>
+                {/* 🟢 FIX: Subtext font size is text-sm (same as heading) but faded (text-gray-500) */}
+                <p className="text-sm text-gray-500 mb-2">Enter pincode to know exact delivery dates/charges</p>
                 <div className="flex gap-2">
                   <input type="text" value={pincodeInput} onChange={(e) => setPincodeInput(e.target.value)} placeholder="Pincode" className="border border-gray-300 rounded-md px-3 py-2 text-sm w-40 outline-none focus:border-black placeholder:text-gray-400" />
                   <button onClick={checkDeliveryAvailability} className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-600">Check</button>
@@ -592,21 +592,21 @@ export default function ProductDetails() {
                 {deliveryAvailable === true && <p className="text-xs text-green-600 font-medium mt-2">✓ We deliver to this location!</p>}
                 {deliveryAvailable === false && <p className="text-xs text-red-500 font-medium mt-2">🚫 We do not deliver to this area.</p>}
 
-                {/* 🟢 FIX: Lines and Know More buttons are now text-sm (larger size) */}
+                {/* 🟢 FIX: Lines and Know More buttons are now text-sm with Black color (text-black) */}
                 <div className="space-y-2 mt-4">
                   <div className="flex justify-between items-center text-sm">
-                    <div className="flex items-center gap-2 text-gray-700">
+                    <div className="flex items-center gap-2 text-black">
                       <RotateCcw className="w-4 h-4" />
                       <span>14-day return and size exchange</span>
                     </div>
-                    <button onClick={() => setIsReturnModalOpen(true)} className="text-sm text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
+                    <button onClick={() => setIsReturnModalOpen(true)} className="text-sm text-black underline hover:text-gray-800 cursor-pointer font-medium">Know More</button>
                   </div>
                   <div className="flex justify-between items-center text-sm">
-                    <div className="flex items-center gap-2 text-gray-700">
+                    <div className="flex items-center gap-2 text-black">
                       <Truck className="w-4 h-4" />
                       <span>Free delivery available</span>
                     </div>
-                    <button onClick={() => setIsDeliveryModalOpen(true)} className="text-sm text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
+                    <button onClick={() => setIsDeliveryModalOpen(true)} className="text-sm text-black underline hover:text-gray-800 cursor-pointer font-medium">Know More</button>
                   </div>
                 </div>
               </div>
