@@ -24,7 +24,8 @@ export default function ProductDetails() {
   const carouselRef = useRef(null);
 
   const [reviews, setReviews] = useState([]);
-  const [newReview, setNewReview] = useState({ user: '', comment: '', rating: 5 });
+  // 🟢 FIX: Removed 'user' from state, backend uses logged-in user automatically
+  const [newReview, setNewReview] = useState({ comment: '', rating: 5 });
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
   const [sizeUnit, setSizeUnit] = useState('in');
 
@@ -161,16 +162,25 @@ export default function ProductDetails() {
     else addToWishlist(product._id);
   };
 
+  // 🟢 FIX: Corrected handleReviewSubmit to use logged-in user.id and fixed state
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!user) { showToast("Please login to write a review", "error"); return; }
     if (!newReview.comment) { showToast("Please write a comment.", "error"); return; }
     try {
-      await axiosClient.post('/api/reviews', { user: user.id, product: product._id, rating: newReview.rating, comment: newReview.comment });
+      await axiosClient.post('/api/reviews', { 
+        user: user.id, 
+        product: product._id, 
+        rating: newReview.rating, 
+        comment: newReview.comment 
+      });
       setNewReview({ comment: '', rating: 5 });
       fetchReviews();
       showToast("Review submitted successfully!", "success");
-    } catch (error) { showToast("Failed to submit review. Try again.", "error"); }
+    } catch (error) { 
+      console.error("Review submit error:", error);
+      showToast("Failed to submit review. Try again.", "error"); 
+    }
   };
 
   const renderStars = (rating) => Array.from({ length: 5 }, (_, i) => <span key={i} className={i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"}>★</span>);
