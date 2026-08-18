@@ -1,3 +1,4 @@
+import AnimatedInfinityLogo from './AnimatedInfinityLogo';
 import { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
@@ -162,8 +163,8 @@ export default function Navbar() {
             <ForgeLogo />
           </div>
           {/* Mobile Logo (Center aligned on mobile because of flex-1 justify-center) */}
-          <Link to="/" className="block md:hidden">
-            <ScrambleLogo text="FORGE" className="forge-logo" />
+          <Link to="/" className="block md:hidden flex items-center justify-center h-8 w-8">
+            <AnimatedInfinityLogo className="w-full h-full" />
           </Link>
         </div>     
 
