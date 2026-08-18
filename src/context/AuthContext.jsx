@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axiosClient from '../api/axiosClient';
+import { useCart } from './CartContext'; // 🟢 Import useCart for restore logic
 
 const AuthContext = createContext();
 
@@ -27,6 +28,16 @@ export function AuthProvider({ children }) {
       localStorage.setItem('user', JSON.stringify(user));
       
       setUser(user);
+
+      // 🟢 RESTORE CART ON LOGIN (YEH LOGIC ADD KIYA HAI)
+      const { addToCart } = useCart(); // Get addToCart from context
+      const pendingItem = localStorage.getItem('pendingCartItem');
+      if (pendingItem) {
+        const item = JSON.parse(pendingItem);
+        addToCart(item);
+        localStorage.removeItem('pendingCartItem'); // Clean up
+      }
+
       return { success: true, user };
     } catch (error) {
       return { success: false, message: error.response?.data?.message || 'Login failed' };
