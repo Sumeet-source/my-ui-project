@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import axiosClient from '../api/axiosClient';
 import ProductCard from '../components/ProductCard';
 import { Truck, RotateCcw, X } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom'; // 🟢 YEH ADD KARO
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -14,6 +15,8 @@ export default function ProductDetails() {
   const { showToast } = useToast();
   const { user } = useAuth();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+   const navigate = useNavigate(); // 🟢 YEH LINE ADD KARO
+  const { id } = useParams();
 
   const [product, setProduct] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
@@ -124,9 +127,8 @@ export default function ProductDetails() {
   if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
   if (!selectedSize) { showToast("Please select a size!", "error"); return; }
   
-  // 🟢 STEP 1: Agar user login nahi hai, toh login page par bhejo aur cart save kar lo
+  // 🟢 Check: Agar user login nahi hai
   if (!user) {
-    // Cart ko local storage mein save karo taaki login ke baad restore ho sake
     const itemToAdd = { 
       ...product, 
       id: product._id, 
@@ -135,15 +137,13 @@ export default function ProductDetails() {
       quantity: 1 
     };
     
-    // Save to localStorage (temporary)
     localStorage.setItem('pendingCartItem', JSON.stringify(itemToAdd));
-    
     showToast("Please login to add items to cart!", "warning");
-    navigate('/login?redirect=/cart');
+    navigate('/login?redirect=/cart'); // 🟢 Ab ye sahi chalega
     return;
   }
 
-  // 🟢 Agar user login hai, toh normal add to cart karo
+  // 🟢 Agar user login hai
   addToCart({ ...product, id: product._id, size: selectedSize, image: product.images?.[0] || product.imageUrl });
   openAddedToBag({ 
     title: product.title, 

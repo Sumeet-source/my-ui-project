@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 
 export default function Cart() {
-  const { cart, removeFromCart, updateQuantity, getTotalPrice, clearCart, discount, applyDiscount, clearDiscount } = useCart(); 
+  const { cart,addToCart, removeFromCart, updateQuantity, getTotalPrice, clearCart, discount, applyDiscount, clearDiscount } = useCart(); 
   const { user } = useAuth();
   const { showToast } = useToast();
   const [orderPlaced, setOrderPlaced] = useState(false);
