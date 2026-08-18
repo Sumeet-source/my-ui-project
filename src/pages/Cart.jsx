@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // 🟢 Link hata kar useNavigate add kiya
+import { useNavigate } from 'react-router-dom'; 
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import axiosClient from '../api/axiosClient';
 
 export default function Cart() {
-  const navigate = useNavigate(); // 🟢 navigate declare kiya
+  const navigate = useNavigate(); 
   const { cart, addToCart, removeFromCart, updateQuantity, getTotalPrice, clearCart, discount, applyDiscount, clearDiscount } = useCart(); 
-  const { user } = useAuth();
+  
+  // 🟢 FIX 1: 'loading' ko destructure kiya
+  const { user, loading } = useAuth(); 
   const { showToast } = useToast();
   const [orderPlaced, setOrderPlaced] = useState(false);
   
-  // 🟢 Coupon Input State
   const [couponCode, setCouponCode] = useState('');
   const [applyingCoupon, setApplyingCoupon] = useState(false);
 
@@ -22,17 +23,18 @@ export default function Cart() {
     if (pendingItem) {
       const item = JSON.parse(pendingItem);
       addToCart(item);
-      localStorage.removeItem('pendingCartItem'); // Clean up
+      localStorage.removeItem('pendingCartItem'); 
       showToast("Item added to your cart!", "success");
     }
   }, []); 
 
-  // 🟢 Safety Check - Agar user logout hai toh cart clear karo
+  // 🟢 FIX 2: Safety Check - Ab auth loading complete hone ke baad hi cart clear karega
   useEffect(() => {
-    if (!user) {
+    // 🔥 Jab tak loading true hai, wait karo. Jab loading complete ho aur user null ho, tab clear karo.
+    if (!loading && !user) {
       clearCart();
     }
-  }, [user, clearCart]);
+  }, [user, loading, clearCart]);
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
@@ -70,21 +72,8 @@ export default function Cart() {
             <div className="flex-1">
               <p className="text-green-700 text-sm font-medium mb-4">Create an account to get exclusive benefits.</p>
               <div className="flex flex-col sm:flex-row gap-4">
-                {/* 🟢 FIX: Link ko button + onClick navigate se replace kiya */}
-                <button
-                  type="button"
-                  onClick={() => navigate('/signup')}
-                  className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded"
-                >
-                  Register
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/login')}
-                  className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded"
-                >
-                  Login
-                </button>
+                <button type="button" onClick={() => navigate('/signup')} className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Register</button>
+                <button type="button" onClick={() => navigate('/login')} className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Login</button>
               </div>
             </div>
             <div className="flex-1 md:border-l md:border-gray-200 md:pl-6 flex flex-col justify-center gap-3 text-sm text-gray-600">
@@ -108,24 +97,8 @@ export default function Cart() {
           <div className={!user ? 'flex-1' : ''}>
             <p className="text-gray-900 font-medium text-lg">You have no items in your bag.</p>
             <p className="text-gray-500 mt-1 text-sm">Don't know where to start? Here's the gear everyone's after.</p>
-            
-            {/* 🟢 FIX: Link ko button + onClick navigate se replace kiya */}
-            <button
-              type="button"
-              onClick={() => navigate('/men')}
-              className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition"
-            >
-              Shop Best Sellers
-            </button>
-            
-            {/* 🟢 FIX: Link ko button + onClick navigate se replace kiya */}
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className="block mt-4 text-sm text-gray-500 hover:text-black underline"
-            >
-              Continue Shopping
-            </button>
+            <button type="button" onClick={() => navigate('/men')} className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition">Shop Best Sellers</button>
+            <button type="button" onClick={() => navigate('/')} className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</button>
           </div>
           {!user && <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[250px]"></div>}
         </div>
@@ -149,7 +122,6 @@ export default function Cart() {
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Your Bag ({cart.length})</h1>
       
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Cart Items List */}
         <div className="flex-1 space-y-4">
           {cart.map((item, index) => (
             <div key={`${item.id}-${item.size}-${index}`} className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
@@ -169,7 +141,6 @@ export default function Cart() {
           ))}
         </div>
 
-        {/* Order Summary */}
         <div className="lg:w-1/3 bg-gray-50 p-6 rounded-lg h-fit">
           <h2 className="text-xl font-bold text-gray-900 border-b border-gray-200 pb-4 mb-4">Order Summary</h2>
           <div className="flex justify-between text-gray-600 mb-2">
@@ -177,7 +148,6 @@ export default function Cart() {
             <span>${subtotal.toFixed(2)}</span>
           </div>
           
-          {/* 🟢 COUPON INPUT SECTION */}
           <div className="flex gap-2 mt-2">
             <input 
               type="text" 
@@ -195,7 +165,6 @@ export default function Cart() {
             </button>
           </div>
 
-          {/* Discount Display */}
           {discount.amount > 0 && (
             <div className="flex justify-between text-green-600 text-sm mt-2">
               <span>Discount ({discount.code})</span>
@@ -208,12 +177,7 @@ export default function Cart() {
             <span>${finalTotal.toFixed(2)}</span>
           </div>
           
-          {/* 🟢 FIX: Proceed to Checkout ko bhi button + onClick navigate se replace kiya */}
-          <button
-            type="button"
-            onClick={() => navigate('/checkout')}
-            className="w-full bg-black text-white py-3 mt-6 rounded font-bold hover:bg-gray-800 transition uppercase tracking-wider text-center block"
-          >
+          <button type="button" onClick={() => navigate('/checkout')} className="w-full bg-black text-white py-3 mt-6 rounded font-bold hover:bg-gray-800 transition uppercase tracking-wider text-center block">
             Proceed to Checkout
           </button>
         </div>
