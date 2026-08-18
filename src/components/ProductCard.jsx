@@ -11,6 +11,21 @@ export default function ProductCard({ id, title, price, image, badge }) {
   
   const isLiked = isInWishlist(id);
 
+  // 🟢 FIX 2: Cloudinary image optimization helper function
+  const getOptimizedImageUrl = (url) => {
+    if (!url) return 'https://placehold.co/600x600/333/fff?text=Product+Image';
+    
+    if (url.includes('cloudinary.com')) {
+      if (!url.includes('f_auto') && !url.includes('q_auto') && !url.includes('w_')) {
+        const parts = url.split('/upload/');
+        if (parts.length === 2) {
+          return `${parts[0]}/upload/w_400,f_auto,q_auto/${parts[1]}`;
+        }
+      }
+    }
+    return url;
+  };
+
   const handleWishlistToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -42,11 +57,11 @@ export default function ProductCard({ id, title, price, image, badge }) {
     <div onClick={handleCardClick} className="group cursor-pointer">
       <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
         <img 
-          src={image || 'https://placehold.co/600x600/333/fff?text=Product+Image'} 
+          src={getOptimizedImageUrl(image)} // 🟢 FIX 2: Optimized URL use ho raha hai
           alt={title} 
           loading="lazy" // 🟢 FIX 1: Lazy loading add kar diya
-          width="400"    // 🟢 Width specify kar di
-          height="400"   // 🟢 Height specify kar di
+          width="400"    
+          height="400"   
           className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
           onError={(e) => { e.target.src = 'https://placehold.co/600x600/333/fff?text=Product+Image'; }} 
         />
