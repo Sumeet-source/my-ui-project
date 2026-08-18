@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // 🟢 REMOVED: useNavigate import
+import { useNavigate } from 'react-router-dom'; // 🟢 useNavigate wapas add kiya
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import axiosClient from '../api/axiosClient';
 
 export default function Cart() {
+  const navigate = useNavigate(); // 🟢 navigate declare kiya
   const { cart, addToCart, removeFromCart, updateQuantity, getTotalPrice, clearCart, discount, applyDiscount, clearDiscount } = useCart(); 
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -69,9 +70,9 @@ export default function Cart() {
             <div className="flex-1">
               <p className="text-green-700 text-sm font-medium mb-4">Create an account to get exclusive benefits.</p>
               <div className="flex flex-col sm:flex-row gap-4">
-                {/* 🟢 FIX: onClick HATAYA, sirf `to` use kiya */}
-                <Link to="/signup" className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Register</Link>
-                <Link to="/login" className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Login</Link>
+                {/* 🟢 FIX: Link ki jagah Button aur onClick navigate use kiya */}
+                <button onClick={() => navigate('/signup')} className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Register</button>
+                <button onClick={() => navigate('/login')} className="flex-1 border border-black py-3 text-center font-medium hover:bg-gray-50 transition rounded">Login</button>
               </div>
             </div>
             <div className="flex-1 md:border-l md:border-gray-200 md:pl-6 flex flex-col justify-center gap-3 text-sm text-gray-600">
@@ -95,10 +96,12 @@ export default function Cart() {
           <div className={!user ? 'flex-1' : ''}>
             <p className="text-gray-900 font-medium text-lg">You have no items in your bag.</p>
             <p className="text-gray-500 mt-1 text-sm">Don't know where to start? Here's the gear everyone's after.</p>
-            {/* 🟢 FIX: onClick HATAYA, sirf `to` use kiya */}
-            <Link to="/men" className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition">Shop Best Sellers</Link>
-            {/* 🟢 FIX: onClick HATAYA, sirf `to` use kiya */}
-            <Link to="/" className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</Link>
+            
+            {/* 🟢 FIX: Button aur onClick navigate */}
+            <button onClick={() => navigate('/men')} className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition">Shop Best Sellers</button>
+            
+            {/* 🟢 FIX: Button aur onClick navigate */}
+            <button onClick={() => navigate('/')} className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</button>
           </div>
           {!user && <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[250px]"></div>}
         </div>
@@ -181,12 +184,12 @@ export default function Cart() {
             <span>${finalTotal.toFixed(2)}</span>
           </div>
           
-          <Link 
-            to="/checkout" 
+          <button 
+            onClick={() => navigate('/checkout')} 
             className="w-full bg-black text-white py-3 mt-6 rounded font-bold hover:bg-gray-800 transition uppercase tracking-wider text-center block"
           >
             Proceed to Checkout
-          </Link>
+          </button>
         </div>
       </div>
     </div>
