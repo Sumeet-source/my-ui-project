@@ -11,15 +11,20 @@ export default function ProductCard({ id, title, price, image, badge, index = 0 
   
   const isLiked = isInWishlist(id);
 
-  // 🟢 Cloudinary optimization helper function
+  // 🟢 iPhone optimize karne ke liye detect karo
+  const isiPhone = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // 🟢 iPhone ke liye f_jpg, baaki ke liye f_auto
   const getOptimizedImageUrl = (url) => {
     if (!url) return 'https://placehold.co/600x600/333/fff?text=Product+Image';
     
+    const format = isiPhone ? 'f_jpg' : 'f_auto';
+
     if (url.includes('cloudinary.com') && !url.includes('w_400')) {
       if (url.includes('/upload/v')) {
-        return url.replace('/upload/v', '/upload/w_400,f_auto,q_auto/v');
+        return url.replace('/upload/v', `/upload/w_400,${format},q_auto/v`);
       } else if (url.includes('/upload/') && !url.includes('/upload/v')) {
-        return url.replace('/upload/', '/upload/w_400,f_auto,q_auto/');
+        return url.replace('/upload/', `/upload/w_400,${format},q_auto/`);
       }
     }
     return url;
@@ -59,7 +64,7 @@ export default function ProductCard({ id, title, price, image, badge, index = 0 
           src={getOptimizedImageUrl(image)} 
           alt={title} 
           loading="lazy" 
-          fetchpriority={index < 4 ? "high" : "auto"} // 🟢 Pehli 4 images high priority
+          fetchpriority={index < 4 ? "high" : "auto"}
           width="400"    
           height="400"   
           className="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
