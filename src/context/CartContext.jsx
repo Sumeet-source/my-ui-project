@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'; // 🟢 useCallback IMPORT KARO
 
 const CartContext = createContext();
 
@@ -18,7 +18,8 @@ export function CartProvider({ children }) {
     localStorage.setItem('shopping_cart', JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (item) => {
+  // 🟢 FIX: Sare functions ko useCallback mein wrap kar diya
+  const addToCart = useCallback((item) => {
     setCart((prev) => {
       const existingItem = prev.find((i) => i.id === item.id && i.size === item.size);
       if (existingItem) {
@@ -30,25 +31,25 @@ export function CartProvider({ children }) {
       }
       return [...prev, { ...item, quantity: 1 }];
     });
-  };
+  }, []);
 
   // 🟢 NEW FUNCTIONS TO HANDLE POPUP
-  const openAddedToBag = (product) => {
+  const openAddedToBag = useCallback((product) => {
     setAddedProductData(product);
     setIsAddedToBagOpen(true);
-  };
+  }, []);
 
-  const closeAddedToBag = () => {
+  const closeAddedToBag = useCallback(() => {
     setIsAddedToBagOpen(false);
     // Data ko thodi der baad clear kar dete hain taaki animation smooth rahe
     setTimeout(() => setAddedProductData(null), 300);
-  };
+  }, []);
 
-  const removeFromCart = (id, size) => {
+  const removeFromCart = useCallback((id, size) => {
     setCart((prev) => prev.filter((item) => !(item.id === id && item.size === size)));
-  };
+  }, []);
 
-  const updateQuantity = (id, size, delta) => {
+  const updateQuantity = useCallback((id, size, delta) => {
     setCart((prev) =>
       prev.map((item) =>
         item.id === id && item.size === size
@@ -56,24 +57,24 @@ export function CartProvider({ children }) {
           : item
       )
     );
-  };
+  }, []);
 
-  const getTotalPrice = () => {
+  const getTotalPrice = useCallback(() => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
+  }, [cart]);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCart([]);
     setDiscount({ amount: 0, code: '' });
-  };
+  }, []);
 
-  const applyDiscount = (amount, code) => {
+  const applyDiscount = useCallback((amount, code) => {
     setDiscount({ amount, code });
-  };
+  }, []);
 
-  const clearDiscount = () => {
+  const clearDiscount = useCallback(() => {
     setDiscount({ amount: 0, code: '' });
-  };
+  }, []);
 
   return (
     <CartContext.Provider value={{
