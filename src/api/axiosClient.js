@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// 🔥 HARDCODED FIX: Backend URL directly set kiya hai (Vercel env variable issue bypass)
-const API_URL = 'https://forge-backend-production-1cef.up.railway.app';
+// 🟢 FIX: Vercel .env variable use karo, agar nahi hai toh fallback URL
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://forge-backend-fawn.vercel.app';
 
 const api = axios.create({
   baseURL: API_URL,
