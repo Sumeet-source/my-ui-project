@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import { useToast } from '../context/ToastContext.jsx'; // 🟢 Toast import kiya
+import { useToast } from '../context/ToastContext.jsx';
 import ForgeLogo from './ForgeLogo';
 
 // 🟢 MOBILE SCRAMBLE DECODE ANIMATION COMPONENT
@@ -51,10 +51,10 @@ export default function Navbar() {
   const [searchInput, setSearchInput] = useState('');
   const inputRef = useRef(null);
   
-  // 🟢 FIX 1: clearCart ko destructure kiya
+  // 🟢 Cart and Auth
   const { cart, clearCart } = useCart(); 
   const { user, logout } = useAuth();
-  const { showToast } = useToast(); // 🟢 FIX 2: showToast declare kiya
+  const { showToast } = useToast();
   
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
@@ -86,7 +86,7 @@ export default function Navbar() {
     });
   };
 
-  // 🟢 FIX 3: handleLogout function sahi kiya
+  // 🟢 Logout Function
   const handleLogout = () => {
     clearCart(); 
     logout(); 
@@ -154,16 +154,17 @@ export default function Navbar() {
         </div>
 
         {/* LOGO SECTION */}
-        <div className="flex items-center justify-center flex-1 md:flex-none">
-          <Link to="/" className="hidden md:block">
-            <ForgeLogo />
-          </Link>
-          <Link to="/" className="block md:hidden">
-            <span className="text-xl font-black tracking-[0.2em] text-black">
-              <ScrambleLogo text="FORGE" />
-            </span>
-          </Link>
-        </div>
+<div className="flex items-center justify-center flex-1 md:flex-none">
+  {/* 🟢 FIX: Directly render ForgeLogo. Extra Link hata diya. */}
+  <div className="hidden md:block">
+    <ForgeLogo />
+  </div>
+  <Link to="/" className="block md:hidden">
+    <span className="text-xl font-black tracking-[0.2em] text-black">
+      <ScrambleLogo text="FORGE" />
+    </span>
+  </Link>
+</div>
 
         {/* Mobile Right Icons */}
         <div className="flex items-center gap-4 md:hidden">
@@ -203,7 +204,8 @@ export default function Navbar() {
           </div>
           <Link to="/cart" className="relative text-black">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-            {cart.length > 0 && <span className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
+            {/* 🟢 FIXED: Desktop badge key add kiya */}
+            {cart.length > 0 && <span key={cart.length} className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </Link>
         </div>
       </div>
