@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // 🟢 STEP 1: useEffect import kiya
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -14,6 +14,17 @@ export default function Cart() {
   // 🟢 Coupon Input State
   const [couponCode, setCouponCode] = useState('');
   const [applyingCoupon, setApplyingCoupon] = useState(false);
+
+  // 🟢 STEP 2: Login ke baad pending item restore karo
+  useEffect(() => {
+    const pendingItem = localStorage.getItem('pendingCartItem');
+    if (pendingItem) {
+      const item = JSON.parse(pendingItem);
+      addToCart(item);
+      localStorage.removeItem('pendingCartItem'); // Clean up
+      showToast("Item added to your cart!", "success");
+    }
+  }, []); // 🟢 Sirf ek baar run hoga jab page load ho
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {

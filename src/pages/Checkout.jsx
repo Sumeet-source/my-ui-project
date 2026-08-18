@@ -10,6 +10,13 @@ export default function Checkout() {
   const { showToast } = useToast();
   const { user } = useAuth();
 
+  // 🟢 STEP 3 FIX: Agar user login nahi hai, toh checkout khulne se pehle login par bhejo
+  useEffect(() => {
+    if (!user) {
+      navigate('/login?redirect=/checkout');
+    }
+  }, [user, navigate]);
+
   const { cart, clearCart, getTotalPrice, discount, clearDiscount } = useCart() || { 
     cart: [], 
     clearCart: () => {}, 

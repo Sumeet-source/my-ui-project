@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
-import { useCart } from './context/CartContext'; // 👈 1. Import useCart
-import AddedToBagPopup from './components/AddedToBagPopup'; // 👈 2. Import the Popup component
+import { useCart } from './context/CartContext'; 
+import AddedToBagPopup from './components/AddedToBagPopup'; 
+import ScrollToTop from './components/ScrollToTop'; // 🟢 STEP 1: Import ScrollToTop component
 
 // --- COMPONENTS ---
 import Navbar from './components/Navbar';
@@ -26,13 +27,16 @@ import Checkout from './pages/Checkout';
 import NewArrivalsFixed from './pages/NewArrivalsFixed';
 
 function App() {
-  // 👈 3. Extract popup state from CartContext
   const { isAddedToBagOpen, addedProductData, closeAddedToBag } = useCart();
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="flex-1 bg-white">
+        
+        {/* 🟢 STEP 2: YEH LINE ADD KARO (Routes ke bilkul upar) */}
+        <ScrollToTop /> 
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/men" element={<Men />} />
@@ -55,7 +59,6 @@ function App() {
       </div>
       <Footer />
 
-      {/* 👈 4. Render the Popup Component Here (Overlays on top of everything) */}
       <AddedToBagPopup 
         isOpen={isAddedToBagOpen} 
         closePopup={closeAddedToBag} 

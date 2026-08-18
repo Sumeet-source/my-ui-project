@@ -121,17 +121,37 @@ export default function ProductDetails() {
   const sizeOptions = isShoeProduct ? shoeSizes : clothingSizes;
 
   const handleAddToCart = () => {
-    if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
-    if (!selectedSize) { showToast("Please select a size!", "error"); return; }
-    
-    addToCart({ ...product, id: product._id, size: selectedSize, image: product.images?.[0] || product.imageUrl });
-    openAddedToBag({ 
-      title: product.title, 
-      price: product.price, 
+  if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
+  if (!selectedSize) { showToast("Please select a size!", "error"); return; }
+  
+  // 🟢 STEP 1: Agar user login nahi hai, toh login page par bhejo aur cart save kar lo
+  if (!user) {
+    // Cart ko local storage mein save karo taaki login ke baad restore ho sake
+    const itemToAdd = { 
+      ...product, 
+      id: product._id, 
       size: selectedSize, 
-      image: product.images?.[0] || product.imageUrl 
-    });
-  };
+      image: product.images?.[0] || product.imageUrl,
+      quantity: 1 
+    };
+    
+    // Save to localStorage (temporary)
+    localStorage.setItem('pendingCartItem', JSON.stringify(itemToAdd));
+    
+    showToast("Please login to add items to cart!", "warning");
+    navigate('/login?redirect=/cart');
+    return;
+  }
+
+  // 🟢 Agar user login hai, toh normal add to cart karo
+  addToCart({ ...product, id: product._id, size: selectedSize, image: product.images?.[0] || product.imageUrl });
+  openAddedToBag({ 
+    title: product.title, 
+    price: product.price, 
+    size: selectedSize, 
+    image: product.images?.[0] || product.imageUrl 
+  });
+};
 
   const handleWishlistToggle = (e) => {
     e.preventDefault();

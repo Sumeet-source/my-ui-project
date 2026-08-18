@@ -25,7 +25,12 @@ export default function Login() {
       const result = await login(email, password);
       if (result.success) {
         showToast('Logged in successfully!', 'success');
-        navigate('/');
+        
+        // 🟢 STEP 4 (FINAL): YEH 2 LINES ADD KARO (Redirect handle karna)
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get('redirect') || '/';
+        navigate(redirect);
+        
       } else {
         showToast(result.message, 'error');
       }
