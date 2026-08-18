@@ -177,7 +177,8 @@ export default function ProductDetails() {
   const images = product.images?.length > 0 ? product.images : [product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'];
 
   return (
-    <div className="bg-white min-h-screen pb-20 font-sans">
+    // 🟢 FIX: Replaced 'font-sans' with 'font-helvetica' (which falls back to Arial, system-ui, and finally sans-serif)
+    <div className="bg-white min-h-screen pb-20 font-helvetica">
       
       {/* ================= SIZE CHART MODAL (Dynamic for Shoes vs Clothing) ================= */}
       {isSizeChartOpen && (
@@ -435,12 +436,14 @@ export default function ProductDetails() {
                 value={pincodeInput} 
                 onChange={(e) => setPincodeInput(e.target.value)} 
                 placeholder="Pincode" 
-                className="border border-gray-300 rounded px-3 py-2 text-sm w-full outline-none focus:border-black"
+                // 🟢 FIX: Made input exactly like Nike's (rounded-md, placeholder text color, border)
+                className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full outline-none focus:border-black placeholder:text-gray-400"
               />
               <button 
                 onClick={checkDeliveryAvailability}
                 disabled={checkingPincode}
-                className="bg-white border border-gray-300 rounded px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-600 disabled:opacity-50"
+                // 🟢 FIX: Made button exactly like Nike's (slightly rounded, darker gray text)
+                className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-600 disabled:opacity-50"
               >
                 {checkingPincode ? '...' : 'Check'}
               </button>
@@ -455,14 +458,15 @@ export default function ProductDetails() {
                   <RotateCcw className="w-4 h-4" />
                   <span>14-day return and size exchange</span>
                 </div>
-                <button onClick={() => setIsReturnModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium">Know More</button>
+                {/* 🟢 FIX: Made "Know More" buttons exactly like Nike's (smaller font, dark gray instead of light gray) */}
+                <button onClick={() => setIsReturnModalOpen(true)} className="text-xs text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <div className="flex items-center gap-2 text-gray-700">
                   <Truck className="w-4 h-4" />
                   <span>Free delivery available</span>
                 </div>
-                <button onClick={() => setIsDeliveryModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium">Know More</button>
+                <button onClick={() => setIsDeliveryModalOpen(true)} className="text-xs text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
               </div>
             </div>
           </div>
@@ -550,7 +554,6 @@ export default function ProductDetails() {
             <div className="mt-4">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="text-sm font-bold text-gray-900">Select Size</h3>
-                {/* 🟢 UPDATED: Size Guide button - same font size, weight, and color as "Select Size" */}
                 <button onClick={() => setIsSizeChartOpen(true)} className="text-sm font-bold text-gray-900 hover:text-black transition cursor-pointer">Size Guide</button>
               </div>
               <div className="grid grid-cols-3 gap-2 max-w-md">
@@ -585,27 +588,26 @@ export default function ProductDetails() {
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
                 <p className="text-xs text-gray-500 mb-2">Enter pincode to know exact delivery dates/charges</p>
                 <div className="flex gap-2">
-                  <input type="text" value={pincodeInput} onChange={(e) => setPincodeInput(e.target.value)} placeholder="Pincode" className="border border-gray-300 rounded px-3 py-2 text-sm w-40 outline-none focus:border-black" />
-                  <button onClick={checkDeliveryAvailability} className="bg-white border border-gray-300 rounded px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-600">Check</button>
+                  <input type="text" value={pincodeInput} onChange={(e) => setPincodeInput(e.target.value)} placeholder="Pincode" className="border border-gray-300 rounded-md px-3 py-2 text-sm w-40 outline-none focus:border-black placeholder:text-gray-400" />
+                  <button onClick={checkDeliveryAvailability} className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-600">Check</button>
                 </div>
                 {deliveryAvailable === true && <p className="text-xs text-green-600 font-medium mt-2">✓ We deliver to this location!</p>}
                 {deliveryAvailable === false && <p className="text-xs text-red-500 font-medium mt-2">🚫 We do not deliver to this area.</p>}
 
-                {/* 🟢 MISSING LINES RESTORED (Desktop) */}
                 <div className="space-y-2 mt-4">
                   <div className="flex justify-between items-center text-sm">
                     <div className="flex items-center gap-2 text-gray-700">
                       <RotateCcw className="w-4 h-4" />
                       <span>14-day return and size exchange</span>
                     </div>
-                    <button onClick={() => setIsReturnModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium text-xs">Know More</button>
+                    <button onClick={() => setIsReturnModalOpen(true)} className="text-xs text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <div className="flex items-center gap-2 text-gray-700">
                       <Truck className="w-4 h-4" />
                       <span>Free delivery available</span>
                     </div>
-                    <button onClick={() => setIsDeliveryModalOpen(true)} className="text-gray-500 underline cursor-pointer hover:text-black font-medium text-xs">Know More</button>
+                    <button onClick={() => setIsDeliveryModalOpen(true)} className="text-xs text-gray-700 underline hover:text-black cursor-pointer font-medium">Know More</button>
                   </div>
                 </div>
               </div>
