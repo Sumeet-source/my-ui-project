@@ -46,10 +46,13 @@ const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
   return <span>{displayText}</span>;
 };
 
-// 🟢 FIX: Mega Dropdown ko bilkul screenshot wali position par fix kiya
+// 🟢 FIX: Ab sirf ek hi MegaMenu instance render hota hai (state-driven), isliye
+// position hamesha poori nav-row ke center me fixed rehti hai — chahe Men/Women/Shoes/Outlet
+// kisi pe bhi hover karo. Visibility ab parent ke `activeMenu` state se control hoti hai,
+// isliye yahan se `hidden group-hover:block` hata diya gaya hai.
 const MegaMenu = ({ items }) => {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 w-[1100px] bg-[#1A1A1A] shadow-2xl border border-gray-800 py-8 px-6 z-50 hidden group-hover:block rounded-b-lg">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 w-[1100px] bg-[#1A1A1A] shadow-2xl border border-gray-800 py-8 px-6 z-50 rounded-b-lg">
       <div className="flex flex-col md:flex-row gap-8">
         {/* Left Side: Sub-categories (3 Columns) */}
         <div className="flex-1 grid grid-cols-3 gap-x-6 gap-y-4">
@@ -83,6 +86,8 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  // 🟢 NEW: kaunsa mega menu abhi active/open hai, isse control hoga
+  const [activeMenu, setActiveMenu] = useState(null);
   const inputRef = useRef(null);
   
   const { cart, clearCart } = useCart(); 
@@ -191,7 +196,11 @@ export default function Navbar() {
       </div>
 
       {/* --- MAIN NAVIGATION BAR --- */}
-      <div className="flex justify-between items-center px-4 md:px-10 py-2 md:py-3 max-w-[1600px] mx-auto relative">
+      {/* 🟢 onMouseLeave yahan add kiya — jab cursor poori row (links + dropdown) se bahar jaayega tabhi menu band hoga */}
+      <div
+        className="flex justify-between items-center px-4 md:px-10 py-2 md:py-3 max-w-[1600px] mx-auto relative"
+        onMouseLeave={() => setActiveMenu(null)}
+      >
         
         {/* Mobile Action Buttons */}
         <div className="flex items-center gap-3 md:hidden">
@@ -225,39 +234,36 @@ export default function Navbar() {
         </div>
 
         {/* --- DESKTOP MEGA MENU LINKS --- */}
+        {/* 🟢 Har trigger pe sirf onMouseEnter add kiya — ab yahan se MegaMenu render nahi hota, sirf state set hoti hai */}
         <div className="hidden md:flex justify-center flex-1 gap-8 lg:gap-12 text-[15px] font-bold items-center h-10">
-          <div className="relative group h-full flex items-center cursor-pointer">
+          <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu(null)}>
             <Link to="/new-arrivals" className={`${isActiveNew ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
               <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm font-medium ml-0.5">🔥</span></span>
             </Link>
           </div>
 
-          <div className="relative group h-full flex items-center cursor-pointer">
+          <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('men')}>
             <Link to="/men" className={`${isActiveMen ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors flex items-center gap-1`}>
               <span className={getUnderlineSpanClasses(isActiveMen)}>Men</span>
             </Link>
-            <MegaMenu items={menMenuItems} />
           </div>
 
-          <div className="relative group h-full flex items-center cursor-pointer">
+          <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('women')}>
             <Link to="/women" className={`${isActiveWomen ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
               <span className={getUnderlineSpanClasses(isActiveWomen)}>Women</span>
             </Link>
-            <MegaMenu items={womenMenuItems} />
           </div>
 
-          <div className="relative group h-full flex items-center cursor-pointer">
+          <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('shoes')}>
             <Link to="/shoes" className={`${isActiveShoes ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
               <span className={getUnderlineSpanClasses(isActiveShoes)}>Shoes</span>
             </Link>
-            <MegaMenu items={shoesMenuItems} />
           </div>
 
-          <div className="relative group h-full flex items-center cursor-pointer">
+          <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('outlet')}>
             <Link to="/outlet" className={`${isActiveOutlet ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
               <span className={getUnderlineSpanClasses(isActiveOutlet)}>Outlet</span>
             </Link>
-            <MegaMenu items={outletMenuItems} />
           </div>
         </div>
 
@@ -272,6 +278,13 @@ export default function Navbar() {
             {cart.length > 0 && <span key={cart.length} className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </Link>
         </div>
+
+        {/* 🟢 SINGLE MegaMenu instance — hamesha isi outer row (relative container) ke center me khulta hai,
+            content sirf activeMenu state ke hisaab se badalta hai, position kabhi nahi hilti */}
+        {activeMenu === 'men' && <MegaMenu items={menMenuItems} />}
+        {activeMenu === 'women' && <MegaMenu items={womenMenuItems} />}
+        {activeMenu === 'shoes' && <MegaMenu items={shoesMenuItems} />}
+        {activeMenu === 'outlet' && <MegaMenu items={outletMenuItems} />}
       </div>
 
       {/* --- MOBILE FULL-SCREEN SEARCH OVERLAY --- */}
