@@ -93,9 +93,10 @@ export default function Home() {
       </div>
 
       {/* 🟢 UPDATED VIDEO BANNER - Mobile height reduced & Buttons Circular */}
-      <section className="relative w-full min-h-[50dvh] md:min-h-[85vh] max-h-[900px] overflow-hidden bg-black">
+            {/* --- VIDEO BANNER (Zero black space, aspect-video) --- */}
+      <section className="relative w-full bg-black flex flex-col items-center justify-center">
         <video 
-          className="w-full h-full object-cover"
+          className="w-full h-auto max-h-[85vh] object-contain md:object-cover"
           style={{ objectPosition: 'center 15%', transform: 'scale(1.08)', transformOrigin: 'top center' }}
           autoPlay 
           loop 
@@ -110,7 +111,6 @@ export default function Home() {
 
         <div className="absolute bottom-0 left-0 w-full p-4 md:p-10 pb-6 md:pb-14 flex flex-col items-start gap-3 md:gap-4 text-black md:text-white">
           <div className="flex flex-col sm:flex-row gap-3">
-            {/* 🟢 FIX: Buttons ko rounded-full kar diya */}
             <Link to="/men" className="bg-white text-black border-2 border-black md:border-white px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-full text-center">
               Shop men →
             </Link>
