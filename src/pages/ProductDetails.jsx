@@ -411,7 +411,7 @@ export default function ProductDetails() {
             <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
             <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
             
-            {/* 🟢 FIX: Mobile Pincode Input + Auto-Check Button */}
+            {/* 🟢 FIX: Mobile Pincode - Only text fades */}
             <div className="flex items-stretch gap-0 mb-4">
               <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
                 <input 
@@ -424,10 +424,10 @@ export default function ProductDetails() {
                 <button 
                   onClick={checkDeliveryAvailability}
                   disabled={pincodeInput.length !== 6 || checkingPincode}
-                  className={`px-4 py-2 text-base font-medium transition-colors duration-300 ${
+                  className={`px-4 py-2 text-base font-medium transition-colors duration-300 bg-white ${
                     pincodeInput.length === 6 && !checkingPincode
-                      ? 'bg-black text-white cursor-pointer'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      ? 'text-black cursor-pointer'
+                      : 'text-gray-400 cursor-not-allowed'
                   }`}
                 >
                   {checkingPincode ? '...' : 'Check'}
@@ -578,7 +578,7 @@ export default function ProductDetails() {
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
                 <p className="text-sm text-gray-500 mb-2">Enter pincode to know exact delivery dates/charges</p>
                 
-                {/* 🟢 FIX: Desktop Pincode Input + Auto-Check Button */}
+                {/* 🟢 FIX: Desktop Pincode - Only text fades */}
                 <div className="flex items-stretch gap-0 w-full max-w-sm">
                   <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
                     <input 
@@ -591,10 +591,10 @@ export default function ProductDetails() {
                     <button 
                       onClick={checkDeliveryAvailability}
                       disabled={pincodeInput.length !== 6 || checkingPincode}
-                      className={`px-4 py-2 text-base font-medium transition-colors duration-300 ${
+                      className={`px-4 py-2 text-base font-medium transition-colors duration-300 bg-white ${
                         pincodeInput.length === 6 && !checkingPincode
-                          ? 'bg-black text-white cursor-pointer'
-                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          ? 'text-black cursor-pointer'
+                          : 'text-gray-400 cursor-not-allowed'
                       }`}
                     >
                       {checkingPincode ? '...' : 'Check'}
