@@ -46,18 +46,18 @@ const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
   return <span>{displayText}</span>;
 };
 
-// 🟢 MEGA DROPDOWN (DARK GREY THEME)
+// 🟢 MEGA DROPDOWN (Center Aligned - Women position)
 const MegaMenu = ({ items }) => {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 w-[90vw] max-w-[1200px] bg-[#1A1A1A] shadow-2xl border border-gray-800 py-8 px-6 z-50 hidden group-hover:block rounded-b-lg">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 w-[90vw] max-w-[1200px] bg-[#1A1A1A] shadow-2xl border border-gray-800 py-8 px-6 z-50 hidden group-hover:block rounded-b-xl">
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Left Side: Sub-categories (3 Columns) */}
+        {/* Left Side: Sub-categories */}
         <div className="flex-1 grid grid-cols-3 gap-x-6 gap-y-4">
           {items.map((col, idx) => (
             <div key={idx} className="flex flex-col gap-1">
               <h4 className="font-bold text-xs text-white uppercase tracking-wider mb-2">{col.heading}</h4>
               {col.links.map((link, i) => (
-                <Link key={i} to={link.path} className="text-sm text-gray-400 hover:text-white hover:underline transition-colors">
+                <Link key={i} to={link.path} className="text-sm text-white hover:underline transition-colors">
                   {link.label}
                 </Link>
               ))}
@@ -168,25 +168,24 @@ export default function Navbar() {
   ];
 
   return (
-    // 🟢 FIX: Dark Grey Navbar (`bg-[#1A1A1A]`) aur Text White (`text-white`)
     <nav className={`${isHome ? 'sticky top-0' : 'relative'} z-50 bg-[#1A1A1A] text-white shadow-sm border-b border-gray-800`}>
       
       {/* --- TOP UTILITY BAR --- */}
       <div className="border-b border-gray-800">
-        <div className="max-w-[1600px] mx-auto px-4 md:px-10 py-1.5 hidden md:flex justify-end items-center gap-4 text-[11px] font-medium text-gray-400 tracking-wide">
-          <Link to="/signup" className="uppercase hover:text-white transition">Sign Up</Link>
+        <div className="max-w-[1600px] mx-auto px-4 md:px-10 py-1.5 hidden md:flex justify-end items-center gap-4 text-[11px] font-medium text-white tracking-wide">
+          <Link to="/signup" className="uppercase hover:text-gray-300 transition">Sign Up</Link>
           {user ? (
             <>
-              <Link to="/dashboard" className="hover:text-white transition">Account</Link>
-              <button onClick={handleLogout} className="bg-transparent border-none text-gray-400 hover:text-white transition">Logout</button>
+              <Link to="/dashboard" className="hover:text-gray-300 transition">Account</Link>
+              <button onClick={handleLogout} className="bg-transparent border-none text-white hover:text-gray-300 transition">Logout</button>
             </>
           ) : (
             <>
-              <Link to="/login" className="hover:text-white transition">Log In</Link>
+              <Link to="/login" className="hover:text-gray-300 transition">Log In</Link>
             </>
           )}
-          <span className="uppercase cursor-pointer hover:text-white transition">Help</span>
-          <span className="uppercase cursor-pointer hover:text-white transition">Find a Store</span>
+          <span className="uppercase cursor-pointer hover:text-gray-300 transition">Help</span>
+          <span className="uppercase cursor-pointer hover:text-gray-300 transition">Find a Store</span>
         </div>
       </div>
 
@@ -203,7 +202,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* LOGO SECTION */}
+        {/* LOGO SECTION (Bright White) */}
         <div className="flex items-center flex-1 justify-center md:justify-start md:flex-none">
           <div className="hidden md:block">
             <ForgeLogo />
