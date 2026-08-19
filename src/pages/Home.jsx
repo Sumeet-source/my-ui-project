@@ -80,9 +80,11 @@ export default function Home() {
   const trendingProducts = allProducts.slice(4, 9);
 
   return (
-    <div className="min-h-screen bg-white md:bg-[#1A1A1A] pb-16 transition-colors duration-300">
+    // 🟢 FIX: w-full use kiya taaki pura screen cover kare
+    <div className="min-h-screen bg-white md:bg-[#1A1A1A] pb-16 transition-colors duration-300 w-full overflow-x-hidden">
       
-      <div className="bg-[#F5F0E1] md:bg-[#2A2A2A] py-2.5 md:py-3 text-center border-b border-[#E8DEC5] md:border-gray-800">
+      {/* 🟢 FIX: Coupon bar full width */}
+      <div className="w-full bg-[#F5F0E1] md:bg-[#2A2A2A] py-2.5 md:py-3 text-center border-b border-[#E8DEC5] md:border-gray-800">
         <p className="text-xs md:text-sm font-medium text-black md:text-white">
           Enjoy 15% Off On The FORGE App. Use: <span className="font-bold">APP15</span>
           <Link to="/" className="ml-2 underline decoration-1 underline-offset-2 hover:text-gray-600 md:hover:text-gray-300 transition">
@@ -92,12 +94,11 @@ export default function Home() {
         </p>
       </div>
 
-      {/*  UPDATED VIDEO BANNER - Mobile height reduced & Buttons Circular */}
-            
-            {/* --- VIDEO BANNER (Bottom-left Text Links) --- */}
-      <section className="relative w-full bg-black flex flex-col items-center justify-center">
+      {/* --- VIDEO BANNER (Full Width Fix) --- */}
+      <section className="relative w-full bg-black flex flex-col items-center justify-center overflow-hidden">
+        {/* 🟢 FIX: Mobile par object-cover use kiya taaki full width cover kare */}
         <video 
-          className="w-full h-auto max-h-[85vh] object-contain md:object-cover"
+          className="w-full h-auto max-h-[85vh] object-cover md:object-cover"
           style={{ objectPosition: 'center 15%', transform: 'scale(1.08)', transformOrigin: 'top center' }}
           autoPlay 
           loop 
@@ -110,17 +111,16 @@ export default function Home() {
         </video>
         <div className="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
 
-        {/* 🟢 NEW: Bottom-left text links without border */}
-        <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 flex flex-col items-start gap-3 md:gap-4">
+        <div className="absolute bottom-4 left-4 md:bottom-10 md:left-10 flex flex-col items-start gap-2 md:gap-4">
           <Link 
             to="/men" 
-            className="text-white text-sm md:text-base font-medium underline decoration-1 underline-offset-4 hover:opacity-70 transition-opacity"
+            className="text-white text-xs md:text-base font-medium underline decoration-1 underline-offset-4 hover:opacity-70 transition-opacity"
           >
             Shop Men →
           </Link>
           <Link 
             to="/women" 
-            className="text-white text-sm md:text-base font-medium underline decoration-1 underline-offset-4 hover:opacity-70 transition-opacity"
+            className="text-white text-xs md:text-base font-medium underline decoration-1 underline-offset-4 hover:opacity-70 transition-opacity"
           >
             Shop Women →
           </Link>
@@ -128,14 +128,15 @@ export default function Home() {
       </section>
 
       {/* --- BESTSELLERS --- */}
-      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
-        <div className="flex justify-between items-center mb-6">
+      <section className="w-full px-4 md:px-10 py-6 md:py-10 relative">
+        <div className="flex justify-between items-center mb-6 w-full">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Bestsellers</h2>
           <div className="flex gap-2">
-            <button onClick={scrollBestsellerLeft} className="bg-white md:bg-[#2A2A2A] shadow border border-gray-200 md:border-gray-800 rounded-full p-1.5 md:p-2 hover:bg-gray-50 md:hover:bg-[#3A3A3A] transition">
+            {/* 🟢 FIX: Mobile scroll arrows chhote aur transparent kiye */}
+            <button onClick={scrollBestsellerLeft} className="bg-white/60 md:bg-[#2A2A2A] backdrop-blur-sm shadow border border-gray-200 md:border-gray-800 rounded-full p-1 md:p-2 hover:bg-white md:hover:bg-[#3A3A3A] transition">
               <svg className="w-4 h-4 md:w-5 md:h-5 text-black md:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
             </button>
-            <button onClick={scrollBestsellerRight} className="bg-white md:bg-[#2A2A2A] shadow border border-gray-200 md:border-gray-800 rounded-full p-1.5 md:p-2 hover:bg-gray-50 md:hover:bg-[#3A3A3A] transition">
+            <button onClick={scrollBestsellerRight} className="bg-white/60 md:bg-[#2A2A2A] backdrop-blur-sm shadow border border-gray-200 md:border-gray-800 rounded-full p-1 md:p-2 hover:bg-white md:hover:bg-[#3A3A3A] transition">
               <svg className="w-4 h-4 md:w-5 md:h-5 text-black md:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
@@ -146,7 +147,7 @@ export default function Home() {
           ) : bestsellers.length > 0 ? (
             bestsellers.map((product) => (
               <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer">
-                <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg">
+                <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg w-full">
                   <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
                 </div>
                 <div className="flex flex-col gap-0.5 px-1">
@@ -163,14 +164,14 @@ export default function Home() {
       </section>
 
       {/* --- SHOP BY SPORT --- */}
-      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
-        <div className="flex justify-between items-center mb-6">
+      <section className="w-full px-4 md:px-10 py-6 md:py-10 relative">
+        <div className="flex justify-between items-center mb-6 w-full">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Shop By Sport</h2>
           <div className="flex gap-2">
-            <button onClick={scrollSportLeft} className="bg-white md:bg-[#2A2A2A] shadow border border-gray-200 md:border-gray-800 rounded-full p-1.5 md:p-2 hover:bg-gray-50 md:hover:bg-[#3A3A3A] transition">
+            <button onClick={scrollSportLeft} className="bg-white/60 md:bg-[#2A2A2A] backdrop-blur-sm shadow border border-gray-200 md:border-gray-800 rounded-full p-1 md:p-2 hover:bg-white md:hover:bg-[#3A3A3A] transition">
               <svg className="w-4 h-4 md:w-5 md:h-5 text-black md:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
             </button>
-            <button onClick={scrollSportRight} className="bg-white md:bg-[#2A2A2A] shadow border border-gray-200 md:border-gray-800 rounded-full p-1.5 md:p-2 hover:bg-gray-50 md:hover:bg-[#3A3A3A] transition">
+            <button onClick={scrollSportRight} className="bg-white/60 md:bg-[#2A2A2A] backdrop-blur-sm shadow border border-gray-200 md:border-gray-800 rounded-full p-1 md:p-2 hover:bg-white md:hover:bg-[#3A3A3A] transition">
               <svg className="w-4 h-4 md:w-5 md:h-5 text-black md:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
@@ -202,7 +203,7 @@ export default function Home() {
                 key={product._id} 
                 className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer"
               >
-                <div className="relative aspect-square overflow-hidden bg-gray-100 md:bg-gray-800 rounded-lg group-hover:shadow-lg transition">
+                <div className="relative aspect-square overflow-hidden bg-gray-100 md:bg-gray-800 rounded-lg w-full group-hover:shadow-lg transition">
                   <img 
                     src={product.images?.[0] || product.imageUrl} 
                     alt={product.title} 
@@ -232,14 +233,14 @@ export default function Home() {
       </section>
 
       {/* --- TRENDING --- */}
-      <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
-        <div className="flex justify-between items-center mb-6">
+      <section className="w-full px-4 md:px-10 py-6 md:py-10 relative">
+        <div className="flex justify-between items-center mb-6 w-full">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Trending</h2>
           <div className="flex gap-2">
-            <button onClick={scrollTrendingLeft} className="bg-white md:bg-[#2A2A2A] shadow border border-gray-200 md:border-gray-800 rounded-full p-1.5 md:p-2 hover:bg-gray-50 md:hover:bg-[#3A3A3A] transition">
+            <button onClick={scrollTrendingLeft} className="bg-white/60 md:bg-[#2A2A2A] backdrop-blur-sm shadow border border-gray-200 md:border-gray-800 rounded-full p-1 md:p-2 hover:bg-white md:hover:bg-[#3A3A3A] transition">
               <svg className="w-4 h-4 md:w-5 md:h-5 text-black md:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
             </button>
-            <button onClick={scrollTrendingRight} className="bg-white md:bg-[#2A2A2A] shadow border border-gray-200 md:border-gray-800 rounded-full p-1.5 md:p-2 hover:bg-gray-50 md:hover:bg-[#3A3A3A] transition">
+            <button onClick={scrollTrendingRight} className="bg-white/60 md:bg-[#2A2A2A] backdrop-blur-sm shadow border border-gray-200 md:border-gray-800 rounded-full p-1 md:p-2 hover:bg-white md:hover:bg-[#3A3A3A] transition">
               <svg className="w-4 h-4 md:w-5 md:h-5 text-black md:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
@@ -251,7 +252,7 @@ export default function Home() {
           ) : trendingProducts.length > 0 ? (
             trendingProducts.map((product) => (
               <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer">
-                <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg">
+                <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg w-full">
                   <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
                 </div>
                 <div className="flex flex-col gap-0.5 px-1">
