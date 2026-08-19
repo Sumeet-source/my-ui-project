@@ -262,7 +262,7 @@ export default function Home() {
           )}
         </div>
       </section>
-
+ {/* --- TRENDING -sdsd-- */}
     </div>
   );
 }
