@@ -46,18 +46,18 @@ const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
   return <span>{displayText}</span>;
 };
 
-// 🟢 MEGA DROPDOWN SUB-COMPONENT
+// 🟢 FIX: Mega Dropdown ko Center mein align kar diya
 const MegaMenu = ({ items }) => {
   return (
-    <div className="absolute top-full left-0 w-screen bg-white shadow-xl border-t border-gray-100 py-8 px-4 md:px-10 z-50 hidden group-hover:block">
-      <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row gap-8">
-        {/* Left Side: Sub-categories */}
-        <div className="flex-1 grid grid-cols-3 gap-x-8 gap-y-6">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 w-[90vw] max-w-[1200px] bg-[#F5F5F5] shadow-xl border border-gray-200 py-8 px-6 z-50 hidden group-hover:block rounded-b-lg">
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Left Side: Sub-categories (3 Columns) */}
+        <div className="flex-1 grid grid-cols-3 gap-x-6 gap-y-4">
           {items.map((col, idx) => (
-            <div key={idx} className="flex flex-col gap-2">
-              <h4 className="font-bold text-sm text-black uppercase tracking-wider mb-1">{col.heading}</h4>
+            <div key={idx} className="flex flex-col gap-1">
+              <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-2">{col.heading}</h4>
               {col.links.map((link, i) => (
-                <Link key={i} to={link.path} className="text-sm text-gray-600 hover:text-black transition-colors">
+                <Link key={i} to={link.path} className="text-sm text-gray-700 hover:text-black hover:underline transition-colors">
                   {link.label}
                 </Link>
               ))}
@@ -65,8 +65,8 @@ const MegaMenu = ({ items }) => {
           ))}
         </div>
         {/* Right Side: Featured Image/Offer */}
-        <div className="hidden md:flex flex-col gap-4 w-[300px] shrink-0">
-          <div className="relative h-[200px] bg-gray-100 rounded-lg overflow-hidden group-hover:shadow-lg transition">
+        <div className="hidden md:flex flex-col gap-4 w-[280px] shrink-0">
+          <div className="relative h-[180px] bg-gray-200 rounded-lg overflow-hidden hover:shadow-md transition">
             <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=400&q=80" alt="Featured" className="w-full h-full object-cover" />
             <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/60 to-transparent p-4">
               <p className="text-white font-bold text-sm">New Arrivals</p>
@@ -85,7 +85,6 @@ export default function Navbar() {
   const [searchInput, setSearchInput] = useState('');
   const inputRef = useRef(null);
   
-  // 🟢 Cart and Auth
   const { cart, clearCart } = useCart(); 
   const { user, logout } = useAuth();
   const { showToast } = useToast();
@@ -143,7 +142,7 @@ export default function Navbar() {
   const isActiveShoes = location.pathname === '/shoes';
   const isActiveOutlet = location.pathname === '/outlet';
 
-  // 🟢 MEGA MENU DATA (UNDER ARMOUR STYLE)
+  // 🟢 MEGA MENU DATA
   const menMenuItems = [
     { heading: "Shop By Category", links: [ { label: "T-Shirts & Tops", path: "/men?subCategory=T-Shirts" }, { label: "Hoodies & Sweatshirts", path: "/men?subCategory=Hoodies" }, { label: "Jackets & Vests", path: "/men?subCategory=Jackets" } ] },
     { heading: "Shop By Sport", links: [ { label: "Running", path: "/men?subCategory=Running" }, { label: "Training", path: "/men?subCategory=Training" }, { label: "Football", path: "/men?subCategory=Football" } ] },
@@ -169,11 +168,12 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className={`${isHome ? 'sticky top-0' : 'relative'} z-50 bg-white text-black shadow-sm border-b border-gray-100`}>
+    // 🟢 FIX: Navbar background color ab grey (`bg-[#F5F5F5]`) hai
+    <nav className={`${isHome ? 'sticky top-0' : 'relative'} z-50 bg-[#F5F5F5] text-black shadow-sm border-b border-gray-200`}>
       
-      {/* --- TOP UTILITY BAR (Smaller & Cleaner) --- */}
-      <div className="border-b border-gray-100">
-        <div className="max-w-[1600px] mx-auto px-4 md:px-10 py-2 hidden md:flex justify-end items-center gap-6 text-[11px] font-medium text-gray-500 tracking-wide">
+      {/* --- TOP UTILITY BAR --- */}
+      <div className="border-b border-gray-200">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-10 py-1.5 hidden md:flex justify-end items-center gap-4 text-[11px] font-medium text-gray-500 tracking-wide">
           <Link to="/signup" className="uppercase hover:text-black transition">Sign Up</Link>
           {user ? (
             <>
@@ -185,14 +185,12 @@ export default function Navbar() {
               <Link to="/login" className="hover:text-black transition">Log In</Link>
             </>
           )}
-          <div className="flex items-center gap-4 pl-4 border-l border-gray-200">
-            <span className="uppercase cursor-pointer hover:text-black transition">Help</span>
-            <span className="uppercase cursor-pointer hover:text-black transition">Find a Store</span>
-          </div>
+          <span className="uppercase cursor-pointer hover:text-black transition">Help</span>
+          <span className="uppercase cursor-pointer hover:text-black transition">Find a Store</span>
         </div>
       </div>
 
-      {/* --- MAIN NAVIGATION BAR (Thinner: py-2 md:py-3) --- */}
+      {/* --- MAIN NAVIGATION BAR --- */}
       <div className="flex justify-between items-center px-4 md:px-10 py-2 md:py-3 max-w-[1600px] mx-auto relative">
         
         {/* Mobile Action Buttons */}
@@ -226,7 +224,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* --- DESKTOP MEGA MENU LINKS (Thinner Fonts) --- */}
+        {/* --- DESKTOP MEGA MENU LINKS --- */}
         <div className="hidden md:flex justify-center flex-1 gap-8 lg:gap-12 text-[15px] font-bold items-center h-10">
           <div className="relative group h-full flex items-center cursor-pointer">
             <Link to="/new-arrivals" className={`${isActiveNew ? 'text-black' : 'text-gray-600 hover:text-black'} transition-colors`}>
@@ -265,7 +263,7 @@ export default function Navbar() {
 
         {/* --- DESKTOP RIGHT ICONS --- */}
         <div className="hidden md:flex items-center gap-6">
-          <div className="hidden sm:flex items-center gap-2 border-b border-gray-200 hover:border-black transition-colors pb-0.5 w-28 lg:w-36">
+          <div className="hidden sm:flex items-center gap-2 border-b border-gray-300 hover:border-black transition-colors pb-0.5 w-28 lg:w-36">
             <input type="text" value={searchTerm} onChange={handleDesktopSearch} onKeyDown={(e) => { if(e.key === 'Enter' && searchTerm.trim()) navigate(`/search?q=${searchTerm}`); }} placeholder="Search" className="bg-transparent text-black text-[14px] placeholder-gray-400 focus:outline-none w-full" />
             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
