@@ -237,31 +237,31 @@ export default function Navbar() {
         {/* 🟢 Har trigger pe sirf onMouseEnter add kiya — ab yahan se MegaMenu render nahi hota, sirf state set hoti hai */}
         <div className="hidden md:flex justify-center flex-1 gap-8 lg:gap-12 text-[15px] font-bold items-center h-10">
           <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu(null)}>
-            <Link to="/new-arrivals" className={`${isActiveNew ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
+            <Link to="/new-arrivals" className="text-white transition-colors">
               <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm font-medium ml-0.5">🔥</span></span>
             </Link>
           </div>
 
           <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('men')}>
-            <Link to="/men" className={`${isActiveMen ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors flex items-center gap-1`}>
+            <Link to="/men" className="text-white transition-colors flex items-center gap-1">
               <span className={getUnderlineSpanClasses(isActiveMen)}>Men</span>
             </Link>
           </div>
 
           <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('women')}>
-            <Link to="/women" className={`${isActiveWomen ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
+            <Link to="/women" className="text-white transition-colors">
               <span className={getUnderlineSpanClasses(isActiveWomen)}>Women</span>
             </Link>
           </div>
 
           <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('shoes')}>
-            <Link to="/shoes" className={`${isActiveShoes ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
+            <Link to="/shoes" className="text-white transition-colors">
               <span className={getUnderlineSpanClasses(isActiveShoes)}>Shoes</span>
             </Link>
           </div>
 
           <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('outlet')}>
-            <Link to="/outlet" className={`${isActiveOutlet ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
+            <Link to="/outlet" className="text-white transition-colors">
               <span className={getUnderlineSpanClasses(isActiveOutlet)}>Outlet</span>
             </Link>
           </div>
