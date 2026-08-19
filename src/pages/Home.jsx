@@ -140,9 +140,8 @@ export default function Home() {
             <p className="text-gray-500 text-sm">Loading bestsellers...</p>
           ) : bestsellers.length > 0 ? (
             bestsellers.map((product) => (
-              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[300px] w-full flex-shrink-0 flex flex-col gap-2 group cursor-pointer">
-                {/* 🟢 FIX: aspect-[4/3] use kiya taaki hor/vert dono images same size dikhen */}
-                <div className="relative aspect-[4/3] overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg">
+              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer">
+                <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg">
                   <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
                 </div>
                 <div className="flex flex-col gap-0.5 px-1">
@@ -158,7 +157,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SHOP BY SPORT --- */}
+      {/* --- SHOP BY SPORT (Size Fix kiya hai: min-w-[300px] aur aspect-square) --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Shop By Sport</h2>
@@ -196,9 +195,10 @@ export default function Home() {
               <Link 
                 to={`/product/${product._id}`} 
                 key={product._id} 
-                className="min-w-[240px] md:min-w-[300px] w-full flex-shrink-0 flex flex-col gap-2 group cursor-pointer"
+                // 🟢 FIX: Size same kar diya (min-w-[300px] aur aspect-square)
+                className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer"
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 md:bg-gray-800 rounded-lg group-hover:shadow-lg transition">
+                <div className="relative aspect-square overflow-hidden bg-gray-100 md:bg-gray-800 rounded-lg group-hover:shadow-lg transition">
                   <img 
                     src={product.images?.[0] || product.imageUrl} 
                     alt={product.title} 
@@ -246,8 +246,8 @@ export default function Home() {
             <p className="text-gray-500 text-sm">Loading trending...</p>
           ) : trendingProducts.length > 0 ? (
             trendingProducts.map((product) => (
-              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[300px] w-full flex-shrink-0 flex flex-col gap-2 group cursor-pointer">
-                <div className="relative aspect-[4/3] overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg">
+              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer">
+                <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg">
                   <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
                 </div>
                 <div className="flex flex-col gap-0.5 px-1">
@@ -262,7 +262,7 @@ export default function Home() {
           )}
         </div>
       </section>
-
+ {/* --- TRENDING -sdsd-- */}
     </div>
   );
 }
