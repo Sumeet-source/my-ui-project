@@ -95,6 +95,18 @@ export default function ProductDetails() {
     }
   };
 
+  // 🟢 NEW: Pincode auto-check logic (last digit par trigger)
+  const handlePincodeChange = (e) => {
+    const value = e.target.value;
+    setPincodeInput(value);
+    setDeliveryAvailable(null);
+    
+    // Agar 6 digit ho jaye, toh automatically check kar do
+    if (value.length === 6) {
+      checkDeliveryAvailability();
+    }
+  };
+
   if (loading) return <div className="text-center py-20 text-lg text-gray-500">Loading product...</div>;
   if (!product) return <div className="text-center py-20 text-xl text-gray-600">Product not found!</div>;
 
@@ -399,20 +411,24 @@ export default function ProductDetails() {
             <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
             <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
             
-            {/* 🟢 FIX: Mobile Pincode Input - No vertical line */}
+            {/* 🟢 FIX: Mobile Pincode Input + Auto-Check Button */}
             <div className="flex items-stretch gap-0 mb-4">
               <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
                 <input 
                   type="text" 
                   value={pincodeInput} 
-                  onChange={(e) => setPincodeInput(e.target.value)} 
+                  onChange={handlePincodeChange}
                   placeholder="Pincode" 
                   className="flex-1 w-full px-3 py-2 text-base outline-none bg-transparent placeholder:text-gray-400"
                 />
                 <button 
                   onClick={checkDeliveryAvailability}
-                  disabled={checkingPincode}
-                  className="bg-white px-4 py-2 text-base font-medium text-black hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap"
+                  disabled={pincodeInput.length !== 6 || checkingPincode}
+                  className={`px-4 py-2 text-base font-medium transition-colors duration-300 ${
+                    pincodeInput.length === 6 && !checkingPincode
+                      ? 'bg-black text-white cursor-pointer'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
                 >
                   {checkingPincode ? '...' : 'Check'}
                 </button>
@@ -562,20 +578,24 @@ export default function ProductDetails() {
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
                 <p className="text-sm text-gray-500 mb-2">Enter pincode to know exact delivery dates/charges</p>
                 
-                {/* 🟢 FIX: Desktop Pincode Input - No vertical line */}
+                {/* 🟢 FIX: Desktop Pincode Input + Auto-Check Button */}
                 <div className="flex items-stretch gap-0 w-full max-w-sm">
                   <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
                     <input 
                       type="text" 
                       value={pincodeInput} 
-                      onChange={(e) => setPincodeInput(e.target.value)} 
+                      onChange={handlePincodeChange}
                       placeholder="Pincode" 
                       className="flex-1 w-full px-3 py-2 text-base outline-none bg-transparent placeholder:text-gray-400"
                     />
                     <button 
                       onClick={checkDeliveryAvailability}
-                      disabled={checkingPincode}
-                      className="bg-white px-4 py-2 text-base font-medium text-black hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap"
+                      disabled={pincodeInput.length !== 6 || checkingPincode}
+                      className={`px-4 py-2 text-base font-medium transition-colors duration-300 ${
+                        pincodeInput.length === 6 && !checkingPincode
+                          ? 'bg-black text-white cursor-pointer'
+                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      }`}
                     >
                       {checkingPincode ? '...' : 'Check'}
                     </button>
