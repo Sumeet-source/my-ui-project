@@ -23,10 +23,10 @@ export default function Home() {
     if (bestsellerRef.current) bestsellerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
   };
   const scrollSportLeft = () => {
-    if (sportRef.current) sportRef.current.scrollBy({ left: -280, behavior: 'smooth' });
+    if (sportRef.current) sportRef.current.scrollBy({ left: -300, behavior: 'smooth' });
   };
   const scrollSportRight = () => {
-    if (sportRef.current) sportRef.current.scrollBy({ left: 280, behavior: 'smooth' });
+    if (sportRef.current) sportRef.current.scrollBy({ left: 300, behavior: 'smooth' });
   };
   const scrollTrendingLeft = () => {
     if (trendingRef.current) trendingRef.current.scrollBy({ left: -300, behavior: 'smooth' });
@@ -82,7 +82,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white md:bg-[#1A1A1A] pb-16 transition-colors duration-300">
       
-      {/* 🟢 COUPON PROMO BAR - Desktop dark mode style */}
       <div className="bg-[#F5F0E1] md:bg-[#2A2A2A] py-2.5 md:py-3 text-center border-b border-[#E8DEC5] md:border-gray-800">
         <p className="text-xs md:text-sm font-medium text-black md:text-white">
           Enjoy 15% Off On The FORGE App. Use: <span className="font-bold">APP15</span>
@@ -93,7 +92,6 @@ export default function Home() {
         </p>
       </div>
 
-      {/* --- SINGLE STATIC VIDEO BANNER --- */}
       <section className="relative w-full min-h-[60dvh] md:min-h-[85vh] max-h-[900px] overflow-hidden bg-black">
         <video 
           className="w-full h-full object-cover"
@@ -159,7 +157,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SHOP BY SPORT --- */}
+      {/* --- SHOP BY SPORT (Size Fix kiya hai: min-w-[300px] aur aspect-square) --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Shop By Sport</h2>
@@ -189,14 +187,26 @@ export default function Home() {
           ))}
         </div>
 
-        <div ref={sportRef} className="flex overflow-x-auto gap-6 scroll-smooth hide-scrollbar pb-4">
+        <div ref={sportRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4">
           {loadingSport ? (
             <p className="text-gray-500 text-sm">Loading {selectedSport} products...</p>
           ) : sportProducts.length > 0 ? (
             sportProducts.map((product) => (
-              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[300px] md:min-w-[400px] flex flex-col gap-2 group cursor-pointer">
-                <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-100 md:bg-gray-800 rounded-xl group-hover:shadow-lg transition">
-                  <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = "https://placehold.co/600x450/f3f4f6/333333?text=No+Image"; }} />
+              <Link 
+                to={`/product/${product._id}`} 
+                key={product._id} 
+                // 🟢 FIX: Size same kar diya (min-w-[300px] aur aspect-square)
+                className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer"
+              >
+                <div className="relative aspect-square overflow-hidden bg-gray-100 md:bg-gray-800 rounded-lg group-hover:shadow-lg transition">
+                  <img 
+                    src={product.images?.[0] || product.imageUrl} 
+                    alt={product.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    onError={(e) => {
+                      e.target.src = "https://placehold.co/600x600/f3f4f6/333333?text=No+Image";
+                    }}
+                  />
                 </div>
                 <div className="px-1 pt-1">
                   <h3 className="text-base md:text-lg font-bold text-black md:text-white leading-tight">
@@ -236,7 +246,7 @@ export default function Home() {
             <p className="text-gray-500 text-sm">Loading trending...</p>
           ) : trendingProducts.length > 0 ? (
             trendingProducts.map((product) => (
-              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[280px] flex flex-col gap-2 group cursor-pointer">
+              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer">
                 <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg">
                   <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
                 </div>
@@ -252,7 +262,7 @@ export default function Home() {
           )}
         </div>
       </section>
-//added
+
     </div>
   );
 }
