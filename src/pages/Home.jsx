@@ -92,7 +92,8 @@ export default function Home() {
         </p>
       </div>
 
-      <section className="relative w-full min-h-[60dvh] md:min-h-[85vh] max-h-[900px] overflow-hidden bg-black">
+      {/* 🟢 UPDATED VIDEO BANNER - Mobile height reduced & Buttons Circular */}
+      <section className="relative w-full min-h-[50dvh] md:min-h-[85vh] max-h-[900px] overflow-hidden bg-black">
         <video 
           className="w-full h-full object-cover"
           style={{ objectPosition: 'center 15%', transform: 'scale(1.08)', transformOrigin: 'top center' }}
@@ -109,10 +110,11 @@ export default function Home() {
 
         <div className="absolute bottom-0 left-0 w-full p-4 md:p-10 pb-6 md:pb-14 flex flex-col items-start gap-3 md:gap-4 text-black md:text-white">
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link to="/men" className="bg-white text-black border-2 border-black md:border-white px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm text-center">
+            {/* 🟢 FIX: Buttons ko rounded-full kar diya */}
+            <Link to="/men" className="bg-white text-black border-2 border-black md:border-white px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-full text-center">
               Shop men →
             </Link>
-            <Link to="/women" className="bg-white text-black border-2 border-black md:border-white px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-sm text-center">
+            <Link to="/women" className="bg-white text-black border-2 border-black md:border-white px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-full text-center">
               Shop women →
             </Link>
           </div>
@@ -157,7 +159,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SHOP BY SPORT (Size Fix kiya hai: min-w-[300px] aur aspect-square) --- */}
+      {/* --- SHOP BY SPORT --- */}
       <section className="max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Shop By Sport</h2>
@@ -195,7 +197,6 @@ export default function Home() {
               <Link 
                 to={`/product/${product._id}`} 
                 key={product._id} 
-                // 🟢 FIX: Size same kar diya (min-w-[300px] aur aspect-square)
                 className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer"
               >
                 <div className="relative aspect-square overflow-hidden bg-gray-100 md:bg-gray-800 rounded-lg group-hover:shadow-lg transition">
@@ -262,7 +263,6 @@ export default function Home() {
           )}
         </div>
       </section>
- {/* --- TRENDING -sdsd-- */}
     </div>
   );
 }
