@@ -128,7 +128,9 @@ export default function Home() {
       </section>
 
       {/* --- BESTSELLERS --- */}
-      <section className="w-full px-4 md:px-10 py-6 md:py-10 relative">
+      {/* 🟢 FIX: max-w-[1600px] mx-auto add kiya — Navbar ke container se match karta hai,
+          isliye heading/cards ab screen edge se chipke nahi, thoda center/andar shift ho gaye */}
+      <section className="w-full max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6 w-full">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Bestsellers</h2>
           <div className="flex gap-2">
@@ -170,7 +172,7 @@ export default function Home() {
       </section>
 
       {/* --- SHOP BY SPORT --- */}
-      <section className="w-full px-4 md:px-10 py-6 md:py-10 relative">
+      <section className="w-full max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6 w-full">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Shop By Sport</h2>
           <div className="flex gap-2">
@@ -183,12 +185,14 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex gap-3 mb-6 overflow-x-auto hide-scrollbar pb-2">
+        {/* 🟢 FIX: justify-center add kiya taaki pills center me aayein;
+            padding px-5→px-6 aur py-2→py-2.5 kiya taaki "perfect size" — thoda zyada breathing room */}
+        <div className="flex justify-center gap-3 mb-6 overflow-x-auto hide-scrollbar pb-2">
           {['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga'].map((sport) => (
             <button
               key={sport}
               onClick={() => fetchSportProducts(sport)}
-              className={`px-5 py-2 rounded-full text-sm font-bold tracking-wider transition-all duration-300 whitespace-nowrap ${
+              className={`px-6 py-2.5 rounded-full text-sm font-bold tracking-wider transition-all duration-300 whitespace-nowrap ${
                 selectedSport === sport
                   ? 'bg-black text-white'
                   : 'bg-gray-100 md:bg-[#2A2A2A] text-gray-600 md:text-gray-300 hover:bg-gray-200 md:hover:bg-[#3A3A3A]'
@@ -242,7 +246,7 @@ export default function Home() {
       </section>
 
       {/* --- TRENDING --- */}
-      <section className="w-full px-4 md:px-10 py-6 md:py-10 relative">
+      <section className="w-full max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6 w-full">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Trending</h2>
           <div className="flex gap-2">
