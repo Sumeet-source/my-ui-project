@@ -146,7 +146,9 @@ export default function Home() {
             <p className="text-gray-500 text-sm">Loading bestsellers...</p>
           ) : bestsellers.length > 0 ? (
             bestsellers.map((product) => (
-              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer">
+              // 🟢 FIX: min-w → w (fixed width) + shrink-0, taaki har card hamesha exact same size ho
+              // (pehle min-w tha, jisse first card image ke natural size ke hisaab se bada ho jaata tha)
+              <Link to={`/product/${product._id}`} key={product._id} className="w-[240px] md:w-[300px] shrink-0 flex flex-col gap-2 group cursor-pointer">
                 <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg w-full">
                   <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
                 </div>
@@ -198,10 +200,11 @@ export default function Home() {
             <p className="text-gray-500 text-sm">Loading {selectedSport} products...</p>
           ) : sportProducts.length > 0 ? (
             sportProducts.map((product) => (
+              // 🟢 FIX: same width fix yahan bhi
               <Link 
                 to={`/product/${product._id}`} 
                 key={product._id} 
-                className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer"
+                className="w-[240px] md:w-[300px] shrink-0 flex flex-col gap-2 group cursor-pointer"
               >
                 <div className="relative aspect-square overflow-hidden bg-gray-100 md:bg-gray-800 rounded-lg w-full group-hover:shadow-lg transition">
                   <img 
@@ -251,7 +254,8 @@ export default function Home() {
             <p className="text-gray-500 text-sm">Loading trending...</p>
           ) : trendingProducts.length > 0 ? (
             trendingProducts.map((product) => (
-              <Link to={`/product/${product._id}`} key={product._id} className="min-w-[240px] md:min-w-[300px] flex flex-col gap-2 group cursor-pointer">
+              // 🟢 FIX: same width fix yahan bhi
+              <Link to={`/product/${product._id}`} key={product._id} className="w-[240px] md:w-[300px] shrink-0 flex flex-col gap-2 group cursor-pointer">
                 <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg w-full">
                   <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
                 </div>
