@@ -5,7 +5,6 @@ import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import ForgeLogo from './ForgeLogo';
-import axiosClient from '../api/axiosClient';
 
 // 🟢 MOBILE SCRAMBLE DECODE ANIMATION COMPONENT
 const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
@@ -47,18 +46,21 @@ const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
   return <span>{displayText}</span>;
 };
 
-// 🟢 MEGA DROPDOWN (Center Aligned)
+// 🟢 FIX: Ab sirf ek hi MegaMenu instance render hota hai (state-driven), isliye
+// position hamesha poori nav-row ke center me fixed rehti hai — chahe Men/Women/Shoes/Outlet
+// kisi pe bhi hover karo. Visibility ab parent ke `activeMenu` state se control hoti hai,
+// isliye yahan se `hidden group-hover:block` hata diya gaya hai.
 const MegaMenu = ({ items }) => {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 w-[90vw] max-w-[1200px] bg-[#1A1A1A] shadow-2xl border border-gray-800 py-8 px-6 z-50 hidden group-hover:block rounded-b-xl">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 w-[1100px] bg-[#1A1A1A] shadow-2xl border border-gray-800 py-8 px-6 z-50 rounded-b-lg">
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Left Side: Sub-categories */}
+        {/* Left Side: Sub-categories (3 Columns) */}
         <div className="flex-1 grid grid-cols-3 gap-x-6 gap-y-4">
           {items.map((col, idx) => (
             <div key={idx} className="flex flex-col gap-1">
               <h4 className="font-bold text-xs text-white uppercase tracking-wider mb-2">{col.heading}</h4>
               {col.links.map((link, i) => (
-                <Link key={i} to={link.path} className="text-sm text-white hover:underline transition-colors">
+                <Link key={i} to={link.path} className="text-sm text-gray-300 hover:text-white hover:underline transition-colors">
                   {link.label}
                 </Link>
               ))}
@@ -84,10 +86,9 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  // 🟢 NEW: kaunsa mega menu abhi active/open hai, isse control hoga
+  const [activeMenu, setActiveMenu] = useState(null);
   const inputRef = useRef(null);
-  const suggestionRef = useRef(null);
   
   const { cart, clearCart } = useCart(); 
   const { user, logout } = useAuth();
@@ -102,48 +103,10 @@ export default function Navbar() {
 
   const isHome = location.pathname === '/';
 
-  // 🟢 FETCH SUGGESTIONS FROM API
-  const fetchSuggestions = async (query) => {
-    if (!query.trim()) {
-      setSuggestions([]);
-      return;
-    }
-    setLoadingSuggestions(true);
-    try {
-      const res = await axiosClient.get(`/api/products?q=${query}&limit=6`);
-      let data = res.data;
-      if (data && data.products) {
-        setSuggestions(data.products);
-      } else if (Array.isArray(data)) {
-        setSuggestions(data);
-      } else {
-        setSuggestions([]);
-      }
-    } catch (err) {
-      console.error("Error fetching suggestions", err);
-      setSuggestions([]);
-    } finally {
-      setLoadingSuggestions(false);
-    }
-  };
-
-  // Debounce search input
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchInput.trim()) {
-        fetchSuggestions(searchInput);
-      } else {
-        setSuggestions([]);
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchInput]);
-
   const handleSearchSubmit = (e) => {
     if (e.key === 'Enter' && searchInput.trim()) {
       navigate(`/search?q=${searchInput}`);
       setIsSearchOpen(false);
-      setSuggestions([]);
     }
   };
 
@@ -169,7 +132,6 @@ export default function Navbar() {
 
   const handleSearchClear = () => {
     setSearchInput('');
-    setSuggestions([]);
     if (inputRef.current) inputRef.current.focus();
   };
 
@@ -211,9 +173,10 @@ export default function Navbar() {
   ];
 
   return (
+    // 🟢 DESKTOP: Dark Grey (`bg-[#1A1A1A]`), MOBILE: White (`bg-white`) using Tailwind responsive classes
     <nav className={`${isHome ? 'sticky top-0' : 'relative'} z-50 bg-white md:bg-[#1A1A1A] text-black md:text-white shadow-sm border-b border-gray-200 md:border-gray-800`}>
       
-      {/* --- TOP UTILITY BAR --- */}
+      {/* --- TOP UTILITY BAR (Mobile White, Desktop Dark) --- */}
       <div className="border-b border-gray-200 md:border-gray-800">
         <div className="max-w-[1600px] mx-auto px-4 md:px-10 py-1.5 hidden md:flex justify-end items-center gap-4 text-[11px] font-medium text-gray-500 md:text-white tracking-wide">
           <Link to="/signup" className="uppercase hover:text-black md:hover:text-gray-300 transition">Sign Up</Link>
@@ -233,7 +196,11 @@ export default function Navbar() {
       </div>
 
       {/* --- MAIN NAVIGATION BAR --- */}
-      <div className="flex justify-between items-center px-4 md:px-10 py-2 md:py-3 max-w-[1600px] mx-auto relative">
+      {/* 🟢 onMouseLeave yahan add kiya — jab cursor poori row (links + dropdown) se bahar jaayega tabhi menu band hoga */}
+      <div
+        className="flex justify-between items-center px-4 md:px-10 py-2 md:py-3 max-w-[1600px] mx-auto relative"
+        onMouseLeave={() => setActiveMenu(null)}
+      >
         
         {/* Mobile Action Buttons */}
         <div className="flex items-center gap-3 md:hidden">
@@ -245,7 +212,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* LOGO SECTION */}
+        {/* LOGO SECTION: Mobile Black, Desktop White */}
         <div className="flex items-center flex-1 justify-center md:justify-start md:flex-none">
           <div className="hidden md:block">
             <ForgeLogo />
@@ -267,104 +234,57 @@ export default function Navbar() {
         </div>
 
         {/* --- DESKTOP MEGA MENU LINKS --- */}
+        {/* 🟢 Har trigger pe sirf onMouseEnter add kiya — ab yahan se MegaMenu render nahi hota, sirf state set hoti hai */}
         <div className="hidden md:flex justify-center flex-1 gap-8 lg:gap-12 text-[15px] font-bold items-center h-10">
-          <div className="relative group h-full flex items-center cursor-pointer">
-            <Link to="/new-arrivals" className={`${isActiveNew ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
+          <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu(null)}>
+            <Link to="/new-arrivals" className="text-white transition-colors">
               <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm font-medium ml-0.5">🔥</span></span>
             </Link>
           </div>
 
-          <div className="relative group h-full flex items-center cursor-pointer">
-            <Link to="/men" className={`${isActiveMen ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors flex items-center gap-1`}>
+          <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('men')}>
+            <Link to="/men" className="text-white transition-colors flex items-center gap-1">
               <span className={getUnderlineSpanClasses(isActiveMen)}>Men</span>
             </Link>
-            <MegaMenu items={menMenuItems} />
           </div>
 
-          <div className="relative group h-full flex items-center cursor-pointer">
-            <Link to="/women" className={`${isActiveWomen ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
+          <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('women')}>
+            <Link to="/women" className="text-white transition-colors">
               <span className={getUnderlineSpanClasses(isActiveWomen)}>Women</span>
             </Link>
-            <MegaMenu items={womenMenuItems} />
           </div>
 
-          <div className="relative group h-full flex items-center cursor-pointer">
-            <Link to="/shoes" className={`${isActiveShoes ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
+          <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('shoes')}>
+            <Link to="/shoes" className="text-white transition-colors">
               <span className={getUnderlineSpanClasses(isActiveShoes)}>Shoes</span>
             </Link>
-            <MegaMenu items={shoesMenuItems} />
           </div>
 
-          <div className="relative group h-full flex items-center cursor-pointer">
-            <Link to="/outlet" className={`${isActiveOutlet ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
+          <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu('outlet')}>
+            <Link to="/outlet" className="text-white transition-colors">
               <span className={getUnderlineSpanClasses(isActiveOutlet)}>Outlet</span>
             </Link>
-            <MegaMenu items={outletMenuItems} />
           </div>
         </div>
 
         {/* --- DESKTOP RIGHT ICONS --- */}
-        <div className="hidden md:flex items-center gap-6 relative">
-          {/* 🟢 UPDATED: Nike Style Search Bar with Suggestions */}
-          <div className="hidden sm:flex flex-col relative w-64 lg:w-80">
-            <div className="flex items-center gap-2 border-b border-gray-600 hover:border-white transition-colors pb-0.5 w-full">
-              <input 
-                type="text" 
-                value={searchTerm} 
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setSearchParams((prev) => {
-                    const params = new URLSearchParams(prev);
-                    if (value) params.set('search', value);
-                    else params.delete('search');
-                    return params;
-                  });
-                  // Manually trigger suggestions
-                  if (value.trim()) {
-                    fetchSuggestions(value);
-                  } else {
-                    setSuggestions([]);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && searchTerm.trim()) {
-                    navigate(`/search?q=${searchTerm}`);
-                    setSuggestions([]);
-                  }
-                }} 
-                placeholder="Search" 
-                className="bg-transparent text-white text-[14px] placeholder-gray-500 focus:outline-none w-full"
-              />
-              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            </div>
-
-            {/* 🟢 SUGGESTIONS DROPDOWN */}
-            {suggestions.length > 0 && (
-              <div ref={suggestionRef} className="absolute top-full left-0 w-full bg-[#1A1A1A] border border-gray-800 shadow-xl mt-1 z-50 rounded-md overflow-hidden">
-                <div className="px-4 py-2 text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-gray-800">
-                  Top Suggestions
-                </div>
-                <div className="max-h-60 overflow-y-auto">
-                  {suggestions.map((product) => (
-                    <Link 
-                      key={product._id} 
-                      to={`/product/${product._id}`}
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#2A2A2A] hover:text-white transition-colors"
-                      onClick={() => setSuggestions([])}
-                    >
-                      {product.title}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
+        <div className="hidden md:flex items-center gap-6">
+          <div className="hidden sm:flex items-center gap-2 border-b border-gray-600 hover:border-white transition-colors pb-0.5 w-28 lg:w-36">
+            <input type="text" value={searchTerm} onChange={handleDesktopSearch} onKeyDown={(e) => { if(e.key === 'Enter' && searchTerm.trim()) navigate(`/search?q=${searchTerm}`); }} placeholder="Search" className="bg-transparent text-white text-[14px] placeholder-gray-500 focus:outline-none w-full" />
+            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
-
           <Link to="/cart" className="relative text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             {cart.length > 0 && <span key={cart.length} className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </Link>
         </div>
+
+        {/* 🟢 SINGLE MegaMenu instance — hamesha isi outer row (relative container) ke center me khulta hai,
+            content sirf activeMenu state ke hisaab se badalta hai, position kabhi nahi hilti */}
+        {activeMenu === 'men' && <MegaMenu items={menMenuItems} />}
+        {activeMenu === 'women' && <MegaMenu items={womenMenuItems} />}
+        {activeMenu === 'shoes' && <MegaMenu items={shoesMenuItems} />}
+        {activeMenu === 'outlet' && <MegaMenu items={outletMenuItems} />}
       </div>
 
       {/* --- MOBILE FULL-SCREEN SEARCH OVERLAY --- */}
