@@ -46,18 +46,18 @@ const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
   return <span>{displayText}</span>;
 };
 
-// 🟢 MEGA DROPDOWN (Center Aligned - Women position)
+// 🟢 FIX: Mega Dropdown ko bilkul screenshot wali position par fix kiya
 const MegaMenu = ({ items }) => {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 w-[90vw] max-w-[1200px] bg-[#1A1A1A] shadow-2xl border border-gray-800 py-8 px-6 z-50 hidden group-hover:block rounded-b-xl">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 w-[1100px] bg-[#1A1A1A] shadow-2xl border border-gray-800 py-8 px-6 z-50 hidden group-hover:block rounded-b-lg">
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Left Side: Sub-categories */}
+        {/* Left Side: Sub-categories (3 Columns) */}
         <div className="flex-1 grid grid-cols-3 gap-x-6 gap-y-4">
           {items.map((col, idx) => (
             <div key={idx} className="flex flex-col gap-1">
               <h4 className="font-bold text-xs text-white uppercase tracking-wider mb-2">{col.heading}</h4>
               {col.links.map((link, i) => (
-                <Link key={i} to={link.path} className="text-sm text-white hover:underline transition-colors">
+                <Link key={i} to={link.path} className="text-sm text-gray-300 hover:text-white hover:underline transition-colors">
                   {link.label}
                 </Link>
               ))}
@@ -168,24 +168,25 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className={`${isHome ? 'sticky top-0' : 'relative'} z-50 bg-[#1A1A1A] text-white shadow-sm border-b border-gray-800`}>
+    // 🟢 DESKTOP: Dark Grey (`bg-[#1A1A1A]`), MOBILE: White (`bg-white`) using Tailwind responsive classes
+    <nav className={`${isHome ? 'sticky top-0' : 'relative'} z-50 bg-white md:bg-[#1A1A1A] text-black md:text-white shadow-sm border-b border-gray-200 md:border-gray-800`}>
       
-      {/* --- TOP UTILITY BAR --- */}
-      <div className="border-b border-gray-800">
-        <div className="max-w-[1600px] mx-auto px-4 md:px-10 py-1.5 hidden md:flex justify-end items-center gap-4 text-[11px] font-medium text-white tracking-wide">
-          <Link to="/signup" className="uppercase hover:text-gray-300 transition">Sign Up</Link>
+      {/* --- TOP UTILITY BAR (Mobile White, Desktop Dark) --- */}
+      <div className="border-b border-gray-200 md:border-gray-800">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-10 py-1.5 hidden md:flex justify-end items-center gap-4 text-[11px] font-medium text-gray-500 md:text-white tracking-wide">
+          <Link to="/signup" className="uppercase hover:text-black md:hover:text-gray-300 transition">Sign Up</Link>
           {user ? (
             <>
-              <Link to="/dashboard" className="hover:text-gray-300 transition">Account</Link>
-              <button onClick={handleLogout} className="bg-transparent border-none text-white hover:text-gray-300 transition">Logout</button>
+              <Link to="/dashboard" className="hover:text-black md:hover:text-gray-300 transition">Account</Link>
+              <button onClick={handleLogout} className="bg-transparent border-none text-gray-500 md:text-white hover:text-black md:hover:text-gray-300 transition">Logout</button>
             </>
           ) : (
             <>
-              <Link to="/login" className="hover:text-gray-300 transition">Log In</Link>
+              <Link to="/login" className="hover:text-black md:hover:text-gray-300 transition">Log In</Link>
             </>
           )}
-          <span className="uppercase cursor-pointer hover:text-gray-300 transition">Help</span>
-          <span className="uppercase cursor-pointer hover:text-gray-300 transition">Find a Store</span>
+          <span className="uppercase cursor-pointer hover:text-black md:hover:text-gray-300 transition">Help</span>
+          <span className="uppercase cursor-pointer hover:text-black md:hover:text-gray-300 transition">Find a Store</span>
         </div>
       </div>
 
@@ -194,15 +195,15 @@ export default function Navbar() {
         
         {/* Mobile Action Buttons */}
         <div className="flex items-center gap-3 md:hidden">
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-1">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-black p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <Link to={user ? "/dashboard" : "/login"} className="text-white">
+          <Link to={user ? "/dashboard" : "/login"} className="text-black">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
           </Link>
         </div>
 
-        {/* LOGO SECTION (Bright White) */}
+        {/* LOGO SECTION: Mobile Black, Desktop White */}
         <div className="flex items-center flex-1 justify-center md:justify-start md:flex-none">
           <div className="hidden md:block">
             <ForgeLogo />
@@ -214,10 +215,10 @@ export default function Navbar() {
 
         {/* Mobile Right Icons */}
         <div className="flex items-center gap-4 md:hidden">
-          <button onClick={() => setIsSearchOpen(true)} className="text-white">
+          <button onClick={() => setIsSearchOpen(true)} className="text-black">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </button>
-          <Link to="/cart" className="relative text-white">
+          <Link to="/cart" className="relative text-black">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             {cart.length > 0 && <span key={cart.length} className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </Link>
