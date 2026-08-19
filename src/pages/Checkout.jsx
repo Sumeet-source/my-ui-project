@@ -10,7 +10,7 @@ export default function Checkout() {
   const { showToast } = useToast();
   const { user } = useAuth();
 
-  // 🟢 STEP 3 FIX: Agar user login nahi hai, toh checkout khulne se pehle login par bhejo
+  // 🟢 Agar user login nahi hai, toh checkout khulne se pehle login par bhejo
   useEffect(() => {
     if (!user) {
       navigate('/login?redirect=/checkout');
@@ -224,29 +224,36 @@ export default function Checkout() {
         <div className="flex-1 bg-white p-6 lg:p-8 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-xl font-bold mb-5">Delivery Address</h2>
           <div className="space-y-5">
+            
+            {/* 🟢 Full Name - text-base se zoom fix */}
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-1.5">Full Name</label>
-              <input type="text" name="fullName" value={address.fullName} onChange={handleChange} placeholder="John Doe" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
+              <input type="text" name="fullName" value={address.fullName} onChange={handleChange} placeholder="John Doe" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-base" />
             </div>
 
+            {/* 🟢 Email - text-base se zoom fix */}
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-1.5">Email Address (For Order Updates)</label>
-              <input type="email" name="email" value={address.email} onChange={handleChange} placeholder="abc@gmail.com" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
+              <input type="email" name="email" value={address.email} onChange={handleChange} placeholder="abc@gmail.com" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-base" />
             </div>
 
+            {/* 🟢 Address - text-base se zoom fix */}
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-1.5">Address</label>
-              <input type="text" name="street" value={address.street} onChange={handleChange} placeholder="123 Main St" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
+              <input type="text" name="street" value={address.street} onChange={handleChange} placeholder="123 Main St" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-base" />
             </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-1.5">City</label>
-                <input type="text" name="city" value={address.city} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
+                {/* 🟢 City - text-base se zoom fix */}
+                <input type="text" name="city" value={address.city} onChange={handleChange} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-base" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-1.5">Pincode</label>
                 <div className="flex gap-2">
-                  <input type="text" name="pincode" value={address.pincode} onChange={handleChange} placeholder="452010" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm flex-1" />
+                  {/* 🟢 Pincode - text-base se zoom fix */}
+                  <input type="text" name="pincode" value={address.pincode} onChange={handleChange} placeholder="452010" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-base flex-1" />
                   <button type="button" onClick={() => checkDeliveryAvailability()} disabled={checkingPincode || address.pincode.length !== 6} className="px-4 py-3 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition disabled:opacity-50">
                     {checkingPincode ? '...' : 'Check'}
                   </button>
@@ -268,10 +275,13 @@ export default function Checkout() {
                 )}
               </div>
             </div>
+
+            {/* 🟢 Phone Number - text-base se zoom fix */}
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-1.5">Phone Number</label>
-              <input type="text" name="phone" value={address.phone} onChange={handleChange} placeholder="9876543210" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm" />
+              <input type="text" name="phone" value={address.phone} onChange={handleChange} placeholder="9876543210" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-base" />
             </div>
+
           </div>
         </div>
 
