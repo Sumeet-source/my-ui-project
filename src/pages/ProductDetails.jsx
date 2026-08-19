@@ -403,13 +403,13 @@ export default function ProductDetails() {
             {/* 🟢 FIX: Mobile Pincode Input - Single Row Nike Style */}
             <div className="flex items-stretch gap-0 mb-4">
               <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
-                <input 
-                  type="text" 
-                  value={pincodeInput} 
-                  onChange={(e) => setPincodeInput(e.target.value)} 
-                  placeholder="Pincode" 
-                  className="flex-1 w-full px-3 py-2 text-sm outline-none bg-transparent placeholder:text-gray-400"
-                />
+               <input 
+  type="text" 
+  value={pincodeInput} 
+  onChange={(e) => setPincodeInput(e.target.value)} 
+  placeholder="Pincode" 
+  className="flex-1 w-full px-3 py-2 text-base outline-none bg-transparent placeholder:text-gray-400"
+/>
                 <button 
                   onClick={checkDeliveryAvailability}
                   disabled={checkingPincode}
