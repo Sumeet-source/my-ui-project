@@ -141,27 +141,31 @@ export default function Home() {
             </button>
           </div>
         </div>
-        <div ref={bestsellerRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4">
-          {loadingProducts ? (
-            <p className="text-gray-500 text-sm">Loading bestsellers...</p>
-          ) : bestsellers.length > 0 ? (
-            bestsellers.map((product) => (
-              // 🟢 FIX: min-w → w (fixed width) + shrink-0, taaki har card hamesha exact same size ho
-              // (pehle min-w tha, jisse first card image ke natural size ke hisaab se bada ho jaata tha)
-              <Link to={`/product/${product._id}`} key={product._id} className="w-[240px] md:w-[300px] shrink-0 flex flex-col gap-2 group cursor-pointer">
-                <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg w-full">
-                  <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
-                </div>
-                <div className="flex flex-col gap-0.5 px-1">
-                  <p className="font-bold text-sm text-black md:text-white">{product.title}</p>
-                  <p className="text-xs text-gray-500 md:text-gray-400">{product.category}</p>
-                  <p className="font-bold text-sm text-black md:text-white mt-0.5">₹{product.price}</p>
-                </div>
-              </Link>
-            ))
-          ) : (
-            <p className="text-gray-400 text-sm">No products found.</p>
-          )}
+        {/* 🟢 FIX: outer wrapper justify-center karta hai jab items kam hon; 
+            inner row w-fit + max-w-full hai isliye overflow hone par normal scroll bhi break nahi hota */}
+        <div className="flex justify-center">
+          <div ref={bestsellerRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4 w-fit max-w-full">
+            {loadingProducts ? (
+              <p className="text-gray-500 text-sm">Loading bestsellers...</p>
+            ) : bestsellers.length > 0 ? (
+              bestsellers.map((product) => (
+                // 🟢 FIX: min-w → w (fixed width) + shrink-0, taaki har card hamesha exact same size ho
+                // (pehle min-w tha, jisse first card image ke natural size ke hisaab se bada ho jaata tha)
+                <Link to={`/product/${product._id}`} key={product._id} className="w-[240px] md:w-[300px] shrink-0 flex flex-col gap-2 group cursor-pointer">
+                  <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg w-full">
+                    <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
+                  </div>
+                  <div className="flex flex-col gap-0.5 px-1">
+                    <p className="font-bold text-sm text-black md:text-white">{product.title}</p>
+                    <p className="text-xs text-gray-500 md:text-gray-400">{product.category}</p>
+                    <p className="font-bold text-sm text-black md:text-white mt-0.5">₹{product.price}</p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <p className="text-gray-400 text-sm">No products found.</p>
+            )}
+          </div>
         </div>
       </section>
 
@@ -195,43 +199,45 @@ export default function Home() {
           ))}
         </div>
 
-        <div ref={sportRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4">
-          {loadingSport ? (
-            <p className="text-gray-500 text-sm">Loading {selectedSport} products...</p>
-          ) : sportProducts.length > 0 ? (
-            sportProducts.map((product) => (
-              // 🟢 FIX: same width fix yahan bhi
-              <Link 
-                to={`/product/${product._id}`} 
-                key={product._id} 
-                className="w-[240px] md:w-[300px] shrink-0 flex flex-col gap-2 group cursor-pointer"
-              >
-                <div className="relative aspect-square overflow-hidden bg-gray-100 md:bg-gray-800 rounded-lg w-full group-hover:shadow-lg transition">
-                  <img 
-                    src={product.images?.[0] || product.imageUrl} 
-                    alt={product.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                    onError={(e) => {
-                      e.target.src = "https://placehold.co/600x600/f3f4f6/333333?text=No+Image";
-                    }}
-                  />
-                </div>
-                <div className="px-1 pt-1">
-                  <h3 className="text-base md:text-lg font-bold text-black md:text-white leading-tight">
-                    {product.title}
-                  </h3>
-                  <p className="text-xs text-gray-500 md:text-gray-400 mt-0.5">
-                    {product.category}
-                  </p>
-                  <p className="font-bold text-sm text-black md:text-white mt-1">
-                    ₹{product.price}
-                  </p>
-                </div>
-              </Link>
-            ))
-          ) : (
-            <p className="text-gray-400 text-sm">No products found for {selectedSport}.</p>
-          )}
+        <div className="flex justify-center">
+          <div ref={sportRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4 w-fit max-w-full">
+            {loadingSport ? (
+              <p className="text-gray-500 text-sm">Loading {selectedSport} products...</p>
+            ) : sportProducts.length > 0 ? (
+              sportProducts.map((product) => (
+                // 🟢 FIX: same width fix yahan bhi
+                <Link 
+                  to={`/product/${product._id}`} 
+                  key={product._id} 
+                  className="w-[240px] md:w-[300px] shrink-0 flex flex-col gap-2 group cursor-pointer"
+                >
+                  <div className="relative aspect-square overflow-hidden bg-gray-100 md:bg-gray-800 rounded-lg w-full group-hover:shadow-lg transition">
+                    <img 
+                      src={product.images?.[0] || product.imageUrl} 
+                      alt={product.title} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                      onError={(e) => {
+                        e.target.src = "https://placehold.co/600x600/f3f4f6/333333?text=No+Image";
+                      }}
+                    />
+                  </div>
+                  <div className="px-1 pt-1">
+                    <h3 className="text-base md:text-lg font-bold text-black md:text-white leading-tight">
+                      {product.title}
+                    </h3>
+                    <p className="text-xs text-gray-500 md:text-gray-400 mt-0.5">
+                      {product.category}
+                    </p>
+                    <p className="font-bold text-sm text-black md:text-white mt-1">
+                      ₹{product.price}
+                    </p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <p className="text-gray-400 text-sm">No products found for {selectedSport}.</p>
+            )}
+          </div>
         </div>
       </section>
 
@@ -249,26 +255,28 @@ export default function Home() {
           </div>
         </div>
 
-        <div ref={trendingRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4">
-          {loadingProducts ? (
-            <p className="text-gray-500 text-sm">Loading trending...</p>
-          ) : trendingProducts.length > 0 ? (
-            trendingProducts.map((product) => (
-              // 🟢 FIX: same width fix yahan bhi
-              <Link to={`/product/${product._id}`} key={product._id} className="w-[240px] md:w-[300px] shrink-0 flex flex-col gap-2 group cursor-pointer">
-                <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg w-full">
-                  <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
-                </div>
-                <div className="flex flex-col gap-0.5 px-1">
-                  <p className="font-bold text-sm text-black md:text-white">{product.title}</p>
-                  <p className="text-xs text-gray-500 md:text-gray-400">{product.category}</p>
-                  <p className="font-bold text-sm text-black md:text-white mt-0.5">₹{product.price}</p>
-                </div>
-              </Link>
-            ))
-          ) : (
-            <p className="text-gray-400 text-sm">No trending products found.</p>
-          )}
+        <div className="flex justify-center">
+          <div ref={trendingRef} className="flex overflow-x-auto gap-4 scroll-smooth hide-scrollbar pb-4 w-fit max-w-full">
+            {loadingProducts ? (
+              <p className="text-gray-500 text-sm">Loading trending...</p>
+            ) : trendingProducts.length > 0 ? (
+              trendingProducts.map((product) => (
+                // 🟢 FIX: same width fix yahan bhi
+                <Link to={`/product/${product._id}`} key={product._id} className="w-[240px] md:w-[300px] shrink-0 flex flex-col gap-2 group cursor-pointer">
+                  <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg w-full">
+                    <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
+                  </div>
+                  <div className="flex flex-col gap-0.5 px-1">
+                    <p className="font-bold text-sm text-black md:text-white">{product.title}</p>
+                    <p className="text-xs text-gray-500 md:text-gray-400">{product.category}</p>
+                    <p className="font-bold text-sm text-black md:text-white mt-0.5">₹{product.price}</p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <p className="text-gray-400 text-sm">No trending products found.</p>
+            )}
+          </div>
         </div>
       </section>
     </div>
