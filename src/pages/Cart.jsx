@@ -99,16 +99,16 @@ export default function Cart() {
             <p className="text-gray-500 mt-1 text-sm">Don't know where to start? Here's the gear everyone's after.</p>
            
             <button 
-  type="button" 
-  onClick={() => { 
-    window.location.href = '/men'; 
-  }} 
-  className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition"
->
-  Shop Best Sellers
-</button>
+              type="button" 
+              onClick={() => { 
+                window.location.href = '/men'; 
+              }} 
+              className="inline-block mt-6 bg-black text-white px-8 py-3 rounded font-medium hover:bg-gray-800 transition"
+            >
+              Shop Best Sellers
+            </button>
 
-<button type="button" onClick={() => navigate('/')} className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</button>
+            <button type="button" onClick={() => navigate('/')} className="block mt-4 text-sm text-gray-500 hover:text-black underline">Continue Shopping</button>
           </div>
           {!user && <div className="hidden md:block flex-1 bg-gray-100 rounded-lg min-h-[250px]"></div>}
         </div>
@@ -158,13 +158,14 @@ export default function Cart() {
             <span>${subtotal.toFixed(2)}</span>
           </div>
           
+          {/* 🟢 FIX: Coupon input text-base aur py-2 (Zoom Fix) */}
           <div className="flex gap-2 mt-2">
             <input 
               type="text" 
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
               placeholder="Coupon Code"
-              className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black"
+              className="flex-1 border border-gray-200 rounded px-3 py-2 text-base focus:outline-none focus:border-black"
             />
             <button 
               onClick={handleApplyCoupon}
