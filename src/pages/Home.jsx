@@ -94,6 +94,7 @@ export default function Home() {
 
       {/*  UPDATED VIDEO BANNER - Mobile height reduced & Buttons Circular */}
             
+            {/* --- VIDEO BANNER (Bottom-left Text Links) --- */}
       <section className="relative w-full bg-black flex flex-col items-center justify-center">
         <video 
           className="w-full h-auto max-h-[85vh] object-contain md:object-cover"
@@ -108,6 +109,22 @@ export default function Home() {
           <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1920&q=80" alt="Banner Fallback" className="w-full h-full object-cover" />
         </video>
         <div className="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
+
+        {/* 🟢 NEW: Bottom-left text links without border */}
+        <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 flex flex-col items-start gap-3 md:gap-4">
+          <Link 
+            to="/men" 
+            className="text-white text-sm md:text-base font-medium underline decoration-1 underline-offset-4 hover:opacity-70 transition-opacity"
+          >
+            Shop Men →
+          </Link>
+          <Link 
+            to="/women" 
+            className="text-white text-sm md:text-base font-medium underline decoration-1 underline-offset-4 hover:opacity-70 transition-opacity"
+          >
+            Shop Women →
+          </Link>
+        </div>
       </section>
 
       {/* --- BESTSELLERS --- */}
