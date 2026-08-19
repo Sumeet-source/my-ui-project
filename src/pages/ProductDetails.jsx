@@ -163,13 +163,11 @@ export default function ProductDetails() {
   const getCloudinaryUrl = (url, width = 400) => {
     if (!url) return 'https://placehold.co/600x600/333/fff?text=Product+Image';
     if (url.includes('cloudinary.com')) {
-      // Remove any existing transformations
       let baseUrl = url;
       if (baseUrl.includes('/upload/')) {
         const parts = baseUrl.split('/upload/');
         baseUrl = parts[0] + '/upload/';
         const filePath = parts[1].replace(/^[^\/]*\//, '');
-        // Apply exact transformations
         return `${baseUrl}w_${width},f_auto,q_auto/${filePath}`;
       }
     }
@@ -260,11 +258,16 @@ export default function ProductDetails() {
         </div>
       )}
 
-      {/* ================= DELIVERY MODAL ================= */}
+      {/* ================= DELIVERY MODAL (ADDED) ================= */}
       {isDeliveryModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onClick={() => setIsDeliveryModalOpen(false)} className="absolute top-4 right-4 p-2 text-black hover:bg-gray-100 rounded-full transition"><X className="w-6 h-6" /></button>
+            <button 
+              onClick={() => setIsDeliveryModalOpen(false)} 
+              className="absolute top-4 right-4 p-2 text-black hover:bg-gray-100 rounded-full transition"
+            >
+              <X className="w-6 h-6" />
+            </button>
             <div className="flex items-center gap-2 mb-4">
               <Truck className="w-6 h-6 text-gray-800" />
               <h2 className="text-xl font-bold text-gray-900">Delivery Details</h2>
@@ -273,6 +276,7 @@ export default function ProductDetails() {
               <p>We offer free shipping on all orders across India, with no minimum order value and no additional delivery, platform, or hidden charges.</p>
               <p>Orders are typically processed within 3-5 business days. Delivery timelines may vary based on location, product availability, and other factors. If your order includes multiple items, they may be shipped separately.</p>
               <p>Estimated delivery dates shown at checkout are indicative and may be impacted by factors beyond our control, such as extreme weather, public holidays, or logistical constraints. While we aim to meet these timelines, delays may occur, and we'll keep you informed if your order is affected.</p>
+              
               <div className="border-t border-gray-200 my-4 pt-4">
                 <h3 className="font-bold text-gray-800 mb-2 uppercase tracking-wide">CANCELLATION POLICY</h3>
                 <p>You can cancel your order directly from the My Orders section before the item is shipped. Once an order has been processed and shipped, cancellation is not possible. In such cases, you can initiate a return after delivery through our returns process.</p>
@@ -284,13 +288,25 @@ export default function ProductDetails() {
         </div>
       )}
 
-      {/* ================= RETURN & EXCHANGE MODAL ================= */}
+      {/* ================= RETURN & EXCHANGE MODAL (ADDED) ================= */}
       {isReturnModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onClick={() => setIsReturnModalOpen(false)} className="absolute top-4 right-4 p-2 text-black hover:bg-gray-100 rounded-full transition"><X className="w-6 h-6" /></button>
+            <button 
+              onClick={() => setIsReturnModalOpen(false)} 
+              className="absolute top-4 right-4 p-2 text-black hover:bg-gray-100 rounded-full transition"
+            >
+              <X className="w-6 h-6" />
+            </button>
             <div className="flex items-center gap-2 mb-4">
-              <svg className="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><rect x="2" y="4" width="20" height="16" rx="2" /><path strokeLinecap="round" strokeLinejoin="round" d="M8 10h8" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 14h4" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 18h2" /><path strokeLinecap="round" strokeLinejoin="round" d="M16 12l2-2 2 2" /><path strokeLinecap="round" strokeLinejoin="round" d="M18 10v4" /></svg>
+              <svg className="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h8" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 14h4" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h2" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 12l2-2 2 2" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18 10v4" />
+              </svg>
               <h2 className="text-xl font-bold text-gray-900">Return & Exchange</h2>
             </div>
             <div className="space-y-3 text-sm text-gray-600 leading-relaxed">
@@ -312,7 +328,7 @@ export default function ProductDetails() {
             {images.map((img, idx) => (
               <div key={idx} className="min-w-full snap-center flex justify-center items-center">
                 <img 
-                  src={getCloudinaryUrl(img, 600)} // 🟢 Mobile optimized
+                  src={getCloudinaryUrl(img, 600)}
                   alt={`${product.title} ${idx + 1}`} 
                   loading={idx === 0 ? "eager" : "lazy"} 
                   fetchpriority={idx === 0 ? "high" : "auto"}
@@ -451,7 +467,7 @@ export default function ProductDetails() {
           <div className="flex-1 relative group">
             <div className="cursor-pointer relative overflow-hidden rounded-lg bg-gray-100 aspect-square" onClick={() => setIsLightboxOpen(true)}>
               <img 
-                src={getCloudinaryUrl(product.images?.[mainImageIndex] || product.imageUrl, 800)} // 🟢 Desktop optimized
+                src={getCloudinaryUrl(product.images?.[mainImageIndex] || product.imageUrl, 800)}
                 alt={product.title} 
                 loading="eager" 
                 fetchpriority="high"
@@ -467,7 +483,7 @@ export default function ProductDetails() {
                 {product.images.map((img, idx) => (
                   <button key={idx} onClick={() => setMainImageIndex(idx)} className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition flex-shrink-0 ${mainImageIndex === idx ? 'border-black' : 'border-gray-200 hover:border-gray-400'}`}>
                     <img 
-                      src={getCloudinaryUrl(img, 150)} // 🟢 Thumbnail optimized
+                      src={getCloudinaryUrl(img, 150)}
                       alt={`${product.title} - ${idx + 1}`} 
                       loading="lazy"
                       className="w-full h-full object-cover" 
