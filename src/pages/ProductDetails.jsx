@@ -159,7 +159,6 @@ export default function ProductDetails() {
 
   const images = product.images?.length > 0 ? product.images : [product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'];
 
-  // 🟢 NIKKE LEVEL SUPER FAST IMAGE OPTIMIZATION
   const getCloudinaryUrl = (url, width = 400) => {
     if (!url) return 'https://placehold.co/600x600/333/fff?text=Product+Image';
     if (url.includes('cloudinary.com')) {
@@ -400,20 +399,20 @@ export default function ProductDetails() {
             <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
             <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
             
-            {/* 🟢 FIX: Mobile Pincode Input - Single Row Nike Style */}
+            {/* 🟢 FIX: Mobile Pincode Input - No vertical line */}
             <div className="flex items-stretch gap-0 mb-4">
               <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
-               <input 
-  type="text" 
-  value={pincodeInput} 
-  onChange={(e) => setPincodeInput(e.target.value)} 
-  placeholder="Pincode" 
-  className="flex-1 w-full px-3 py-2 text-base outline-none bg-transparent placeholder:text-gray-400"
-/>
+                <input 
+                  type="text" 
+                  value={pincodeInput} 
+                  onChange={(e) => setPincodeInput(e.target.value)} 
+                  placeholder="Pincode" 
+                  className="flex-1 w-full px-3 py-2 text-base outline-none bg-transparent placeholder:text-gray-400"
+                />
                 <button 
                   onClick={checkDeliveryAvailability}
                   disabled={checkingPincode}
-                  className="bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap border-l border-gray-300"
+                  className="bg-white px-4 py-2 text-base font-medium text-black hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap"
                 >
                   {checkingPincode ? '...' : 'Check'}
                 </button>
@@ -563,7 +562,7 @@ export default function ProductDetails() {
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
                 <p className="text-sm text-gray-500 mb-2">Enter pincode to know exact delivery dates/charges</p>
                 
-                {/* 🟢 FIX: Desktop Pincode Input - Single Row Nike Style */}
+                {/* 🟢 FIX: Desktop Pincode Input - No vertical line */}
                 <div className="flex items-stretch gap-0 w-full max-w-sm">
                   <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
                     <input 
@@ -571,12 +570,12 @@ export default function ProductDetails() {
                       value={pincodeInput} 
                       onChange={(e) => setPincodeInput(e.target.value)} 
                       placeholder="Pincode" 
-                      className="flex-1 w-full px-3 py-2 text-sm outline-none bg-transparent placeholder:text-gray-400"
+                      className="flex-1 w-full px-3 py-2 text-base outline-none bg-transparent placeholder:text-gray-400"
                     />
                     <button 
                       onClick={checkDeliveryAvailability}
                       disabled={checkingPincode}
-                      className="bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap border-l border-gray-300"
+                      className="bg-white px-4 py-2 text-base font-medium text-black hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap"
                     >
                       {checkingPincode ? '...' : 'Check'}
                     </button>
