@@ -133,7 +133,8 @@ export default function Home() {
       <section className="w-full max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6 w-full">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Bestsellers</h2>
-          <div className="flex gap-2">
+          {/* 🟢 FIX: md:hidden add kiya — arrows ab sirf mobile pe dikhenge, desktop pe gayab */}
+          <div className="flex gap-2 md:hidden">
             {/* 🟢 FIX: Mobile scroll arrows chhote aur transparent kiye */}
             <button onClick={scrollBestsellerLeft} className="bg-white/60 md:bg-[#2A2A2A] backdrop-blur-sm shadow border border-gray-200 md:border-gray-800 rounded-full p-1 md:p-2 hover:bg-white md:hover:bg-[#3A3A3A] transition">
               <svg className="w-4 h-4 md:w-5 md:h-5 text-black md:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
@@ -157,7 +158,7 @@ export default function Home() {
                   <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg w-full">
                     <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
                   </div>
-                  <div className="flex flex-col gap-0.5 px-1">
+                  <div className="flex flex-col gap-0.5">
                     <p className="font-bold text-sm text-black md:text-white">{product.title}</p>
                     <p className="text-xs text-gray-500 md:text-gray-400">{product.category}</p>
                     <p className="font-bold text-sm text-black md:text-white mt-0.5">₹{product.price}</p>
@@ -175,7 +176,7 @@ export default function Home() {
       <section className="w-full max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6 w-full">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Shop By Sport</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 md:hidden">
             <button onClick={scrollSportLeft} className="bg-white/60 md:bg-[#2A2A2A] backdrop-blur-sm shadow border border-gray-200 md:border-gray-800 rounded-full p-1 md:p-2 hover:bg-white md:hover:bg-[#3A3A3A] transition">
               <svg className="w-4 h-4 md:w-5 md:h-5 text-black md:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
             </button>
@@ -225,7 +226,7 @@ export default function Home() {
                       }}
                     />
                   </div>
-                  <div className="px-1 pt-1">
+                  <div className="pt-1">
                     <h3 className="text-base md:text-lg font-bold text-black md:text-white leading-tight">
                       {product.title}
                     </h3>
@@ -249,7 +250,7 @@ export default function Home() {
       <section className="w-full max-w-[1600px] mx-auto px-4 md:px-10 py-6 md:py-10 relative">
         <div className="flex justify-between items-center mb-6 w-full">
           <h2 className="text-xl md:text-2xl font-bold text-black md:text-white">Trending</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 md:hidden">
             <button onClick={scrollTrendingLeft} className="bg-white/60 md:bg-[#2A2A2A] backdrop-blur-sm shadow border border-gray-200 md:border-gray-800 rounded-full p-1 md:p-2 hover:bg-white md:hover:bg-[#3A3A3A] transition">
               <svg className="w-4 h-4 md:w-5 md:h-5 text-black md:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
             </button>
@@ -270,7 +271,7 @@ export default function Home() {
                   <div className="relative aspect-square overflow-hidden bg-gray-50 md:bg-gray-800 rounded-lg w-full">
                     <img src={product.images?.[0] || product.imageUrl} alt={product.title} className="w-full h-full object-contain group-hover:scale-105 transition duration-500" onError={(e) => { e.target.src = 'https://placehold.co/600x600/f3f4f6/333333?text=No+Image'; }} />
                   </div>
-                  <div className="flex flex-col gap-0.5 px-1">
+                  <div className="flex flex-col gap-0.5">
                     <p className="font-bold text-sm text-black md:text-white">{product.title}</p>
                     <p className="text-xs text-gray-500 md:text-gray-400">{product.category}</p>
                     <p className="font-bold text-sm text-black md:text-white mt-0.5">₹{product.price}</p>
