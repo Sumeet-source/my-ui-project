@@ -258,7 +258,7 @@ export default function ProductDetails() {
         </div>
       )}
 
-      {/* ================= DELIVERY MODAL (ADDED) ================= */}
+      {/* ================= DELIVERY MODAL ================= */}
       {isDeliveryModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -288,7 +288,7 @@ export default function ProductDetails() {
         </div>
       )}
 
-      {/* ================= RETURN & EXCHANGE MODAL (ADDED) ================= */}
+      {/* ================= RETURN & EXCHANGE MODAL ================= */}
       {isReturnModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -399,10 +399,27 @@ export default function ProductDetails() {
           <div className="py-4 border-b border-gray-100">
             <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
             <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
-            <div className="flex gap-2 mb-4">
-              <input type="text" value={pincodeInput} onChange={(e) => setPincodeInput(e.target.value)} placeholder="Pincode" className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full outline-none focus:border-black placeholder:text-gray-400" />
-              <button onClick={checkDeliveryAvailability} disabled={checkingPincode} className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-600 disabled:opacity-50">{checkingPincode ? '...' : 'Check'}</button>
+            
+            {/* 🟢 FIX: Mobile Pincode Input - Single Row Nike Style */}
+            <div className="flex items-stretch gap-0 mb-4">
+              <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
+                <input 
+                  type="text" 
+                  value={pincodeInput} 
+                  onChange={(e) => setPincodeInput(e.target.value)} 
+                  placeholder="Pincode" 
+                  className="flex-1 w-full px-3 py-2 text-sm outline-none bg-transparent placeholder:text-gray-400"
+                />
+                <button 
+                  onClick={checkDeliveryAvailability}
+                  disabled={checkingPincode}
+                  className="bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap border-l border-gray-300"
+                >
+                  {checkingPincode ? '...' : 'Check'}
+                </button>
+              </div>
             </div>
+
             {deliveryAvailable === true && <p className="text-xs text-green-600 font-medium">✓ We deliver to this location!</p>}
             {deliveryAvailable === false && <p className="text-xs text-red-500 font-medium">🚫 We do not deliver to this area.</p>}
 
@@ -545,10 +562,27 @@ export default function ProductDetails() {
               <div className="py-4 border-b border-gray-200">
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
                 <p className="text-sm text-gray-500 mb-2">Enter pincode to know exact delivery dates/charges</p>
-                <div className="flex gap-2">
-                  <input type="text" value={pincodeInput} onChange={(e) => setPincodeInput(e.target.value)} placeholder="Pincode" className="border border-gray-300 rounded-md px-3 py-2 text-sm w-40 outline-none focus:border-black placeholder:text-gray-400" />
-                  <button onClick={checkDeliveryAvailability} className="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors text-gray-600">Check</button>
+                
+                {/* 🟢 FIX: Desktop Pincode Input - Single Row Nike Style */}
+                <div className="flex items-stretch gap-0 w-full max-w-sm">
+                  <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
+                    <input 
+                      type="text" 
+                      value={pincodeInput} 
+                      onChange={(e) => setPincodeInput(e.target.value)} 
+                      placeholder="Pincode" 
+                      className="flex-1 w-full px-3 py-2 text-sm outline-none bg-transparent placeholder:text-gray-400"
+                    />
+                    <button 
+                      onClick={checkDeliveryAvailability}
+                      disabled={checkingPincode}
+                      className="bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50 whitespace-nowrap border-l border-gray-300"
+                    >
+                      {checkingPincode ? '...' : 'Check'}
+                    </button>
+                  </div>
                 </div>
+
                 {deliveryAvailable === true && <p className="text-xs text-green-600 font-medium mt-2">✓ We deliver to this location!</p>}
                 {deliveryAvailable === false && <p className="text-xs text-red-500 font-medium mt-2">🚫 We do not deliver to this area.</p>}
 
