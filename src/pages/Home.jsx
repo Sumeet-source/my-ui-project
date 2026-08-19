@@ -92,8 +92,8 @@ export default function Home() {
         </p>
       </div>
 
-      {/* 🟢 UPDATED VIDEO BANNER - Mobile height reduced & Buttons Circular */}
-            {/* --- VIDEO BANNER (Zero black space, aspect-video) --- */}
+      {/*  UPDATED VIDEO BANNER - Mobile height reduced & Buttons Circular */}
+            
       <section className="relative w-full bg-black flex flex-col items-center justify-center">
         <video 
           className="w-full h-auto max-h-[85vh] object-contain md:object-cover"
@@ -108,20 +108,6 @@ export default function Home() {
           <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1920&q=80" alt="Banner Fallback" className="w-full h-full object-cover" />
         </video>
         <div className="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
-
-        <div className="absolute bottom-0 left-0 w-full p-4 md:p-10 pb-6 md:pb-14 flex flex-col items-start gap-3 md:gap-4 text-black md:text-white">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link to="/men" className="bg-white text-black border-2 border-black md:border-white px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-full text-center">
-              Shop men →
-            </Link>
-            <Link to="/women" className="bg-white text-black border-2 border-black md:border-white px-6 py-3 text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-gray-100 transition rounded-full text-center">
-              Shop women →
-            </Link>
-          </div>
-          <span className="inline-block text-xs md:text-sm font-bold uppercase tracking-wider border-b-2 border-black md:border-white pb-1 cursor-pointer hover:opacity-70 transition">
-            Learn More →
-          </span>
-        </div>
       </section>
 
       {/* --- BESTSELLERS --- */}
