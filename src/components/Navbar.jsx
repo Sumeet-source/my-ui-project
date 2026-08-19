@@ -46,18 +46,18 @@ const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
   return <span>{displayText}</span>;
 };
 
-// 🟢 FIX: Mega Dropdown ko Center mein align kar diya
+// 🟢 MEGA DROPDOWN (DARK GREY THEME)
 const MegaMenu = ({ items }) => {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 w-[90vw] max-w-[1200px] bg-[#F5F5F5] shadow-xl border border-gray-200 py-8 px-6 z-50 hidden group-hover:block rounded-b-lg">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 w-[90vw] max-w-[1200px] bg-[#1A1A1A] shadow-2xl border border-gray-800 py-8 px-6 z-50 hidden group-hover:block rounded-b-lg">
       <div className="flex flex-col md:flex-row gap-8">
         {/* Left Side: Sub-categories (3 Columns) */}
         <div className="flex-1 grid grid-cols-3 gap-x-6 gap-y-4">
           {items.map((col, idx) => (
             <div key={idx} className="flex flex-col gap-1">
-              <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-2">{col.heading}</h4>
+              <h4 className="font-bold text-xs text-white uppercase tracking-wider mb-2">{col.heading}</h4>
               {col.links.map((link, i) => (
-                <Link key={i} to={link.path} className="text-sm text-gray-700 hover:text-black hover:underline transition-colors">
+                <Link key={i} to={link.path} className="text-sm text-gray-400 hover:text-white hover:underline transition-colors">
                   {link.label}
                 </Link>
               ))}
@@ -66,9 +66,9 @@ const MegaMenu = ({ items }) => {
         </div>
         {/* Right Side: Featured Image/Offer */}
         <div className="hidden md:flex flex-col gap-4 w-[280px] shrink-0">
-          <div className="relative h-[180px] bg-gray-200 rounded-lg overflow-hidden hover:shadow-md transition">
+          <div className="relative h-[180px] bg-gray-800 rounded-lg overflow-hidden hover:shadow-md transition">
             <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=400&q=80" alt="Featured" className="w-full h-full object-cover" />
-            <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/60 to-transparent p-4">
+            <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4">
               <p className="text-white font-bold text-sm">New Arrivals</p>
               <p className="text-white text-xs">Shop the latest drops →</p>
             </div>
@@ -132,7 +132,7 @@ export default function Navbar() {
 
   const getUnderlineSpanClasses = (isActive) =>
     `relative inline-block 
-    after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-black 
+    after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white 
     after:transition-all after:duration-300 hover:after:w-full 
     ${isActive ? 'after:w-full' : ''}`;
 
@@ -168,25 +168,25 @@ export default function Navbar() {
   ];
 
   return (
-    // 🟢 FIX: Navbar background color ab grey (`bg-[#F5F5F5]`) hai
-    <nav className={`${isHome ? 'sticky top-0' : 'relative'} z-50 bg-[#F5F5F5] text-black shadow-sm border-b border-gray-200`}>
+    // 🟢 FIX: Dark Grey Navbar (`bg-[#1A1A1A]`) aur Text White (`text-white`)
+    <nav className={`${isHome ? 'sticky top-0' : 'relative'} z-50 bg-[#1A1A1A] text-white shadow-sm border-b border-gray-800`}>
       
       {/* --- TOP UTILITY BAR --- */}
-      <div className="border-b border-gray-200">
-        <div className="max-w-[1600px] mx-auto px-4 md:px-10 py-1.5 hidden md:flex justify-end items-center gap-4 text-[11px] font-medium text-gray-500 tracking-wide">
-          <Link to="/signup" className="uppercase hover:text-black transition">Sign Up</Link>
+      <div className="border-b border-gray-800">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-10 py-1.5 hidden md:flex justify-end items-center gap-4 text-[11px] font-medium text-gray-400 tracking-wide">
+          <Link to="/signup" className="uppercase hover:text-white transition">Sign Up</Link>
           {user ? (
             <>
-              <Link to="/dashboard" className="hover:text-black transition">Account</Link>
-              <button onClick={handleLogout} className="bg-transparent border-none hover:text-black transition">Logout</button>
+              <Link to="/dashboard" className="hover:text-white transition">Account</Link>
+              <button onClick={handleLogout} className="bg-transparent border-none text-gray-400 hover:text-white transition">Logout</button>
             </>
           ) : (
             <>
-              <Link to="/login" className="hover:text-black transition">Log In</Link>
+              <Link to="/login" className="hover:text-white transition">Log In</Link>
             </>
           )}
-          <span className="uppercase cursor-pointer hover:text-black transition">Help</span>
-          <span className="uppercase cursor-pointer hover:text-black transition">Find a Store</span>
+          <span className="uppercase cursor-pointer hover:text-white transition">Help</span>
+          <span className="uppercase cursor-pointer hover:text-white transition">Find a Store</span>
         </div>
       </div>
 
@@ -195,10 +195,10 @@ export default function Navbar() {
         
         {/* Mobile Action Buttons */}
         <div className="flex items-center gap-3 md:hidden">
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-black p-1">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <Link to={user ? "/dashboard" : "/login"} className="text-black">
+          <Link to={user ? "/dashboard" : "/login"} className="text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
           </Link>
         </div>
@@ -215,10 +215,10 @@ export default function Navbar() {
 
         {/* Mobile Right Icons */}
         <div className="flex items-center gap-4 md:hidden">
-          <button onClick={() => setIsSearchOpen(true)} className="text-black">
+          <button onClick={() => setIsSearchOpen(true)} className="text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </button>
-          <Link to="/cart" className="relative text-black">
+          <Link to="/cart" className="relative text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             {cart.length > 0 && <span key={cart.length} className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </Link>
@@ -227,34 +227,34 @@ export default function Navbar() {
         {/* --- DESKTOP MEGA MENU LINKS --- */}
         <div className="hidden md:flex justify-center flex-1 gap-8 lg:gap-12 text-[15px] font-bold items-center h-10">
           <div className="relative group h-full flex items-center cursor-pointer">
-            <Link to="/new-arrivals" className={`${isActiveNew ? 'text-black' : 'text-gray-600 hover:text-black'} transition-colors`}>
+            <Link to="/new-arrivals" className={`${isActiveNew ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
               <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm font-medium ml-0.5">🔥</span></span>
             </Link>
           </div>
 
           <div className="relative group h-full flex items-center cursor-pointer">
-            <Link to="/men" className={`${isActiveMen ? 'text-black' : 'text-gray-600 hover:text-black'} transition-colors flex items-center gap-1`}>
+            <Link to="/men" className={`${isActiveMen ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors flex items-center gap-1`}>
               <span className={getUnderlineSpanClasses(isActiveMen)}>Men</span>
             </Link>
             <MegaMenu items={menMenuItems} />
           </div>
 
           <div className="relative group h-full flex items-center cursor-pointer">
-            <Link to="/women" className={`${isActiveWomen ? 'text-black' : 'text-gray-600 hover:text-black'} transition-colors`}>
+            <Link to="/women" className={`${isActiveWomen ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
               <span className={getUnderlineSpanClasses(isActiveWomen)}>Women</span>
             </Link>
             <MegaMenu items={womenMenuItems} />
           </div>
 
           <div className="relative group h-full flex items-center cursor-pointer">
-            <Link to="/shoes" className={`${isActiveShoes ? 'text-black' : 'text-gray-600 hover:text-black'} transition-colors`}>
+            <Link to="/shoes" className={`${isActiveShoes ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
               <span className={getUnderlineSpanClasses(isActiveShoes)}>Shoes</span>
             </Link>
             <MegaMenu items={shoesMenuItems} />
           </div>
 
           <div className="relative group h-full flex items-center cursor-pointer">
-            <Link to="/outlet" className={`${isActiveOutlet ? 'text-black' : 'text-gray-600 hover:text-black'} transition-colors`}>
+            <Link to="/outlet" className={`${isActiveOutlet ? 'text-white' : 'text-gray-400 hover:text-white'} transition-colors`}>
               <span className={getUnderlineSpanClasses(isActiveOutlet)}>Outlet</span>
             </Link>
             <MegaMenu items={outletMenuItems} />
@@ -263,11 +263,11 @@ export default function Navbar() {
 
         {/* --- DESKTOP RIGHT ICONS --- */}
         <div className="hidden md:flex items-center gap-6">
-          <div className="hidden sm:flex items-center gap-2 border-b border-gray-300 hover:border-black transition-colors pb-0.5 w-28 lg:w-36">
-            <input type="text" value={searchTerm} onChange={handleDesktopSearch} onKeyDown={(e) => { if(e.key === 'Enter' && searchTerm.trim()) navigate(`/search?q=${searchTerm}`); }} placeholder="Search" className="bg-transparent text-black text-[14px] placeholder-gray-400 focus:outline-none w-full" />
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <div className="hidden sm:flex items-center gap-2 border-b border-gray-600 hover:border-white transition-colors pb-0.5 w-28 lg:w-36">
+            <input type="text" value={searchTerm} onChange={handleDesktopSearch} onKeyDown={(e) => { if(e.key === 'Enter' && searchTerm.trim()) navigate(`/search?q=${searchTerm}`); }} placeholder="Search" className="bg-transparent text-white text-[14px] placeholder-gray-500 focus:outline-none w-full" />
+            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
-          <Link to="/cart" className="relative text-black">
+          <Link to="/cart" className="relative text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             {cart.length > 0 && <span key={cart.length} className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </Link>
