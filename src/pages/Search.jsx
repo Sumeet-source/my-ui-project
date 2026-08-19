@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import ProductCard from '../components/ProductCard.jsx';
 import axiosClient from '../api/axiosClient';
 
 export default function Search() {
-  const navigate = useNavigate(); // 🟢 navigate import kiya
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const subCategory = searchParams.get('subCategory') || ''; 
@@ -71,6 +70,7 @@ export default function Search() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         
+        {/* 🟢 UPDATED: Upar wala bada 'Running Shoes' text hata diya. Ab sirf Tag aur Count hai */}
         <div className="flex items-center flex-wrap gap-3 mb-6 mt-2">
           {subCategory && (
             <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-900 border border-gray-200 shadow-sm transition-all">
