@@ -106,18 +106,19 @@ export default function Shoes() {
         </div>
       </div>
 
+      {/* 🟢 UPDATED: Gender Tabs with Thin Black Border & No Emojis */}
       <div className="flex gap-2 px-4 md:px-8 mt-3 mb-4 overflow-x-auto">
         {['All', 'Men', 'Women'].map((gender) => (
           <button
             key={gender}
             onClick={() => handleGenderChange(gender)}
-            className={`px-6 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+            className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap border-2 ${
               genderFromUrl === gender || (gender === 'All' && !genderFromUrl)
-                ? 'bg-black text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'border-black bg-white text-black shadow-sm'
+                : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
             }`}
           >
-            {gender === 'All' ? '👟 All' : gender === 'Men' ? '👨 Men' : '👩 Women'}
+            {gender}
           </button>
         ))}
       </div>
