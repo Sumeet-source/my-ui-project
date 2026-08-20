@@ -1,70 +1,65 @@
-// Haptic feedback utility for mobile devices
+// Haptic feedback utility - Vibration only (No Audio)
 
-let audioCtx = null;
+// Fallback for devices that don't support vibration (like iOS)
+// We use a tiny CSS animation to simulate a "tap" feeling instead
+const simulateTapFeedback = (intensity = 'light') => {
+  // Create a temporary feedback element
+  const feedback = document.createElement('div');
+  feedback.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: ${intensity === 'heavy' ? '20px' : '10px'};
+    height: ${intensity === 'heavy' ? '20px' : '10px'};
+    background: transparent;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    pointer-events: none;
+    z-index: 999999;
+    transition: none;
+  `;
+  document.body.appendChild(feedback);
 
-// iOS-friendly haptic using Audio Context (fallback)
-const playIOSHaptic = (intensity = 0.05) => {
-  try {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    
-    osc.frequency.value = 150;
-    osc.type = 'sine';
-    gain.gain.value = intensity;
-    
-    osc.start(0);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05);
-    osc.stop(audioCtx.currentTime + 0.05);
-    
-    return true;
-  } catch (e) {
-    console.log('Haptic not supported');
-    return false;
-  }
+  // Trigger the animation (scale up and fade out instantly)
+  requestAnimationFrame(() => {
+    feedback.style.transition = 'transform 0.05s, opacity 0.05s';
+    feedback.style.transform = 'translate(-50%, -50%) scale(4)';
+    feedback.style.opacity = '0';
+  });
+
+  // Clean up the element after animation
+  setTimeout(() => {
+    if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
+  }, 100);
 };
 
 export const triggerHaptic = (type = 'light') => {
-  // iOS: Use Audio Context (since vibrate API is not supported)
-  if (!navigator.vibrate) {
-    const intensityMap = {
-      light: 0.03,
-      medium: 0.05,
-      heavy: 0.08,
-      success: 0.06,
-      error: 0.08,
-      warning: 0.05,
-      double: 0.04,
-      long: 0.07,
+  // 1. Check if native vibration API is available (Android, Chrome, etc.)
+  if (navigator.vibrate) {
+    const patterns = {
+      light: 5,      // Very short, barely noticeable buzz
+      medium: 15,    // Standard short buzz
+      heavy: 30,     // Strong buzz
+      success: [15, 20, 15],
+      error: [30, 20, 30],
+      warning: [15, 15, 15],
+      double: [10, 20, 10],
+      long: 50,
     };
-    playIOSHaptic(intensityMap[type] || 0.05);
-    return;
+
+    const pattern = patterns[type] || patterns.medium;
+    
+    if (typeof pattern === 'number') {
+      navigator.vibrate(pattern);
+    } else {
+      navigator.vibrate(pattern);
+    }
+    return; // Exit after vibrating
   }
 
-  // Android / Others: Use standard vibration API
-  const patterns = {
-    light: 10,
-    medium: 20,
-    heavy: 40,
-    success: [30, 50, 30],
-    error: [50, 30, 50, 30, 100],
-    warning: [20, 30, 20],
-    double: [15, 30, 15],
-    long: 80,
-  };
-
-  const pattern = patterns[type] || patterns.medium;
-  
-  if (typeof pattern === 'number') {
-    navigator.vibrate(pattern);
-  } else {
-    navigator.vibrate(pattern);
-  }
+  // 2. Fallback for iOS / Browsers without vibrate API
+  // We use a visual feedback simulation instead of playing any audio
+  simulateTapFeedback(type);
 };
 
 // Shortcut methods
