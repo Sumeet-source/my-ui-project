@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import axiosClient from '../api/axiosClient';
 import ProductCard from '../components/ProductCard';
 import { Truck, RotateCcw, X } from 'lucide-react';
-import { useHaptic } from '../hooks/useHaptic';
+// 🟢 HAPTIC IMPORT HATA DIYA GAYA HAI
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -17,8 +17,7 @@ export default function ProductDetails() {
   const { user } = useAuth();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
-  // 🟢 HAPTIC HOOK
-  const { success, click, double } = useHaptic();
+  // 🟢 HAPTIC HOOK HATA DIYA GAYA HAI
 
   const [product, setProduct] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
@@ -109,9 +108,9 @@ export default function ProductDetails() {
     }
   };
 
-  // 🟢 HAPTIC: Add to Cart with haptic feedback
+  // 🟢 HAPTIC REMOVED: Add to Cart without haptic feedback
   const handleAddToCart = () => {
-    click(); // 🟢 HAPTIC: Click feedback on button press
+    // click(); // 🟢 REMOVED
 
     if (!product.inStock) { 
       showToast("Sorry, this item is out of stock!", "error"); 
@@ -144,16 +143,16 @@ export default function ProductDetails() {
       image: product.images?.[0] || product.imageUrl 
     });
 
-    success(); // 🟢 HAPTIC: Success feedback after adding to cart
+    // success(); // 🟢 REMOVED
   };
 
-  // 🟢 HAPTIC: Wishlist toggle with haptic feedback
+  // 🟢 HAPTIC REMOVED: Wishlist toggle without haptic feedback
   const handleWishlistToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation(); 
     
-    double(); // 🟢 HAPTIC: Double tap pattern for wishlist
+    // double(); // 🟢 REMOVED
 
     if (!user) { 
       showToast("Please login to add to wishlist", "error"); 
