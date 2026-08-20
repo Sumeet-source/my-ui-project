@@ -5,7 +5,14 @@ import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import ForgeLogo from './ForgeLogo';
-import axiosClient from '../api/axiosClient'; // 🟢 NEW: search suggestions ke liye
+import axiosClient from '../api/axiosClient';
+
+// 🟢 NEW: Import icons for hamburger menu
+import { 
+  User, Footprints, Tag, Sparkles, School,
+  LogIn, Heart, HelpCircle, Globe, ShoppingBag,
+  X, Menu
+} from 'lucide-react';
 
 // 🟢 MOBILE SCRAMBLE DECODE ANIMATION COMPONENT
 const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
@@ -47,15 +54,11 @@ const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
   return <span>{displayText}</span>;
 };
 
-// 🟢 FIX: Ab sirf ek hi MegaMenu instance render hota hai (state-driven), isliye
-// position hamesha poori nav-row ke center me fixed rehti hai — chahe Men/Women/Shoes/Outlet
-// kisi pe bhi hover karo. Visibility ab parent ke `activeMenu` state se control hoti hai,
-// isliye yahan se `hidden group-hover:block` hata diya gaya hai.
+// 🟢 MegaMenu Component (Same as before)
 const MegaMenu = ({ items }) => {
   return (
     <div className="absolute top-full left-1/2 -translate-x-1/2 w-[1100px] bg-[#1A1A1A] shadow-2xl border border-gray-800 py-8 px-6 z-50 rounded-b-lg">
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Left Side: Sub-categories (3 Columns) */}
         <div className="flex-1 grid grid-cols-3 gap-x-6 gap-y-4">
           {items.map((col, idx) => (
             <div key={idx} className="flex flex-col gap-1">
@@ -68,7 +71,6 @@ const MegaMenu = ({ items }) => {
             </div>
           ))}
         </div>
-        {/* Right Side: Featured Image/Offer */}
         <div className="hidden md:flex flex-col gap-4 w-[280px] shrink-0">
           <div className="relative h-[180px] bg-gray-800 rounded-lg overflow-hidden hover:shadow-md transition">
             <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=400&q=80" alt="Featured" className="w-full h-full object-cover" />
@@ -87,10 +89,8 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
-  // 🟢 NEW: kaunsa mega menu abhi active/open hai, isse control hoga
   const [activeMenu, setActiveMenu] = useState(null);
 
-  // 🟢 NEW: live search suggestions state (desktop + mobile dono ke liye)
   const [desktopSuggestions, setDesktopSuggestions] = useState([]);
   const [showDesktopSuggestions, setShowDesktopSuggestions] = useState(false);
   const [mobileSuggestions, setMobileSuggestions] = useState([]);
@@ -111,6 +111,15 @@ export default function Navbar() {
 
   const isHome = location.pathname === '/';
 
+  // 🟢 NEW: Menu Categories with Icons
+  const menuCategories = [
+    { name: 'New', icon: Sparkles, path: '/new-arrivals' },
+    { name: 'Men', icon: User, path: '/men' },
+    { name: 'Women', icon: User, path: '/women' },
+    { name: 'Shoes', icon: Footprints, path: '/shoes' },
+    { name: 'Outlet', icon: Tag, path: '/outlet' },
+  ];
+
   const handleSearchSubmit = (e) => {
     if (e.key === 'Enter' && searchInput.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchInput.trim())}`);
@@ -121,10 +130,6 @@ export default function Navbar() {
   const handleDesktopSearch = (e) => {
     const value = e.target.value;
 
-    // 🟢 ORIGINAL LOGIC (as-is): current page ke URL me 'search' param set karta hai —
-    // isse agar koi aur page (jaise /men) is param ko read karke apne aap filter karta hai,
-    // wo behavior bilkul waisa hi chalta rahega.
-    // 🟢 FIX: {replace:true} add kiya taaki har keystroke pe naya browser-history entry na bane.
     setSearchParams((prevParams) => {
       const params = new URLSearchParams(prevParams);
       if (value) {
@@ -135,7 +140,6 @@ export default function Navbar() {
       return params;
     }, { replace: true });
 
-    // 🟢 NEW: debounced live suggestions fetch (Nike jaisa autosuggest)
     if (desktopDebounceRef.current) clearTimeout(desktopDebounceRef.current);
 
     const trimmed = value.trim();
@@ -167,14 +171,12 @@ export default function Navbar() {
     }, 300);
   };
 
-  // 🟢 NEW: unmount pe pending debounce timer clear karo (memory-leak safe)
   useEffect(() => {
     return () => {
       if (desktopDebounceRef.current) clearTimeout(desktopDebounceRef.current);
     };
   }, []);
 
-  // 🟢 NEW: mobile full-screen search overlay ke liye live suggestions (debounced)
   useEffect(() => {
     const trimmed = searchInput.trim();
     if (trimmed.length < 2) {
@@ -212,7 +214,7 @@ export default function Navbar() {
 
   const handleSearchClear = () => {
     setSearchInput('');
-    setMobileSuggestions([]); // 🟢 NEW
+    setMobileSuggestions([]);
     if (inputRef.current) inputRef.current.focus();
   };
 
@@ -228,7 +230,6 @@ export default function Navbar() {
   const isActiveShoes = location.pathname === '/shoes';
   const isActiveOutlet = location.pathname === '/outlet';
 
-  // 🟢 MEGA MENU DATA
   const menMenuItems = [
     { heading: "Shop By Category", links: [ { label: "T-Shirts & Tops", path: "/men?subCategory=T-Shirts" }, { label: "Hoodies & Sweatshirts", path: "/men?subCategory=Hoodies" }, { label: "Jackets & Vests", path: "/men?subCategory=Jackets" } ] },
     { heading: "Shop By Sport", links: [ { label: "Running", path: "/men?subCategory=Running" }, { label: "Training", path: "/men?subCategory=Training" }, { label: "Football", path: "/men?subCategory=Football" } ] },
@@ -254,10 +255,9 @@ export default function Navbar() {
   ];
 
   return (
-    // 🟢 DESKTOP: Dark Grey (`bg-[#1A1A1A]`), MOBILE: White (`bg-white`) using Tailwind responsive classes
     <nav className={`${isHome ? 'sticky top-0' : 'relative'} z-50 bg-white md:bg-[#1A1A1A] text-black md:text-white shadow-sm border-b border-gray-200 md:border-gray-800`}>
       
-      {/* --- TOP UTILITY BAR (Mobile White, Desktop Dark) --- */}
+      {/* --- TOP UTILITY BAR --- */}
       <div className="border-b border-gray-200 md:border-gray-800">
         <div className="max-w-[1600px] mx-auto px-4 md:px-10 py-1.5 hidden md:flex justify-end items-center gap-4 text-[11px] font-medium text-gray-500 md:text-white tracking-wide">
           <Link to="/signup" className="uppercase hover:text-black md:hover:text-gray-300 transition">Sign Up</Link>
@@ -277,7 +277,6 @@ export default function Navbar() {
       </div>
 
       {/* --- MAIN NAVIGATION BAR --- */}
-      {/* 🟢 onMouseLeave yahan add kiya — jab cursor poori row (links + dropdown) se bahar jaayega tabhi menu band hoga */}
       <div
         className="flex justify-between items-center px-4 md:px-10 py-2 md:py-3 max-w-[1600px] mx-auto relative"
         onMouseLeave={() => setActiveMenu(null)}
@@ -286,14 +285,14 @@ export default function Navbar() {
         {/* Mobile Action Buttons */}
         <div className="flex items-center gap-3 md:hidden">
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-black p-1">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+            <Menu className="w-6 h-6" />
           </button>
           <Link to={user ? "/dashboard" : "/login"} className="text-black">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+            <User className="w-5 h-5" />
           </Link>
         </div>
 
-        {/* LOGO SECTION: Mobile Black, Desktop White */}
+        {/* LOGO SECTION */}
         <div className="flex items-center flex-1 justify-center md:justify-start md:flex-none">
           <div className="hidden md:block">
             <ForgeLogo />
@@ -309,17 +308,16 @@ export default function Navbar() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </button>
           <Link to="/cart" className="relative text-black">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            <ShoppingBag className="w-5 h-5" />
             {cart.length > 0 && <span key={cart.length} className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </Link>
         </div>
 
         {/* --- DESKTOP MEGA MENU LINKS --- */}
-        {/* 🟢 Har trigger pe sirf onMouseEnter add kiya — ab yahan se MegaMenu render nahi hota, sirf state set hoti hai */}
         <div className="hidden md:flex justify-center flex-1 gap-8 lg:gap-12 text-[15px] font-bold items-center h-10">
           <div className="relative group h-full flex items-center cursor-pointer" onMouseEnter={() => setActiveMenu(null)}>
             <Link to="/new-arrivals" className="text-white transition-colors">
-              <span className={getUnderlineSpanClasses(isActiveNew)}>New <span className="text-orange-500 text-sm font-medium ml-0.5">🔥</span></span>
+              <span className={getUnderlineSpanClasses(isActiveNew)}>New</span>
             </Link>
           </div>
 
@@ -350,7 +348,6 @@ export default function Navbar() {
 
         {/* --- DESKTOP RIGHT ICONS --- */}
         <div className="hidden md:flex items-center gap-6">
-          {/* 🟢 NEW: relative wrapper add kiya taaki neeche suggestions dropdown correctly position ho */}
           <div className="hidden sm:block relative">
             <div className="flex items-center gap-2 border-b border-gray-600 hover:border-white transition-colors pb-0.5 w-28 lg:w-36">
               <input
@@ -371,7 +368,6 @@ export default function Navbar() {
               <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
 
-            {/* 🟢 NEW: Desktop live search suggestions dropdown (Nike jaisa "Top Suggestions") */}
             {showDesktopSuggestions && desktopSuggestions.length > 0 && (
               <div className="absolute top-full right-0 mt-2 w-80 bg-white text-black rounded-lg shadow-2xl border border-gray-200 py-2 z-[60] max-h-96 overflow-y-auto">
                 {desktopSuggestions.map((product) => (
@@ -407,13 +403,12 @@ export default function Navbar() {
             )}
           </div>
           <Link to="/cart" className="relative text-white">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            <ShoppingBag className="w-5 h-5" />
             {cart.length > 0 && <span key={cart.length} className="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </Link>
         </div>
 
-        {/* 🟢 SINGLE MegaMenu instance — hamesha isi outer row (relative container) ke center me khulta hai,
-            content sirf activeMenu state ke hisaab se badalta hai, position kabhi nahi hilti */}
+        {/* MegaMenu Instances */}
         {activeMenu === 'men' && <MegaMenu items={menMenuItems} />}
         {activeMenu === 'women' && <MegaMenu items={womenMenuItems} />}
         {activeMenu === 'shoes' && <MegaMenu items={shoesMenuItems} />}
@@ -445,7 +440,6 @@ export default function Navbar() {
                 </div>
               </>
             ) : mobileSuggestions.length > 0 ? (
-              // 🟢 NEW: mobile live suggestions list (Nike jaisa)
               <div className="flex flex-col divide-y divide-gray-100">
                 {mobileSuggestions.map((product) => (
                   <button
@@ -478,21 +472,77 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* --- MOBILE DRAWER --- */}
+      {/* --- 🟢 UPDATED: MOBILE DRAWER (Under Armour Style) --- */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[999] bg-white text-black md:hidden flex flex-col overflow-hidden">
+          {/* Header with Close Button */}
           <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 shrink-0">
             <div className="flex-1"></div>
-            <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0"><span className="text-xl font-black tracking-[0.2em] text-black"><ScrambleLogo text="FORGE" /></span></Link>
-            <div className="flex-1 flex justify-end"><button onClick={() => setIsMenuOpen(false)} className="text-black p-1"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg></button></div>
+            <Link to="/" onClick={() => setIsMenuOpen(false)} className="block shrink-0">
+              <span className="text-xl font-black tracking-[0.2em] text-black">
+                <ScrambleLogo text="FORGE" />
+              </span>
+            </Link>
+            <div className="flex-1 flex justify-end">
+              <button onClick={() => setIsMenuOpen(false)} className="text-black p-1">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
           </div>
+
+          {/* Menu Content */}
           <div className="flex-1 overflow-y-auto px-6 py-4">
+            {/* Categories with Icons */}
             <div className="flex flex-col">
-              <button onClick={() => { navigate('/new-arrivals'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full"><span>New <span className="text-orange-500 text-sm">🔥</span></span><svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg></button>
-              <button onClick={() => { navigate('/men'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full"><span>Men</span><svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg></button>
-              <button onClick={() => { navigate('/women'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full"><span>Women</span><svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg></button>
-              <button onClick={() => { navigate('/shoes'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full"><span>Shoes</span><svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg></button>
-              <button onClick={() => { navigate('/outlet'); setIsMenuOpen(false); }} className="flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full"><span>Outlet</span><svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg></button>
+              {menuCategories.map(({ name, icon: Icon, path }) => (
+                <button
+                  key={name}
+                  onClick={() => { navigate(path); setIsMenuOpen(false); }}
+                  className={`flex justify-between items-center py-4 border-b border-gray-100 text-[16px] font-bold text-left w-full ${
+                    name === 'New' ? 'text-black' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className="w-5 h-5 text-gray-700" />
+                    <span>{name}</span>
+                  </div>
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              ))}
+            </div>
+
+            {/* Bottom Section: Login, Saved, Help, Region */}
+            <div className="mt-6 pt-6 border-t border-gray-200 space-y-4">
+              <button
+                onClick={() => { navigate(user ? '/dashboard' : '/login'); setIsMenuOpen(false); }}
+                className="flex items-center gap-3 text-[15px] text-gray-700 hover:text-black w-full"
+              >
+                <LogIn className="w-5 h-5" />
+                <span>{user ? 'My Account' : 'Log In'}</span>
+              </button>
+              
+              <button
+                onClick={() => { navigate('/wishlist'); setIsMenuOpen(false); }}
+                className="flex items-center gap-3 text-[15px] text-gray-700 hover:text-black w-full"
+              >
+                <Heart className="w-5 h-5" />
+                <span>Saved</span>
+              </button>
+              
+              <button
+                onClick={() => { navigate('/help'); setIsMenuOpen(false); }}
+                className="flex items-center gap-3 text-[15px] text-gray-700 hover:text-black w-full"
+              >
+                <HelpCircle className="w-5 h-5" />
+                <span>Help</span>
+              </button>
+
+              <div className="flex items-center gap-3 text-[13px] text-gray-500 pt-2">
+                <Globe className="w-4 h-4" />
+                <span>Region: US</span>
+              </div>
             </div>
           </div>
         </div>
