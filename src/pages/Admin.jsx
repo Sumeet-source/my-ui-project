@@ -492,30 +492,142 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === 'delivery' && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold mb-4">Manage Delivery Pincodes</h2>
+            
+            {/* 🟢 FIX: Form - Mobile responsive */}
             <form onSubmit={handlePincodeSubmit} className="space-y-4 mb-6 border-b border-gray-100 pb-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div><label className="block text-sm font-semibold text-gray-900">Pincode</label><input type="text" name="pincode" value={pincodeForm.pincode} onChange={handlePincodeChange} placeholder="e.g. 452010" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" required disabled={isEditPincode} /></div>
-                <div><label className="block text-sm font-semibold text-gray-900">City</label><input type="text" name="city" value={pincodeForm.city} onChange={handlePincodeChange} placeholder="Indore" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" /></div>
-                <div><label className="block text-sm font-semibold text-gray-900">State</label><input type="text" name="state" value={pincodeForm.state} onChange={handlePincodeChange} placeholder="MP" className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black" /></div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Pincode</label>
+                  <input 
+                    type="text" 
+                    name="pincode" 
+                    value={pincodeForm.pincode} 
+                    onChange={handlePincodeChange} 
+                    placeholder="e.g. 452010" 
+                    className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black text-sm" 
+                    required 
+                    disabled={isEditPincode} 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">City</label>
+                  <input 
+                    type="text" 
+                    name="city" 
+                    value={pincodeForm.city} 
+                    onChange={handlePincodeChange} 
+                    placeholder="Indore" 
+                    className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black text-sm" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">State</label>
+                  <input 
+                    type="text" 
+                    name="state" 
+                    value={pincodeForm.state} 
+                    onChange={handlePincodeChange} 
+                    placeholder="MP" 
+                    className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black text-sm" 
+                  />
+                </div>
               </div>
-              <div className="flex items-center gap-4 mt-2">
-                <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="isActive" checked={pincodeForm.isActive} onChange={handlePincodeChange} className="w-5 h-5 accent-black" /><span className="text-sm font-medium">Active (Deliverable)</span></label>
-                <button type="submit" className="px-6 py-2 bg-black text-white text-sm font-semibold rounded hover:bg-gray-800 transition">{isEditPincode ? 'Update Pincode' : 'Add Pincode'}</button>
-                {isEditPincode && (<button type="button" onClick={() => { setIsEditPincode(false); setEditingPincodeId(null); setPincodeForm({ pincode: '', city: '', state: '', isActive: true }); }} className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-semibold rounded hover:bg-gray-300 transition">Cancel</button>)}
+              
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    name="isActive" 
+                    checked={pincodeForm.isActive} 
+                    onChange={handlePincodeChange} 
+                    className="w-4 h-4 sm:w-5 sm:h-5 accent-black" 
+                  />
+                  <span className="text-sm font-medium">Active (Deliverable)</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <button 
+                    type="submit" 
+                    className="px-4 sm:px-6 py-2 bg-black text-white text-sm font-semibold rounded hover:bg-gray-800 transition"
+                  >
+                    {isEditPincode ? 'Update Pincode' : 'Add Pincode'}
+                  </button>
+                  {isEditPincode && (
+                    <button 
+                      type="button" 
+                      onClick={() => { 
+                        setIsEditPincode(false); 
+                        setEditingPincodeId(null); 
+                        setPincodeForm({ pincode: '', city: '', state: '', isActive: true }); 
+                      }} 
+                      className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-semibold rounded hover:bg-gray-300 transition"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
               </div>
             </form>
 
-            {loadingPincodes ? (<p className="text-center py-4 text-gray-500">Loading pincodes...</p>) : (
-              <div className="space-y-2">
-                {deliveryPincodes.length === 0 ? (<p className="text-center py-4 text-gray-500">No pincodes added yet.</p>) : (
-                  deliveryPincodes.map((p) => (
-                    <div key={p.pincode} className="flex items-center justify-between p-3 border border-gray-100 rounded bg-gray-50">
-                      <div className="flex gap-4 text-sm"><span className="font-bold w-24">{p.pincode}</span><span className="w-32">{p.city || '-'}</span><span className="w-32">{p.state || '-'}</span><span className={`px-2 py-0.5 rounded text-xs font-semibold ${p.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{p.isActive ? 'Active' : 'Blocked'}</span></div>
-                      <div className="flex gap-2"><button onClick={() => handleEditPincode(p)} className="text-xs text-blue-600 hover:underline">Edit</button><button onClick={() => handleDeletePincode(p.pincode)} className="text-xs text-red-600 hover:underline">Delete</button></div>
+            {/* 🟢 FIX: Pincode List - Mobile responsive with horizontal scroll */}
+            {loadingPincodes ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                <span className="ml-3 text-gray-500 text-sm">Loading pincodes...</span>
+              </div>
+            ) : (
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                {deliveryPincodes.length === 0 ? (
+                  <p className="text-center py-4 text-gray-500 text-sm">No pincodes added yet.</p>
+                ) : (
+                  <div className="min-w-full inline-block align-middle">
+                    <div className="overflow-hidden border border-gray-200 rounded-lg">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-3 py-2.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Pincode</th>
+                            <th className="px-3 py-2.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">City</th>
+                            <th className="px-3 py-2.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">State</th>
+                            <th className="px-3 py-2.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                            <th className="px-3 py-2.5 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-100">
+                          {deliveryPincodes.map((p) => (
+                            <tr key={p.pincode} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-3 py-2.5 whitespace-nowrap text-sm font-medium text-gray-900">{p.pincode}</td>
+                              <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">{p.city || '-'}</td>
+                              <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">{p.state || '-'}</td>
+                              <td className="px-3 py-2.5 whitespace-nowrap">
+                                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                                  p.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                }`}>
+                                  {p.isActive ? 'Active' : 'Blocked'}
+                                </span>
+                              </td>
+                              <td className="px-3 py-2.5 whitespace-nowrap text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                  <button 
+                                    onClick={() => handleEditPincode(p)} 
+                                    className="text-xs text-blue-600 hover:text-blue-800 font-medium transition"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button 
+                                    onClick={() => handleDeletePincode(p.pincode)} 
+                                    className="text-xs text-red-600 hover:text-red-800 font-medium transition"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                  ))
+                  </div>
                 )}
               </div>
             )}
