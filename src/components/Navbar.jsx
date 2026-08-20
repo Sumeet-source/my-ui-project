@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import ForgeLogo from './ForgeLogo';
+import axiosClient from '../api/axiosClient'; // 🟢 NEW: search suggestions ke liye
 
 // 🟢 MOBILE SCRAMBLE DECODE ANIMATION COMPONENT
 const ScrambleLogo = ({ text = "FORGE", delay = 500 }) => {
@@ -88,6 +89,13 @@ export default function Navbar() {
   const [searchInput, setSearchInput] = useState('');
   // 🟢 NEW: kaunsa mega menu abhi active/open hai, isse control hoga
   const [activeMenu, setActiveMenu] = useState(null);
+
+  // 🟢 NEW: live search suggestions state (desktop + mobile dono ke liye)
+  const [desktopSuggestions, setDesktopSuggestions] = useState([]);
+  const [showDesktopSuggestions, setShowDesktopSuggestions] = useState(false);
+  const [mobileSuggestions, setMobileSuggestions] = useState([]);
+  const desktopDebounceRef = useRef(null);
+
   const inputRef = useRef(null);
   
   const { cart, clearCart } = useCart(); 
@@ -105,13 +113,18 @@ export default function Navbar() {
 
   const handleSearchSubmit = (e) => {
     if (e.key === 'Enter' && searchInput.trim()) {
-      navigate(`/search?q=${searchInput}`);
+      navigate(`/search?q=${encodeURIComponent(searchInput.trim())}`);
       setIsSearchOpen(false);
     }
   };
 
   const handleDesktopSearch = (e) => {
     const value = e.target.value;
+
+    // 🟢 ORIGINAL LOGIC (as-is): current page ke URL me 'search' param set karta hai —
+    // isse agar koi aur page (jaise /men) is param ko read karke apne aap filter karta hai,
+    // wo behavior bilkul waisa hi chalta rahega.
+    // 🟢 FIX: {replace:true} add kiya taaki har keystroke pe naya browser-history entry na bane.
     setSearchParams((prevParams) => {
       const params = new URLSearchParams(prevParams);
       if (value) {
@@ -120,8 +133,75 @@ export default function Navbar() {
         params.delete('search');
       }
       return params;
-    });
+    }, { replace: true });
+
+    // 🟢 NEW: debounced live suggestions fetch (Nike jaisa autosuggest)
+    if (desktopDebounceRef.current) clearTimeout(desktopDebounceRef.current);
+
+    const trimmed = value.trim();
+    if (trimmed.length < 2) {
+      setDesktopSuggestions([]);
+      setShowDesktopSuggestions(false);
+      return;
+    }
+
+    desktopDebounceRef.current = setTimeout(async () => {
+      try {
+        const res = await axiosClient.get('/api/products', { params: { q: trimmed } });
+        let data = res.data;
+        if (Array.isArray(data)) {
+          data = data;
+        } else if (data && Array.isArray(data.products)) {
+          data = data.products;
+        } else if (data && Array.isArray(data.data)) {
+          data = data.data;
+        } else {
+          data = [];
+        }
+        setDesktopSuggestions(data.slice(0, 6));
+        setShowDesktopSuggestions(true);
+      } catch (error) {
+        console.error('Search suggestion error:', error);
+        setDesktopSuggestions([]);
+      }
+    }, 300);
   };
+
+  // 🟢 NEW: unmount pe pending debounce timer clear karo (memory-leak safe)
+  useEffect(() => {
+    return () => {
+      if (desktopDebounceRef.current) clearTimeout(desktopDebounceRef.current);
+    };
+  }, []);
+
+  // 🟢 NEW: mobile full-screen search overlay ke liye live suggestions (debounced)
+  useEffect(() => {
+    const trimmed = searchInput.trim();
+    if (trimmed.length < 2) {
+      setMobileSuggestions([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await axiosClient.get('/api/products', { params: { q: trimmed } });
+        let data = res.data;
+        if (Array.isArray(data)) {
+          data = data;
+        } else if (data && Array.isArray(data.products)) {
+          data = data.products;
+        } else if (data && Array.isArray(data.data)) {
+          data = data.data;
+        } else {
+          data = [];
+        }
+        setMobileSuggestions(data.slice(0, 8));
+      } catch (error) {
+        console.error('Mobile search suggestion error:', error);
+        setMobileSuggestions([]);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const handleLogout = () => {
     clearCart(); 
@@ -132,6 +212,7 @@ export default function Navbar() {
 
   const handleSearchClear = () => {
     setSearchInput('');
+    setMobileSuggestions([]); // 🟢 NEW
     if (inputRef.current) inputRef.current.focus();
   };
 
@@ -269,9 +350,61 @@ export default function Navbar() {
 
         {/* --- DESKTOP RIGHT ICONS --- */}
         <div className="hidden md:flex items-center gap-6">
-          <div className="hidden sm:flex items-center gap-2 border-b border-gray-600 hover:border-white transition-colors pb-0.5 w-28 lg:w-36">
-            <input type="text" value={searchTerm} onChange={handleDesktopSearch} onKeyDown={(e) => { if(e.key === 'Enter' && searchTerm.trim()) navigate(`/search?q=${searchTerm}`); }} placeholder="Search" className="bg-transparent text-white text-[14px] placeholder-gray-500 focus:outline-none w-full" />
-            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          {/* 🟢 NEW: relative wrapper add kiya taaki neeche suggestions dropdown correctly position ho */}
+          <div className="hidden sm:block relative">
+            <div className="flex items-center gap-2 border-b border-gray-600 hover:border-white transition-colors pb-0.5 w-28 lg:w-36">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleDesktopSearch}
+                onFocus={() => { if (desktopSuggestions.length > 0) setShowDesktopSuggestions(true); }}
+                onBlur={() => setTimeout(() => setShowDesktopSuggestions(false), 150)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && searchTerm.trim()) {
+                    navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+                    setShowDesktopSuggestions(false);
+                  }
+                }}
+                placeholder="Search"
+                className="bg-transparent text-white text-[14px] placeholder-gray-500 focus:outline-none w-full"
+              />
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </div>
+
+            {/* 🟢 NEW: Desktop live search suggestions dropdown (Nike jaisa "Top Suggestions") */}
+            {showDesktopSuggestions && desktopSuggestions.length > 0 && (
+              <div className="absolute top-full right-0 mt-2 w-80 bg-white text-black rounded-lg shadow-2xl border border-gray-200 py-2 z-[60] max-h-96 overflow-y-auto">
+                {desktopSuggestions.map((product) => (
+                  <button
+                    key={product._id}
+                    onMouseDown={() => {
+                      navigate(`/product/${product._id}`);
+                      setShowDesktopSuggestions(false);
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-2 hover:bg-gray-100 text-left transition"
+                  >
+                    <img
+                      src={product.images?.[0] || 'https://placehold.co/60x60/333/fff?text=IMG'}
+                      alt={product.title}
+                      className="w-10 h-10 object-cover rounded shrink-0"
+                    />
+                    <div className="flex flex-col overflow-hidden">
+                      <span className="text-sm font-medium truncate">{product.title}</span>
+                      {product.price && <span className="text-xs text-gray-500">₹{product.price}</span>}
+                    </div>
+                  </button>
+                ))}
+                <button
+                  onMouseDown={() => {
+                    navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+                    setShowDesktopSuggestions(false);
+                  }}
+                  className="w-full text-center text-sm font-semibold text-black py-2 border-t border-gray-100 hover:bg-gray-50 transition"
+                >
+                  View all results for "{searchTerm}"
+                </button>
+              </div>
+            )}
           </div>
           <Link to="/cart" className="relative text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
@@ -299,7 +432,7 @@ export default function Navbar() {
                 <button onClick={handleSearchClear} className="text-gray-400 hover:text-gray-600 p-1 rounded-full transition"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg></button>
               )}
             </div>
-            <button onClick={() => { if(searchInput.trim()) { navigate(`/search?q=${searchInput}`); setIsSearchOpen(false); } }} className="ml-3 text-sm font-semibold text-black hover:underline">Search</button>
+            <button onClick={() => { if(searchInput.trim()) { navigate(`/search?q=${encodeURIComponent(searchInput.trim())}`); setIsSearchOpen(false); } }} className="ml-3 text-sm font-semibold text-black hover:underline">Search</button>
           </div>
           <div className="flex-1 px-6 py-6 overflow-y-auto">
             {searchInput.trim() === '' ? (
@@ -307,12 +440,39 @@ export default function Navbar() {
                 <h3 className="text-sm font-bold text-gray-900 mb-4">Trending on FORGE</h3>
                 <div className="flex flex-wrap gap-2">
                   {['Men', 'Women', 'Shoes', 'Outlet', 'Hoodies', 'Leggings'].map((tag) => (
-                    <button key={tag} onClick={() => { navigate(`/search?q=${tag}`); setIsSearchOpen(false); }} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition">{tag}</button>
+                    <button key={tag} onClick={() => { navigate(`/search?q=${encodeURIComponent(tag)}`); setIsSearchOpen(false); }} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition">{tag}</button>
                   ))}
                 </div>
               </>
+            ) : mobileSuggestions.length > 0 ? (
+              // 🟢 NEW: mobile live suggestions list (Nike jaisa)
+              <div className="flex flex-col divide-y divide-gray-100">
+                {mobileSuggestions.map((product) => (
+                  <button
+                    key={product._id}
+                    onClick={() => { navigate(`/product/${product._id}`); setIsSearchOpen(false); }}
+                    className="flex items-center gap-3 py-3 text-left w-full"
+                  >
+                    <img
+                      src={product.images?.[0] || 'https://placehold.co/60x60/333/fff?text=IMG'}
+                      alt={product.title}
+                      className="w-12 h-12 object-cover rounded shrink-0"
+                    />
+                    <div className="flex flex-col overflow-hidden">
+                      <span className="text-sm font-medium text-gray-900 truncate">{product.title}</span>
+                      {product.price && <span className="text-xs text-gray-500">₹{product.price}</span>}
+                    </div>
+                  </button>
+                ))}
+                <button
+                  onClick={() => { navigate(`/search?q=${encodeURIComponent(searchInput.trim())}`); setIsSearchOpen(false); }}
+                  className="py-4 text-center text-sm font-semibold text-black"
+                >
+                  View all results for "{searchInput}"
+                </button>
+              </div>
             ) : (
-              <div className="text-center py-10 text-gray-500 text-sm">Press <span className="font-bold text-black">Search</span> or hit <span className="font-bold text-black">Enter</span> to find results for "{searchInput}"</div>
+              <div className="text-center py-10 text-gray-500 text-sm">No matches yet — press <span className="font-bold text-black">Search</span> or hit <span className="font-bold text-black">Enter</span> to find results for "{searchInput}"</div>
             )}
           </div>
         </div>
