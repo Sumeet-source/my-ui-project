@@ -97,6 +97,7 @@ export default function Shoes() {
 
   return (
     <div className="px-0 md:px-8 bg-white min-h-screen pb-10">
+      {/* Header Bar with Title and Filter Button */}
       <div className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
         <div className="flex justify-between items-center py-3 px-4 md:px-10 max-w-[1280px] mx-auto">
           <span className="text-sm font-semibold text-gray-900 pl-5">Shoes</span>
@@ -106,7 +107,7 @@ export default function Shoes() {
         </div>
       </div>
 
-      {/* 🟢 UPDATED: Smaller Gender Tabs - No Emojis, Thin Border */}
+      {/* 🟢 Gender Tabs - Header ke neeche, Products se pehle */}
       <div className="flex gap-2 px-4 md:px-8 mt-3 mb-4 overflow-x-auto">
         {['All', 'Men', 'Women'].map((gender) => (
           <button
@@ -123,6 +124,7 @@ export default function Shoes() {
         ))}
       </div>
 
+      {/* SubCategory Filter Badge (if any) */}
       {subCategoryFromUrl && (
         <div className="mt-3 mb-4 px-3 md:px-8">
           <div className="inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg text-sm font-medium text-gray-900 shadow-sm border border-gray-100 transition-all">
@@ -141,6 +143,7 @@ export default function Shoes() {
         </div>
       )}
 
+      {/* Products Grid */}
       {loading ? (
         <p className="text-center py-20 text-gray-500 text-sm mt-6">Loading products...</p>
       ) : (
