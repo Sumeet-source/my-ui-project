@@ -97,31 +97,34 @@ export default function Shoes() {
 
   return (
     <div className="px-0 md:px-8 bg-white min-h-screen pb-10">
-      {/* Header Bar with Title and Filter Button */}
+      {/* Header Container - Title, Filter & Gender Tabs ALL INSIDE */}
       <div className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
-        <div className="flex justify-between items-center py-3 px-4 md:px-10 max-w-[1280px] mx-auto">
-          <span className="text-sm font-semibold text-gray-900 pl-5">Shoes</span>
-          <button onClick={() => setIsFilterOpen(true)} className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors">
-            <Filter className="w-4 h-4" /> Filter
-          </button>
+        <div className="py-3 px-4 md:px-10 max-w-[1280px] mx-auto">
+          {/* Row 1: Title + Filter Button */}
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-semibold text-gray-900 pl-5">Shoes</span>
+            <button onClick={() => setIsFilterOpen(true)} className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-1.5 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors">
+              <Filter className="w-4 h-4" /> Filter
+            </button>
+          </div>
+          
+          {/* Row 2: Gender Tabs - INSIDE THE SAME CONTAINER */}
+          <div className="flex gap-2 px-4 md:px-0 mt-2 overflow-x-auto">
+            {['All', 'Men', 'Women'].map((gender) => (
+              <button
+                key={gender}
+                onClick={() => handleGenderChange(gender)}
+                className={`px-3 py-1 text-xs font-medium transition-all duration-200 whitespace-nowrap border rounded-full ${
+                  genderFromUrl === gender || (gender === 'All' && !genderFromUrl)
+                    ? 'border-black bg-white text-black shadow-sm'
+                    : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
+                }`}
+              >
+                {gender}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-
-      {/* 🟢 Gender Tabs - Header ke neeche, Products se pehle */}
-      <div className="flex gap-2 px-4 md:px-8 mt-3 mb-4 overflow-x-auto">
-        {['All', 'Men', 'Women'].map((gender) => (
-          <button
-            key={gender}
-            onClick={() => handleGenderChange(gender)}
-            className={`px-3 py-1 text-xs font-medium transition-all duration-200 whitespace-nowrap border rounded-full ${
-              genderFromUrl === gender || (gender === 'All' && !genderFromUrl)
-                ? 'border-black bg-white text-black shadow-sm'
-                : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
-            }`}
-          >
-            {gender}
-          </button>
-        ))}
       </div>
 
       {/* SubCategory Filter Badge (if any) */}
