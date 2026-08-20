@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import axiosClient from '../api/axiosClient';
 import ProductCard from '../components/ProductCard';
 import { Truck, RotateCcw, X } from 'lucide-react';
+import { useHaptic } from '../hooks/useHaptic';
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -32,6 +33,20 @@ export default function ProductDetails() {
   const [pincodeInput, setPincodeInput] = useState('');
   const [deliveryAvailable, setDeliveryAvailable] = useState(null);
   const [checkingPincode, setCheckingPincode] = useState(false);
+
+
+  export default function ProductDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate(); 
+  const { addToCart, openAddedToBag } = useCart(); 
+  const { showToast } = useToast();
+  const { user } = useAuth();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  
+  // 🟢 ADD HAPTIC HOOK
+  const { success, click } = useHaptic(); // success for add to cart, click for other clicks
+
+  // ... rest of states
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -134,31 +149,43 @@ export default function ProductDetails() {
   const sizeOptions = isShoeProduct ? shoeSizes : clothingSizes;
 
   const handleAddToCart = () => {
-    if (!product.inStock) { showToast("Sorry, this item is out of stock!", "error"); return; }
-    if (!selectedSize) { showToast("Please select a size!", "error"); return; }
-    
-    if (!user) {
-      const itemToAdd = { 
-        ...product, 
-        id: product._id, 
-        size: selectedSize, 
-        image: product.images?.[0] || product.imageUrl,
-        quantity: 1 
-      };
-      localStorage.setItem('pendingCartItem', JSON.stringify(itemToAdd));
-      showToast("Please login to add items to cart!", "warning");
-      navigate('/login?redirect=/cart');
-      return;
-    }
+  // 🟢 HAPTIC: Click feedback on button press
+  click();
 
-    addToCart({ ...product, id: product._id, size: selectedSize, image: product.images?.[0] || product.imageUrl });
-    openAddedToBag({ 
-      title: product.title, 
-      price: product.price, 
+  if (!product.inStock) { 
+    showToast("Sorry, this item is out of stock!", "error"); 
+    return; 
+  }
+  if (!selectedSize) { 
+    showToast("Please select a size!", "error"); 
+    return; 
+  }
+  
+  if (!user) {
+    const itemToAdd = { 
+      ...product, 
+      id: product._id, 
       size: selectedSize, 
-      image: product.images?.[0] || product.imageUrl 
-    });
-  };
+      image: product.images?.[0] || product.imageUrl,
+      quantity: 1 
+    };
+    localStorage.setItem('pendingCartItem', JSON.stringify(itemToAdd));
+    showToast("Please login to add items to cart!", "warning");
+    navigate('/login?redirect=/cart');
+    return;
+  }
+
+  addToCart({ ...product, id: product._id, size: selectedSize, image: product.images?.[0] || product.imageUrl });
+  openAddedToBag({ 
+    title: product.title, 
+    price: product.price, 
+    size: selectedSize, 
+    image: product.images?.[0] || product.imageUrl 
+  });
+
+  // 🟢 HAPTIC: Success feedback after adding to cart
+  success();
+};
 
   const handleWishlistToggle = (e) => {
     e.preventDefault();
