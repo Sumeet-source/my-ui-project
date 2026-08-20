@@ -2,14 +2,12 @@ import { useState, useEffect } from 'react';
 import { useToast } from '../context/ToastContext';
 import axiosClient from '../api/axiosClient';
 
-// 🟢 UPDATED: Sub-Category Mapping with Outlet added
 const SUB_CATEGORY_MAP = {
   Men: ['T-Shirt', 'Polo', 'Shirt', 'Jean', 'Trouser', 'Jacket', 'Sweatshirt', 'Hoodie', 'Short', 'Track Pant'],
   Women: ['T-Shirt', 'Top', 'Dress', 'Jean', 'Trouser', 'Jacket', 'Sweatshirt', 'Hoodie', 'Short', 'Legging'],
   Shoes: ['Sneaker', 'Running Shoe', 'Casual Shoe', 'Formal Shoe', 'Loafer', 'Boot', 'Sandal'],
   Accessories: ['Watch', 'Sunglass', 'Belt', 'Wallet', 'Cap & Hat', 'Backpack', 'Sock', 'Tie', 'Cufflink'],
   Sportswear: ['Running', 'Training', 'Sportswear', 'Basketball', 'Football', 'Yoga'],
-  // 🟢 NEW: Outlet sub-categories (can be any products)
   Outlet: ['T-Shirt', 'Polo', 'Shirt', 'Jacket', 'Hoodie', 'Sneaker', 'Running Shoe', 'Boot', 'Watch', 'Backpack']
 };
 
@@ -21,7 +19,6 @@ export default function AdminDashboard() {
   
   const [uploading, setUploading] = useState(false);
 
-  // 🟢 State mein 'sport' aur 'discountPercent' add kar diya
   const [formData, setFormData] = useState({
     title: '', 
     price: '', 
@@ -30,7 +27,8 @@ export default function AdminDashboard() {
     category: 'Men', 
     subCategory: '', 
     sport: 'Running',
-    discountPercent: 0, // 🟢 NEW field
+    discountPercent: 0,
+    gender: 'Unisex',
     inStock: true
   });
 
@@ -44,7 +42,8 @@ export default function AdminDashboard() {
     category: 'Men', 
     subCategory: '', 
     sport: 'Running',
-    discountPercent: 0, // 🟢 NEW field
+    discountPercent: 0,
+    gender: 'Unisex',
     inStock: true
   });
 
@@ -70,7 +69,6 @@ export default function AdminDashboard() {
     setTimeout(() => setCustomToast({ show: false, message: '', type: 'success' }), 3000);
   };
 
-  // --- Fetch Data ---
   useEffect(() => {
     fetchProducts();
     fetchOrders();
@@ -177,7 +175,7 @@ export default function AdminDashboard() {
       await axiosClient.post('/api/products', dataToSend);
       showToast('Product added successfully!', 'success');
       fetchProducts();
-      setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', sport: 'Running', discountPercent: 0, inStock: true });
+      setFormData({ title: '', price: '', description: '', images: [], category: 'Men', subCategory: '', sport: 'Running', discountPercent: 0, gender: 'Unisex', inStock: true });
     } catch (error) { showToast('Failed to add product', 'error'); }
   };
 
@@ -191,7 +189,8 @@ export default function AdminDashboard() {
       category: product.category, 
       subCategory: product.subCategory || '', 
       sport: product.sport || 'Running',
-      discountPercent: product.discountPercent || 0, // 🟢 Load discount
+      discountPercent: product.discountPercent || 0,
+      gender: product.gender || 'Unisex',
       inStock: product.inStock
     });
     setIsEditModalOpen(true);
@@ -357,7 +356,6 @@ export default function AdminDashboard() {
                       <option value="Shoes">Shoes</option>
                       <option value="Accessories">Accessories</option>
                       <option value="Sportswear">Sportswear</option>
-                      {/* 🟢 YEH LINE ADD KARO */}
                       <option value="Outlet">Outlet</option>
                     </select>
                   </div>
@@ -376,7 +374,23 @@ export default function AdminDashboard() {
                   </div>
                 )}
                 
-                {/* 🟢 Sport Dropdown */}
+                {formData.category === 'Shoes' && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900">Gender *</label>
+                    <select 
+                      name="gender" 
+                      value={formData.gender || 'Unisex'} 
+                      onChange={handleChange}
+                      className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"
+                      required
+                    >
+                      <option value="Men">Men</option>
+                      <option value="Women">Women</option>
+                      <option value="Unisex">Unisex</option>
+                    </select>
+                  </div>
+                )}
+                
                 <div>
                   <label className="block text-sm font-semibold text-gray-900">Sport (For Shop By Sport)</label>
                   <select name="sport" value={formData.sport} onChange={handleChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
@@ -389,7 +403,6 @@ export default function AdminDashboard() {
                   </select>
                 </div>
 
-                {/* 🟢 Discount Dropdown Added Here */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900">Discount (%)</label>
                   <select name="discountPercent" value={formData.discountPercent} onChange={handleChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
@@ -553,7 +566,23 @@ export default function AdminDashboard() {
                   <div><label className="block text-sm font-semibold text-gray-900">Sub-Category</label><select name="subCategory" value={editFormData.subCategory} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"><option value="">Select Sub-Category</option>{SUB_CATEGORY_MAP[editFormData.category].map((sub) => <option key={sub} value={sub}>{sub}</option>)}</select></div>
                 )}
                 
-                {/* 🟢 Sport Dropdown in Edit Modal */}
+                {editFormData.category === 'Shoes' && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900">Gender *</label>
+                    <select 
+                      name="gender" 
+                      value={editFormData.gender || 'Unisex'} 
+                      onChange={handleEditChange}
+                      className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white"
+                      required
+                    >
+                      <option value="Men">Men</option>
+                      <option value="Women">Women</option>
+                      <option value="Unisex">Unisex</option>
+                    </select>
+                  </div>
+                )}
+                
                 <div>
                   <label className="block text-sm font-semibold text-gray-900">Sport (For Shop By Sport)</label>
                   <select name="sport" value={editFormData.sport} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">
@@ -566,7 +595,6 @@ export default function AdminDashboard() {
                   </select>
                 </div>
 
-                {/* 🟢 Discount Dropdown in Edit Modal */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900">Discount (%)</label>
                   <select name="discountPercent" value={editFormData.discountPercent} onChange={handleEditChange} className="mt-1 w-full h-10 px-3 border border-gray-300 rounded focus:outline-none focus:border-black bg-white">

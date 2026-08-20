@@ -15,9 +15,9 @@ export default function Shoes() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const subCategoryFromUrl = searchParams.get('subCategory');
+  const genderFromUrl = searchParams.get('gender') || 'All';
   const [currentFilters, setCurrentFilters] = useState({});
 
-  // 🟢 FIX: Cleanest fetch function using filters directly
   const fetchShoesProducts = async (page = 1, reset = false, filters = {}) => {
     if (reset) {
       setLoading(true);
@@ -31,6 +31,7 @@ export default function Shoes() {
       if (filters.subCategory) params.subCategory = filters.subCategory;
       if (filters.sort) params.sort = filters.sort;
       if (filters.maxPrice !== undefined) params.maxPrice = filters.maxPrice;
+      if (filters.gender && filters.gender !== 'All') params.gender = filters.gender;
 
       const res = await axiosClient.get('/api/products', { params });
       const { products: newProducts, totalCount: newTotalCount, currentPage: pageReturned, totalPages } = res.data;
@@ -58,23 +59,25 @@ export default function Shoes() {
   };
 
   useEffect(() => {
-    const initialFilters = subCategoryFromUrl ? { subCategory: subCategoryFromUrl } : {};
+    const initialFilters = {};
+    if (subCategoryFromUrl) initialFilters.subCategory = subCategoryFromUrl;
+    if (genderFromUrl && genderFromUrl !== 'All') initialFilters.gender = genderFromUrl;
     setCurrentFilters(initialFilters);
     fetchShoesProducts(1, true, initialFilters);
-  }, []);
-  
-  useEffect(() => {
-    const newFilters = subCategoryFromUrl ? { subCategory: subCategoryFromUrl } : {};
-    setCurrentFilters(newFilters);
-    fetchShoesProducts(1, true, newFilters);
-  }, [subCategoryFromUrl]);
+  }, [subCategoryFromUrl, genderFromUrl]);
+
+  const handleGenderChange = (gender) => {
+    const newParams = {};
+    if (subCategoryFromUrl) newParams.subCategory = subCategoryFromUrl;
+    if (gender !== 'All') newParams.gender = gender;
+    setSearchParams(newParams);
+  };
 
   const handleLoadMore = () => {
     setLoadingMore(true);
     fetchShoesProducts(currentPage + 1, false, currentFilters);
   };
 
-  // 🟢 FIX: applyFilters now correctly calls fetchShoesProducts
   const applyFilters = (filters) => {
     setCurrentFilters(filters);
     setFilteredProducts([]);
@@ -83,7 +86,9 @@ export default function Shoes() {
   };
 
   const clearFilters = () => {
-    const urlFilter = subCategoryFromUrl ? { subCategory: subCategoryFromUrl } : {};
+    const urlFilter = {};
+    if (subCategoryFromUrl) urlFilter.subCategory = subCategoryFromUrl;
+    if (genderFromUrl && genderFromUrl !== 'All') urlFilter.gender = genderFromUrl;
     setCurrentFilters(urlFilter);
     setFilteredProducts([]);
     setHasMore(true);
@@ -99,6 +104,22 @@ export default function Shoes() {
             <Filter className="w-4 h-4" /> Filter
           </button>
         </div>
+      </div>
+
+      <div className="flex gap-2 px-4 md:px-8 mt-3 mb-4 overflow-x-auto">
+        {['All', 'Men', 'Women'].map((gender) => (
+          <button
+            key={gender}
+            onClick={() => handleGenderChange(gender)}
+            className={`px-6 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+              genderFromUrl === gender || (gender === 'All' && !genderFromUrl)
+                ? 'bg-black text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {gender === 'All' ? '👟 All' : gender === 'Men' ? '👨 Men' : '👩 Women'}
+          </button>
+        ))}
       </div>
 
       {subCategoryFromUrl && (
