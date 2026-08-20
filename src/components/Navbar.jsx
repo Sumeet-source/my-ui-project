@@ -10,7 +10,7 @@ import axiosClient from '../api/axiosClient';
 // 🟢 NEW: Import icons for hamburger menu
 import { 
   User, Footprints, Tag, Sparkles, School,
-  LogIn, Heart, HelpCircle, Globe, ShoppingBag,
+  LogIn, Heart, HelpCircle, ShoppingBag,
   X, Menu
 } from 'lucide-react';
 
@@ -539,9 +539,10 @@ export default function Navbar() {
                 <span>Help</span>
               </button>
 
+              {/* 🟢 UPDATED: Region India with Flag */}
               <div className="flex items-center gap-3 text-[13px] text-gray-500 pt-2">
-                <Globe className="w-4 h-4" />
-                <span>Region: US</span>
+                <span className="text-lg">🇮🇳</span>
+                <span>Region: India</span>
               </div>
             </div>
           </div>
