@@ -15,7 +15,7 @@ export default function Shoes() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const subCategoryFromUrl = searchParams.get('subCategory');
-  const genderFromUrl = searchParams.get('gender') || null; // Default null, not 'All'
+  const genderFromUrl = searchParams.get('gender') || null;
   const [currentFilters, setCurrentFilters] = useState({});
 
   const fetchShoesProducts = async (page = 1, reset = false, filters = {}) => {
@@ -66,13 +66,11 @@ export default function Shoes() {
     fetchShoesProducts(1, true, initialFilters);
   }, [subCategoryFromUrl, genderFromUrl]);
 
+  // 🟢 UPDATED: Always set gender in URL
   const handleGenderChange = (gender) => {
     const newParams = {};
     if (subCategoryFromUrl) newParams.subCategory = subCategoryFromUrl;
-    if (gender !== 'All') {
-      newParams.gender = gender;
-    }
-    // If gender is 'All', we don't add it to URL (it will be removed)
+    newParams.gender = gender; // Always set, even for 'All'
     setSearchParams(newParams);
   };
 
@@ -111,10 +109,10 @@ export default function Shoes() {
             </button>
           </div>
           
-          {/* Row 2: Gender Tabs - Highlight ONLY After Click */}
+          {/* 🟢 Gender Tabs - All, Men, Women */}
           <div className="flex gap-2 px-4 md:px-0 mt-2 overflow-x-auto">
             {['All', 'Men', 'Women'].map((gender) => {
-              // Active condition: ONLY if URL gender matches
+              // Active condition: URL gender matches exactly
               const isActive = genderFromUrl === gender;
               
               return (
@@ -145,7 +143,7 @@ export default function Shoes() {
               </svg>
               <span>{subCategoryFromUrl}</span>
             </span>
-            <button onClick={() => setSearchParams({})} className="ml-1 p-1 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition-colors">
+            <button onClick={() => setSearchParams({ gender: 'All' })} className="ml-1 p-1 text-gray-400 hover:text-black hover:bg-gray-200 rounded-full transition-colors">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
