@@ -15,7 +15,7 @@ export default function Shoes() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const subCategoryFromUrl = searchParams.get('subCategory');
-  const genderFromUrl = searchParams.get('gender') || 'All';
+  const genderFromUrl = searchParams.get('gender') || null; // Default null, not 'All'
   const [currentFilters, setCurrentFilters] = useState({});
 
   const fetchShoesProducts = async (page = 1, reset = false, filters = {}) => {
@@ -69,7 +69,10 @@ export default function Shoes() {
   const handleGenderChange = (gender) => {
     const newParams = {};
     if (subCategoryFromUrl) newParams.subCategory = subCategoryFromUrl;
-    if (gender !== 'All') newParams.gender = gender;
+    if (gender !== 'All') {
+      newParams.gender = gender;
+    }
+    // If gender is 'All', we don't add it to URL (it will be removed)
     setSearchParams(newParams);
   };
 
@@ -97,7 +100,7 @@ export default function Shoes() {
 
   return (
     <div className="px-0 md:px-8 bg-white min-h-screen pb-10">
-      {/* Header Container - Title, Filter & Gender Tabs ALL INSIDE */}
+      {/* Header Container */}
       <div className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
         <div className="py-3 px-4 md:px-10 max-w-[1280px] mx-auto">
           {/* Row 1: Title + Filter Button */}
@@ -108,21 +111,26 @@ export default function Shoes() {
             </button>
           </div>
           
-          {/* Row 2: Gender Tabs - INSIDE THE SAME CONTAINER */}
+          {/* Row 2: Gender Tabs - Highlight ONLY After Click */}
           <div className="flex gap-2 px-4 md:px-0 mt-2 overflow-x-auto">
-            {['All', 'Men', 'Women'].map((gender) => (
-              <button
-                key={gender}
-                onClick={() => handleGenderChange(gender)}
-                className={`px-3 py-1 text-xs font-medium transition-all duration-200 whitespace-nowrap border rounded-full ${
-                  genderFromUrl === gender || (gender === 'All' && !genderFromUrl)
-                    ? 'border-black bg-white text-black shadow-sm'
-                    : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
-                }`}
-              >
-                {gender}
-              </button>
-            ))}
+            {['All', 'Men', 'Women'].map((gender) => {
+              // Active condition: ONLY if URL gender matches
+              const isActive = genderFromUrl === gender;
+              
+              return (
+                <button
+                  key={gender}
+                  onClick={() => handleGenderChange(gender)}
+                  className={`px-3 py-1 text-xs font-medium transition-all duration-200 whitespace-nowrap border rounded-full ${
+                    isActive
+                      ? 'border-black bg-white text-black shadow-sm'
+                      : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400 hover:bg-gray-50'
+                  }`}
+                >
+                  {gender}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
