@@ -17,6 +17,9 @@ export default function ProductDetails() {
   const { user } = useAuth();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
+  // 🟢 HAPTIC HOOK
+  const { success, click, double } = useHaptic();
+
   const [product, setProduct] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,20 +36,6 @@ export default function ProductDetails() {
   const [pincodeInput, setPincodeInput] = useState('');
   const [deliveryAvailable, setDeliveryAvailable] = useState(null);
   const [checkingPincode, setCheckingPincode] = useState(false);
-
-
-  export default function ProductDetails() {
-  const { id } = useParams();
-  const navigate = useNavigate(); 
-  const { addToCart, openAddedToBag } = useCart(); 
-  const { showToast } = useToast();
-  const { user } = useAuth();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-  
-  // 🟢 ADD HAPTIC HOOK
-  const { success, click } = useHaptic(); // success for add to cart, click for other clicks
-
-  // ... rest of states
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -110,15 +99,70 @@ export default function ProductDetails() {
     }
   };
 
-  // 🟢 NEW: Pincode auto-check logic (last digit par trigger)
   const handlePincodeChange = (e) => {
     const value = e.target.value;
     setPincodeInput(value);
     setDeliveryAvailable(null);
     
-    // Agar 6 digit ho jaye, toh automatically check kar do
     if (value.length === 6) {
       checkDeliveryAvailability();
+    }
+  };
+
+  // 🟢 HAPTIC: Add to Cart with haptic feedback
+  const handleAddToCart = () => {
+    click(); // 🟢 HAPTIC: Click feedback on button press
+
+    if (!product.inStock) { 
+      showToast("Sorry, this item is out of stock!", "error"); 
+      return; 
+    }
+    if (!selectedSize) { 
+      showToast("Please select a size!", "error"); 
+      return; 
+    }
+    
+    if (!user) {
+      const itemToAdd = { 
+        ...product, 
+        id: product._id, 
+        size: selectedSize, 
+        image: product.images?.[0] || product.imageUrl,
+        quantity: 1 
+      };
+      localStorage.setItem('pendingCartItem', JSON.stringify(itemToAdd));
+      showToast("Please login to add items to cart!", "warning");
+      navigate('/login?redirect=/cart');
+      return;
+    }
+
+    addToCart({ ...product, id: product._id, size: selectedSize, image: product.images?.[0] || product.imageUrl });
+    openAddedToBag({ 
+      title: product.title, 
+      price: product.price, 
+      size: selectedSize, 
+      image: product.images?.[0] || product.imageUrl 
+    });
+
+    success(); // 🟢 HAPTIC: Success feedback after adding to cart
+  };
+
+  // 🟢 HAPTIC: Wishlist toggle with haptic feedback
+  const handleWishlistToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation(); 
+    
+    double(); // 🟢 HAPTIC: Double tap pattern for wishlist
+
+    if (!user) { 
+      showToast("Please login to add to wishlist", "error"); 
+      return; 
+    }
+    if (isInWishlist(product._id)) {
+      removeFromWishlist(product._id);
+    } else {
+      addToWishlist(product._id);
     }
   };
 
@@ -148,54 +192,6 @@ export default function ProductDetails() {
   const shoeSizes = ['UK 6', 'UK 7', 'UK 8', 'UK 9', 'UK 10', 'UK 11'];
   const sizeOptions = isShoeProduct ? shoeSizes : clothingSizes;
 
-  const handleAddToCart = () => {
-  // 🟢 HAPTIC: Click feedback on button press
-  click();
-
-  if (!product.inStock) { 
-    showToast("Sorry, this item is out of stock!", "error"); 
-    return; 
-  }
-  if (!selectedSize) { 
-    showToast("Please select a size!", "error"); 
-    return; 
-  }
-  
-  if (!user) {
-    const itemToAdd = { 
-      ...product, 
-      id: product._id, 
-      size: selectedSize, 
-      image: product.images?.[0] || product.imageUrl,
-      quantity: 1 
-    };
-    localStorage.setItem('pendingCartItem', JSON.stringify(itemToAdd));
-    showToast("Please login to add items to cart!", "warning");
-    navigate('/login?redirect=/cart');
-    return;
-  }
-
-  addToCart({ ...product, id: product._id, size: selectedSize, image: product.images?.[0] || product.imageUrl });
-  openAddedToBag({ 
-    title: product.title, 
-    price: product.price, 
-    size: selectedSize, 
-    image: product.images?.[0] || product.imageUrl 
-  });
-
-  // 🟢 HAPTIC: Success feedback after adding to cart
-  success();
-};
-
-  const handleWishlistToggle = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    e.nativeEvent.stopImmediatePropagation(); 
-    if (!user) { showToast("Please login to add to wishlist", "error"); return; }
-    if (isInWishlist(product._id)) removeFromWishlist(product._id);
-    else addToWishlist(product._id);
-  };
-
   const images = product.images?.length > 0 ? product.images : [product.imageUrl || 'https://placehold.co/600x600/333/fff?text=Product+Image'];
 
   const getCloudinaryUrl = (url, width = 400) => {
@@ -215,6 +211,7 @@ export default function ProductDetails() {
   return (
     <div className="bg-white min-h-screen pb-20 font-helvetica">
       
+      {/* Size Chart Modal */}
       {isSizeChartOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-md w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -296,7 +293,7 @@ export default function ProductDetails() {
         </div>
       )}
 
-      {/* ================= DELIVERY MODAL ================= */}
+      {/* Delivery Modal */}
       {isDeliveryModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -326,7 +323,7 @@ export default function ProductDetails() {
         </div>
       )}
 
-      {/* ================= RETURN & EXCHANGE MODAL ================= */}
+      {/* Return Modal */}
       {isReturnModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white max-w-2xl w-full p-6 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -359,7 +356,7 @@ export default function ProductDetails() {
         </div>
       )}
 
-      {/* ================= MOBILE LAYOUT ================= */}
+      {/* MOBILE LAYOUT */}
       <div className="md:hidden">
         <div className="relative w-full bg-gray-50">
           <div ref={carouselRef} onScroll={handleCarouselScroll} className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
@@ -438,7 +435,6 @@ export default function ProductDetails() {
             <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
             <p className="text-sm text-gray-500 mb-3">Enter pincode to know exact delivery dates/charges</p>
             
-            {/* 🟢 FIX: Mobile Pincode - Only text fades */}
             <div className="flex items-stretch gap-0 mb-4">
               <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
                 <input 
@@ -520,7 +516,7 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      {/* ================= DESKTOP LAYOUT ================= */}
+      {/* DESKTOP LAYOUT */}
       <div className="hidden md:block max-w-6xl mx-auto px-8 py-12">
         <div className="flex flex-col md:flex-row gap-12 mb-12">
           <div className="flex-1 relative group">
@@ -605,7 +601,6 @@ export default function ProductDetails() {
                 <h4 className="font-semibold text-gray-900 text-sm mb-2">Check delivery date</h4>
                 <p className="text-sm text-gray-500 mb-2">Enter pincode to know exact delivery dates/charges</p>
                 
-                {/* 🟢 FIX: Desktop Pincode - Only text fades */}
                 <div className="flex items-stretch gap-0 w-full max-w-sm">
                   <div className="flex-1 flex items-center border border-gray-300 rounded-md overflow-hidden bg-white focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all">
                     <input 
